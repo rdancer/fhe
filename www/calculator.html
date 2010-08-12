@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<!-- calculator.html - fully homomorphic encryption demo: calculator -->
+
+<!--
+
+    Copyright © 2010 Jan Minář <rdancer@rdancer.org>
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License version 2 (two),
+    as published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+  -->
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Fully Homomorphic Encryption Demo: Calculator</title>
+  <style type="text/css">
+      /* .firstResult { font-size: 120%; font-weight: bold; } */
+  </style>
+  <script type="text/javascript">
+      // <![CDATA[
+
+      /* Spin the throbber */
+      function updateThrobber() {
+	  throbber = document.getElementById('throbber');
+	  if        (throbber.innerHTML == '') {
+	      throbber.innerHTML = '.';
+	  } else if (throbber.innerHTML == '.') {
+	      throbber.innerHTML = '..';
+	  } else if (throbber.innerHTML == '..') {
+	      throbber.innerHTML = '...';
+	  } else {
+	      throbber.innerHTML = '';
+	  }
+	  window.setTimeout('updateThrobber()', 1000);
+      }
+
+      /* Copy the contents of the input box into the result label */
+      function updateResult() {
+	  /* Sanity checks */
+
+	  if ((formula = document.getElementById('formula').value) == '') {
+	      // Empty formula -- don't do anything
+	      return;
+	  }
+
+	  /* Disable the throbber */
+	  // DNW
+	  // Reset ID so the updateThrobber() routine would balk
+	  if (throbber = document.getElementById('throbber')) {
+	      // the element does exist => it's OK to proceed
+	      throbber.value = '';
+	      throbber.style = 'visibility: hidden';
+	  }
+
+	  /* Get rid of the old first line */
+
+	  oldResult = document.getElementById('firstResult');
+	  oldResult.id = '';
+	  oldResult.class = 'result';
+
+	  /* Insert the new first line */
+
+	  // DNW
+	  //newResult = document.createElement("div");
+	  //newResult.id = 'firstResult';
+	  //newResult.innerHTML
+	  //    = document.getElementById('formula').value + " = ";
+	  //oldResult.insertBefore(newResult);
+
+	  content = document.getElementById('results').innerHTML;
+	  document.getElementById('results').innerHTML =
+	      "<div id=\"firstResult\" class=\"firstResult\">"
+	      + formula + " = "
+	      + "<div style=\"display: inline\" id=\"throbber\">[throbber]</div>"
+	      + "</div>"
+	      + content;
+
+	  updateThrobber();
+      }
+
+      /* Display the ultimate answer, no matter what the formula.  Note: this
+	 is cheating, and the answer will most likely not be correct */
+      function cheat() {
+	  /* Disable the throbber */
+	  // Change ID so the updateThrobber() routine would balk
+	  document.getElementById('throbber').id = 'resultValue';
+
+	  // Display the answer
+	  document.getElementById('resultValue').innerHTML = '42';
+
+      }
+
+      /* Do the gory work and produce the result */
+      function calculate() {
+	  updateResult();
+
+	  /* XXX Demo functionality */
+	  window.setTimeout('cheat()', 3500);
+      }
+
+      window.onload = updateResult;
+
+      // ]]>
+  </script>
+</head>
+
+<body style="background: black; font-family: sans-serif;">
+    <!-- background image -->
+    <div style="position: absolute; margin: 0; width: 99%; height: 99%; overflow: hidden;">
+	<img src="background.jpeg" style="width: 150%" />
+    </div>
+    <!-- calculator -->
+    <div style="position: absolute; margin-left: 15%; margin-top: 13%; padding: 20pt; color: white">
+      <form action="javascript:calculate()">
+	<input name="formula" id="formula" value="" />
+		<input type="submit" value="Calculate" /><br />
+	<div id="results">
+	    <div id="firstResult" class="firstResult">
+		<!-- <big>1 + 1 = 2</big> ← [throbber] in place of result while
+		calculation is in progress -->
+	    </div>
+	    <!--
+	    [last formula &amp; result]<br />
+	    [second last formula &amp; result]<br />
+	    [third last formula &amp; result]<br />
+	    …<br />
+	      -->
+	</div>
+      </form>
+    </div>
+</body>
+</html>
