@@ -1,0 +1,3 @@
+This sub-tree contains the NaCl pieces of the FHE Calculator demo.
+
+Extract the NaCl SDK to the "sdk" subdirectory

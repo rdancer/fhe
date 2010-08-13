@@ -1,0 +1,339 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		5088180A09F0CE0A0071BF1A /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5088180909F0CE0A0071BF1A /* CoreFoundation.framework */; };
+		DF113860117C0823001E9C92 /* sine_synth.plugin in Install Develop */ = {isa = PBXBuildFile; fileRef = 508817D409F0C9AD0071BF1A /* sine_synth.plugin */; };
+		DFCB74D7118B21A3002695B1 /* npn_bridge.cc in Sources */ = {isa = PBXBuildFile; fileRef = DFCB74D0118B21A3002695B1 /* npn_bridge.cc */; };
+		DFCB74D8118B21A3002695B1 /* npp_gate.cc in Sources */ = {isa = PBXBuildFile; fileRef = DFCB74D1118B21A3002695B1 /* npp_gate.cc */; };
+		DFCB74DB118B21A3002695B1 /* scripting_bridge.cc in Sources */ = {isa = PBXBuildFile; fileRef = DFCB74D5118B21A3002695B1 /* scripting_bridge.cc */; };
+		DFD928FF1199BDC80086E73B /* sine_synth.cc in Sources */ = {isa = PBXBuildFile; fileRef = DFD928FC1199BDC80086E73B /* sine_synth.cc */; };
+		DFD929001199BDC80086E73B /* sine_synth_module.cc in Sources */ = {isa = PBXBuildFile; fileRef = DFD928FE1199BDC80086E73B /* sine_synth_module.cc */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		DF11385C117C0769001E9C92 /* Install Develop */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(INTERNET_PLUGINS_PATH)";
+			dstSubfolderSpec = 0;
+			files = (
+				DF113860117C0823001E9C92 /* sine_synth.plugin in Install Develop */,
+			);
+			name = "Install Develop";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DF113867117C0863001E9C92 /* Install App Files */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(INSTALL_PATH)";
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			name = "Install App Files";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		508817D409F0C9AD0071BF1A /* sine_synth.plugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = sine_synth.plugin; sourceTree = BUILT_PRODUCTS_DIR; };
+		5088180909F0CE0A0071BF1A /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
+		DF6288C8117C35EE005CE52A /* naclProj.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = naclProj.xcconfig; path = platform_support/mac/naclProj.xcconfig; sourceTree = "<group>"; };
+		DF6293B9117F95BE005CE52A /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		DFCB74AB118B2011002695B1 /* common.mk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = common.mk; path = ../common.mk; sourceTree = SOURCE_ROOT; };
+		DFCB74D0118B21A3002695B1 /* npn_bridge.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = npn_bridge.cc; sourceTree = "<group>"; };
+		DFCB74D1118B21A3002695B1 /* npp_gate.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = npp_gate.cc; sourceTree = "<group>"; };
+		DFCB74D5118B21A3002695B1 /* scripting_bridge.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = scripting_bridge.cc; sourceTree = "<group>"; };
+		DFCB74D6118B21A3002695B1 /* scripting_bridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = scripting_bridge.h; sourceTree = "<group>"; };
+		DFD928F51199BD290086E73B /* sine_synth-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "sine_synth-Info.plist"; path = "platform_support/mac/sine_synth-Info.plist"; sourceTree = "<group>"; };
+		DFD928FC1199BDC80086E73B /* sine_synth.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sine_synth.cc; sourceTree = "<group>"; };
+		DFD928FD1199BDC80086E73B /* sine_synth.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sine_synth.h; sourceTree = "<group>"; };
+		DFD928FE1199BDC80086E73B /* sine_synth_module.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sine_synth_module.cc; sourceTree = "<group>"; };
+		DFD929011199BDD50086E73B /* sine_synth.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = sine_synth.html; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		508817D209F0C9AD0071BF1A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5088180A09F0CE0A0071BF1A /* CoreFoundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		508817C209F0C9740071BF1A = {
+			isa = PBXGroup;
+			children = (
+				DFD928F51199BD290086E73B /* sine_synth-Info.plist */,
+				508817E509F0C9EF0071BF1A /* Configuration Files */,
+				508817F509F0CAB50071BF1A /* Sources */,
+				DF113866117C0863001E9C92 /* Resources */,
+				DF6293B2117F9585005CE52A /* Publish Build */,
+				5088180609F0CDD00071BF1A /* External Frameworks and Libraries */,
+				508817D509F0C9AD0071BF1A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		508817D509F0C9AD0071BF1A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				508817D409F0C9AD0071BF1A /* sine_synth.plugin */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		508817E509F0C9EF0071BF1A /* Configuration Files */ = {
+			isa = PBXGroup;
+			children = (
+				DF6288C8117C35EE005CE52A /* naclProj.xcconfig */,
+			);
+			name = "Configuration Files";
+			sourceTree = "<group>";
+		};
+		508817F509F0CAB50071BF1A /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				DFCB74D0118B21A3002695B1 /* npn_bridge.cc */,
+				DFCB74D1118B21A3002695B1 /* npp_gate.cc */,
+				DFCB74D5118B21A3002695B1 /* scripting_bridge.cc */,
+				DFCB74D6118B21A3002695B1 /* scripting_bridge.h */,
+				DFD928FC1199BDC80086E73B /* sine_synth.cc */,
+				DFD928FD1199BDC80086E73B /* sine_synth.h */,
+				DFD928FE1199BDC80086E73B /* sine_synth_module.cc */,
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
+		5088180609F0CDD00071BF1A /* External Frameworks and Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				5088180909F0CE0A0071BF1A /* CoreFoundation.framework */,
+			);
+			name = "External Frameworks and Libraries";
+			sourceTree = "<group>";
+		};
+		DF113866117C0863001E9C92 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				DFD929011199BDD50086E73B /* sine_synth.html */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		DF6293B2117F9585005CE52A /* Publish Build */ = {
+			isa = PBXGroup;
+			children = (
+				DFCB74AB118B2011002695B1 /* common.mk */,
+				DF6293B9117F95BE005CE52A /* Makefile */,
+			);
+			name = "Publish Build";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		DF6293E2117F9EFB005CE52A /* sine_synth publish */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = DF6293F2117F9F2B005CE52A /* Build configuration list for PBXLegacyTarget "sine_synth publish" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			dependencies = (
+			);
+			name = "sine_synth publish";
+			passBuildSettingsInEnvironment = 1;
+			productName = "calculator publish";
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXNativeTarget section */
+		508817D309F0C9AD0071BF1A /* sine_synth develop */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 508817D709F0C9AE0071BF1A /* Build configuration list for PBXNativeTarget "sine_synth develop" */;
+			buildPhases = (
+				508817D109F0C9AD0071BF1A /* Sources */,
+				508817D209F0C9AD0071BF1A /* Frameworks */,
+				DF11385C117C0769001E9C92 /* Install Develop */,
+				DF113867117C0863001E9C92 /* Install App Files */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "sine_synth develop";
+			productName = "calculator-xcode";
+			productReference = 508817D409F0C9AD0071BF1A /* sine_synth.plugin */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		508817C409F0C9740071BF1A /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 508817C509F0C9740071BF1A /* Build configuration list for PBXProject "sine_synth" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 0;
+			mainGroup = 508817C209F0C9740071BF1A;
+			productRefGroup = 508817D509F0C9AD0071BF1A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				508817D309F0C9AD0071BF1A /* sine_synth develop */,
+				DF6293E2117F9EFB005CE52A /* sine_synth publish */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		508817D109F0C9AD0071BF1A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DFCB74D7118B21A3002695B1 /* npn_bridge.cc in Sources */,
+				DFCB74D8118B21A3002695B1 /* npp_gate.cc in Sources */,
+				DFCB74DB118B21A3002695B1 /* scripting_bridge.cc in Sources */,
+				DFD928FF1199BDC80086E73B /* sine_synth.cc in Sources */,
+				DFD929001199BDC80086E73B /* sine_synth_module.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		508817C609F0C9740071BF1A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DF6288C8117C35EE005CE52A /* naclProj.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				DEV_SOURCE_ROOT = "$(SDK_ROOT)/examples/sine_synth";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "platform_support/mac/sine_synth-Info.plist";
+				INSTALL_PATH = "$(HOME)/Sites/$(PRODUCT_NAME)";
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				PRODUCT_NAME = sine_synth;
+				SDKROOT = macosx10.5;
+				SDK_ROOT = "$(HOME)/Source/nacl-sdk/src";
+			};
+			name = Debug;
+		};
+		508817C709F0C9740071BF1A /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DF6288C8117C35EE005CE52A /* naclProj.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				DEV_SOURCE_ROOT = "$(SDK_ROOT)/examples/sine_synth";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "platform_support/mac/sine_synth-Info.plist";
+				INSTALL_PATH = "$(HOME)/Sites/$(PRODUCT_NAME)";
+				PREBINDING = NO;
+				PRODUCT_NAME = sine_synth;
+				SDKROOT = macosx10.5;
+				SDK_ROOT = "$(HOME)/Source/nacl-sdk/src";
+			};
+			name = Release;
+		};
+		508817D809F0C9AE0071BF1A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DF6288C8117C35EE005CE52A /* naclProj.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"_GLIBCXX_DEBUG=1",
+					"_GLIBCXX_DEBUG_PEDANTIC=1",
+				);
+				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
+			};
+			name = Debug;
+		};
+		508817D909F0C9AE0071BF1A /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DF6288C8117C35EE005CE52A /* naclProj.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = "";
+				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = "non-global";
+			};
+			name = Release;
+		};
+		DF6293E3117F9EFB005CE52A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = sine_synth;
+			};
+			name = Debug;
+		};
+		DF6293E4117F9EFB005CE52A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = sine_synth;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		508817C509F0C9740071BF1A /* Build configuration list for PBXProject "sine_synth" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				508817C609F0C9740071BF1A /* Debug */,
+				508817C709F0C9740071BF1A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		508817D709F0C9AE0071BF1A /* Build configuration list for PBXNativeTarget "sine_synth develop" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				508817D809F0C9AE0071BF1A /* Debug */,
+				508817D909F0C9AE0071BF1A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		DF6293F2117F9F2B005CE52A /* Build configuration list for PBXLegacyTarget "sine_synth publish" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DF6293E3117F9EFB005CE52A /* Debug */,
+				DF6293E4117F9EFB005CE52A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 508817C409F0C9740071BF1A /* Project object */;
+}

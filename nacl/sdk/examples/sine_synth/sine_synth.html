@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <!--
+  Copyright (c) 2010 The Native Client Authors. All rights reserved.
+  Use of this source code is governed by a BSD-style license that can be
+  found in the LICENSE file.
+  -->
+  <head>
+    <title>Sine Wave Synthesizer</title>
+    <script type="text/javascript">
+      sine_synth = null;  // Global application object.
+
+      function moduleDidLoad() {
+        sine_synth = document.getElementById('sine_synth');
+        document.getElementById('frequency_field').value = 440;
+      }
+
+      function toggleSound(flag) {
+        try {
+          sine_synth.frequency =
+              document.getElementById('frequency_field').value;
+          document.getElementById('frequency_field').value =
+              sine_synth.frequency;
+          if (flag) {
+            sine_synth.playSound();
+          } else {
+            sine_synth.stopSound();
+          }
+        } catch(e) {
+          alert(e.message);
+        }
+      }
+
+      function changeFrequency(freq) {
+        try {
+          sine_synth.frequency = freq;
+          document.getElementById('frequency_field').value =
+              sine_synth.frequency;
+        } catch(e) {
+          alert(e.message);
+        }
+      }
+    </script>
+  </head>
+
+  <body id="bodyId" onunload="pageDidUnload()">
+    <h1>Sine Wave Synthesizer</h1>
+    <!-- For development, use a #develop location, which loads the develop
+    version of the module.
+    -->
+    <p>Click the button to start and stop the sine wave playing.</p>
+    <button onclick="toggleSound(true)">Play</button>
+    <button onclick="toggleSound(false)">Stop</button>
+    <p>Enter the frequency of the sine wave:</p>
+    <input type="text" size="15" id="frequency_field"
+           value="#undef" onchange="changeFrequency(this.value)" />
+
+    <div id="nacl_sine_synth_content"></div>
+    <script type="text/javascript">
+      contentDiv = document.getElementById('nacl_sine_synth_content');
+      if (window.location.hash == '#develop') {
+        // Load the develop version of the module.
+        contentDiv.innerHTML = '<embed name="nacl_module" '
+                               + 'id="sine_synth" '
+                               + 'width=0 height=0 '
+                               + 'type="pepper-application/sine-synth" '
+                               + 'dimensions="2" />';
+        moduleDidLoad();
+      } else {
+        // Load the published .nexe.  This includes the 'nexes' attribute which
+        // shows how to load multi-architecture modules.  Each entry in the
+        // table is a key-value pair: the key is the runtime ('x86-32',
+        // 'x86-64', etc.); the value is a URL for the desired NaCl module.
+        var nexes = 'x86-32: sine_synth_x86_32.nexe\n'
+                    + 'x86-64: sine_synth_x86_64.nexe\n'
+                    + 'arm: sine_synth_arm.nexe ';
+        contentDiv.innerHTML = '<embed name="nacl_module" '
+                               + 'id="sine_synth" '
+                               + 'width=0 height=0 '
+                            // + 'nexes="' + nexes + '" '
+                               + 'type="application/x-nacl-srpc" '
+                               + 'dimensions="2" '
+                               + 'onload=moduleDidLoad(); />';
+        // Note: this code is here to work around a bug in Chromium build
+        // #47357.  See also
+        // http://code.google.com/p/nativeclient/issues/detail?id=500
+        document.getElementById('sine_synth').nexes = nexes;
+      }
+    </script>
+  </body>
+</html>
