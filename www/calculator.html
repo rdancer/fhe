@@ -60,8 +60,8 @@
 	  // Reset ID so the updateThrobber() routine would balk
 	  if (throbber = document.getElementById('throbber')) {
 	      // the element does exist => it's OK to proceed
-	      throbber.value = '';
-	      throbber.style = 'visibility: hidden';
+	      throbber.innerHTML = '';
+	      throbber.style.visibility = 'hidden';
 	  }
 
 	  /* Get rid of the old first line */
