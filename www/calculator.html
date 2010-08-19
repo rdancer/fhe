@@ -114,30 +114,29 @@
 	      "<div id=\"firstResult\" class=\"firstResult\">"
 	      + formula + " = "
 	      + "<div style=\"display: inline\" id=\"throbber\">[throbber]</div>"
+	      + "<div style=\"display: inline\" id=\"resultValue\"></div>"
 	      + "</div>"
 	      + content;
 
 	  updateThrobber();
       }
 
-      /* Display the ultimate answer, no matter what the formula.  Note: this
-	 is cheating, and the answer will most likely not be correct */
-      function cheat() {
-	  /* Disable the throbber */
-	  // Change ID so the updateThrobber() routine would balk
-	  document.getElementById('throbber').id = 'resultValue';
-
-	  // Display the answer
-	  document.getElementById('resultValue').innerHTML = '42';
-
-      }
 
       /* Do the gory work and produce the result */
       function calculate() {
 	  updateResult();
 
-	  /* XXX Demo functionality */
-	  window.setTimeout('cheat()', 3500);
+	  if ((formula = document.getElementById('formula').value) != '') {
+	      // Valid formula -- call NaCl to compute the result
+	      document.getElementById('resultValue').innerHTML
+			= helloworld(formula);
+	  }
+
+
+	  /* Disable the throbber */
+	  // Change ID so the updateThrobber() routine would balk
+	  // TODO set the visibility to invisible
+	  document.getElementById('throbber').id = '';
       }
 
       window.onload = updateResult;
@@ -177,14 +176,6 @@
       }
     }
 
-    function evaluate() {
-      try {
-        alert(hello_world.evaluate());
-      } catch(e) {
-        alert(e.message);
-      }
-    }
-
     function fortytwo() {
       try {
         alert(hello_world.fortytwo());
@@ -193,11 +184,11 @@
       }
     }
 
-    function helloworld() {
+    function helloworld(formula) {
       try {
-        alert(hello_world.helloworld());
+        return(hello_world.helloworld(formula));
       } catch(e) {
-        alert(e.message);
+        return(e.message);
       }
     }
 
@@ -219,7 +210,7 @@
 
 <body style="background: black; font-family: sans-serif;" onload="pageDidLoad()">
     <!-- background image -->
-    <div style="position: absolute; margin: 0; width: 99%; height: 99%; overflow: hidden;">
+    <div style="position: absolute; margin: 0; width: 99%; height: 98%; overflow: hidden;">
 	<img src="background.jpeg" style="width: 150%" />
     </div>
     <!-- calculator -->
@@ -250,16 +241,12 @@
   found in the LICENSE file.
   -->
 
-<h1>Native Client Simple Module</h1>
+<div id="hello_world_div">
 <p>
-  <button onclick="fortytwo()">Call fortytwo()</button>
-  <button onclick="evaluate()">Call evaluate()</button>
-  <button onclick="helloworld()">Call helloworld()</button>
-
   <!-- For development, use a #develop location, which loads the develop
   version of the module.
   -->
-  <div id="nacl_helloworld_content"></div>
+  <div id="nacl_helloworld_content" style="background: blue"></div>
   <script type="text/javascript">
     contentDiv = document.getElementById('nacl_helloworld_content');
     if (window.location.hash == '#develop') {
@@ -291,13 +278,9 @@
   </script>
 </p>
 
-<p>If the module is working correctly, a click on the "Call fortytwo" button
-  should open a popup dialog containing <b>42</b> as value.</p>
-
-<p> Clicking on the "Call helloworld" button
-  should open a popup dialog containing <b>hello, world</b> as value.</p>
 
 <h2>Status</h2>
 <div id="status_field">NO-STATUS</div>
+</div>
 </body>
 </html>
