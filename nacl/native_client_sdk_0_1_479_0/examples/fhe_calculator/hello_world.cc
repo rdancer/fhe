@@ -45,16 +45,25 @@ static bool HelloWorld(const NPVariant *args,
                        uint32_t arg_count,
 		       NPVariant *result) {
   if (result) {
-    //const char *msg = "hello, stranger.";
-    //const int msg_length = strlen(msg) + 1;
-    //// Note: |msg_copy| will be freed later on by the browser, so it needs to
-    //// be allocated here with NPN_MemAlloc().
-    //char *msg_copy = reinterpret_cast<char*>(NPN_MemAlloc(msg_length));
-    //strncpy(msg_copy, msg, msg_length);
-    //STRINGN_TO_NPVARIANT(msg_copy, msg_length - 1, *result);
     if (arg_count > 0) {
-	//NPString s = NPVARIANT_TO_STRING(args[0]);
-	*result = *args;
+	const char *format = "formula: »%s«";
+	NPString nps = NPVARIANT_TO_STRING(args[0]);
+
+	char *formula = reinterpret_cast<char*>(NPN_MemAlloc(nps.UTF8Length + 1));
+	memcpy (formula, nps.UTF8Characters, nps.UTF8Length);
+	formula[nps.UTF8Length] = '\0';
+
+	const int msg_length = strlen(format) + strlen(formula) + 1;
+	// Note: |msg_copy| will be freed later on by the browser, so it needs to
+	// be allocated here with NPN_MemAlloc().
+	char *msg_copy = reinterpret_cast<char*>(NPN_MemAlloc(msg_length));
+	size_t actual_length = snprintf(msg_copy, msg_length, format, formula);
+	STRINGN_TO_NPVARIANT(msg_copy, actual_length, *result);
+
+	free (s);
+    } else {
+	// XXX Signal error
+	STRINGN_TO_NPVARIANT("", 0, *result);
     }
   }
   return true;
