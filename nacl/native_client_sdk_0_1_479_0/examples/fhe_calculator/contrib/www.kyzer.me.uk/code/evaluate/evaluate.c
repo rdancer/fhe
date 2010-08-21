@@ -18,6 +18,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+extern "C" {
+
 
 #include "evaluate.h"
 #include <ctype.h>
@@ -63,8 +65,10 @@ int scantable_ok = 0;
 
 /* table of function names */
 char *functable[] = {
-  "acos", "asin", "atan", "cos", "cosh", "exp", "ln", "log",
-  "sin", "sinh", "sqr", "sqrt", "tan", "tanh", NULL
+  (char *)"acos", (char *)"asin", (char *)"atan", (char *)"cos",
+  (char *)"cosh", (char *)"exp",  (char *)"ln",   (char *)"log",
+  (char *)"sin",  (char *)"sinh", (char *)"sqr",  (char *)"sqrt",
+  (char *)"tan",  (char *)"tanh", (char *)NULL
 };
 
 /* function ids (index to functable) */
@@ -181,7 +185,8 @@ static void init_scantable() {
 
 static int tokenize(struct memh *mh, char **string, struct tok **listptr) {
   struct tok *list;
-  int idx = 0, i, len;
+  int idx = 0, i;
+  size_t len;
   char *s, *name, c, c2, nt;
 
   /* allocate a block of memory to hold the maximum amount of tokens */
@@ -240,7 +245,7 @@ static int tokenize(struct memh *mh, char **string, struct tok **listptr) {
 
     case TK_VAR:
       list[idx].name = name = s;
-      while (scantable[s[1]] == TK_VAR) s++; /* skip to end of string */
+      while (scantable[(int)s[1]] == TK_VAR) s++; /* skip to end of string */
       list[idx].name_end = s+1;
       len = s+1 - name;
 
@@ -351,7 +356,7 @@ static int eval(struct memh *mh, struct tok *list, struct vartable *vt,
   struct val newval = { T_INT, 0, 0.0 }, env, *valstk, *x, *y;
   struct tok open, close, *l, *r, *t, **opstk;
   char *envtxt, lt, rt, token;
-  int vstk, ostk, vcnt = 0, ocnt = 0, error;
+  int vstk, ostk, vcnt = 0, ocnt = 0 /*, error // unused variable */;
   double xr, yr, rr = 0;
   long xi, yi, ri = 0;
 
@@ -830,7 +835,7 @@ void free_vartable(struct vartable *vt) {
 }
 
 /* gets a variable out of a variable table */
-struct var *get_var(struct vartable *vt, char *name) {
+struct var *get_var(struct vartable *vt, const char *name) {
   struct var *v;
   if (!vt || !name) return NULL;
   for (v = vt->first; v; v = v->next) if (same_str(v->name, name)) return v;
@@ -838,7 +843,7 @@ struct var *get_var(struct vartable *vt, char *name) {
 }
 
 /* creates a new variable in a variable table */
-struct var *put_var(struct vartable *vt, char *name, struct val *value) {
+struct var *put_var(struct vartable *vt, const char *name, struct val *value) {
   struct var *v;
   char *n;
 
@@ -861,3 +866,4 @@ struct var *put_var(struct vartable *vt, char *name, struct val *value) {
   }
   return NULL;
 }
+} // extern "C"

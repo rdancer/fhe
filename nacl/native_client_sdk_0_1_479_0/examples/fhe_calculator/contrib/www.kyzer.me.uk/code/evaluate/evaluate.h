@@ -18,7 +18,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-
 #include <stddef.h>
 #include <stdlib.h>
 
@@ -62,16 +61,16 @@ struct vartable {
 };
 
 /* creates a new variable table (NULL if no memory) */
-struct vartable *create_vartable();
+extern struct vartable *create_vartable();
 
 /* frees a variable table */
 void free_vartable(struct vartable *vt);
 
 /* gets a variable from a variable table (NULL if not found) */
-struct var *get_var(struct vartable *vt, char *name);
+struct var *get_var(struct vartable *vt, const char *name);
 
 /* puts a variable into a variable table (NULL if no memory) */
-struct var *put_var(struct vartable *vt, char *name, struct val *value);
+struct var *put_var(struct vartable *vt, const char *name, struct val *value);
 
 
 /* THE FUNCTION YOU WANT TO CALL */
