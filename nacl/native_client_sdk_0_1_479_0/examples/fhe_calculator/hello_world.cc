@@ -1,6 +1,24 @@
-// Copyright 2008 The Native Client Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can
-// be found in the LICENSE file.
+/* hello_world.cc -- FHE Calculator demo (NaCl module) */
+
+/*
+ * Copyright © 2008 The Native Client Authors
+ * Copyright © 2000-2002 Kyzer/CSG
+ * Copyright © 2010 Jan Minář <rdancer@rdancer.org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 (two),
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -27,17 +45,57 @@ static bool Evaluate(NPVariant *result) {
   }
   return true;
 }
+
+extern "C" {
+#define BUFFER_SIZE 2000
+
+/*
+ * Adapted from <http://www.kyzer.me.uk/code/evaluate/eval.c>
+ * retrieved on 2010-08-21
+ * Copyright © 2000-2002 Kyzer/CSG
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include "evaluate.h"
+
+char * PleaseDoEvaluate(char *formula) {
+  struct vartable *vt = create_vartable();
+  struct val p, e, result;
+  char *s = reinterpret_cast<char*>(NPN_MemAlloc(BUFFER_SIZE));
+
+  e.type = T_REAL; e.rval = exp(1.0);
+  p.type = T_REAL; p.rval = 4.0 * atan(1.0);
+
+  if (!vt || !put_var(vt, (char *)"e", &e) || !put_var(vt, (char *)"pi", &p))
+    return (char *)NULL;
+
+  switch (evaluate(formula, &result, vt)) {
+    case ERROR_SYNTAX:      printf("syntax error\n");       break;
+    case ERROR_VARNOTFOUND: printf("variable not found\n"); break;
+    case ERROR_NOMEM:       printf("not enough memory\n");  break;
+    case ERROR_DIV0:        printf("division by zero\n");   break;
+    case RESULT_OK: 
+      if (result.type == T_INT) snprintf(s, BUFFER_SIZE, "%ld\n", result.ival);
+      else snprintf(s, BUFFER_SIZE, "%g\n", result.rval);
+  }
+  free_vartable(vt);
+  return s;
+}
+} // extern "C"
+
 
 /** Evaluate the formula */
 char * DoEvaluate(char *formula) {
 #define BUFFER_SIZE 2000
-    char *s = reinterpret_cast<char*>(NPN_MemAlloc(BUFFER_SIZE));
+    //char *s = reinterpret_cast<char*>(NPN_MemAlloc(BUFFER_SIZE));
 
-    snprintf (s, BUFFER_SIZE, "%lld", atoll(formula) + 1);
+    //snprintf (s, BUFFER_SIZE, "%lld", atoll(formula) + 2);
 
-    return s;
+    //return s;
+    return PleaseDoEvaluate(formula);
 }
-
 /** Increment number by one */
 char * AddOne(char *number) {
 #define BUFFER_SIZE 2000
