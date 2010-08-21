@@ -17,7 +17,7 @@
 #include "third_party/npapi/bindings/nphostapi.h"
 #endif
 
-struct HelloWorld {
+struct FheCalculator {
   NPP npp;
   NPObject *npobject;
 };
@@ -41,12 +41,12 @@ NPError NPP_New(NPMIMEType mime_type,
   if (instance == NULL)
     return NPERR_INVALID_INSTANCE_ERROR;
 
-  struct HelloWorld *hello_world = NULL;
-  hello_world = new HelloWorld;
-  hello_world->npp = instance;
-  hello_world->npobject = NULL;
+  struct FheCalculator *fhe_calculator = NULL;
+  fhe_calculator = new FheCalculator;
+  fhe_calculator->npp = instance;
+  fhe_calculator->npobject = NULL;
 
-  instance->pdata = hello_world;
+  instance->pdata = fhe_calculator;
   return NPERR_NO_ERROR;
 }
 
@@ -63,8 +63,8 @@ NPError NPP_Destroy(NPP instance, NPSavedData** save) {
 
   // free plugin
   if (NULL != instance->pdata) {
-    HelloWorld* hello_world = static_cast<HelloWorld*>(instance->pdata);
-    delete hello_world;
+    FheCalculator* fhe_calculator = static_cast<FheCalculator*>(instance->pdata);
+    delete fhe_calculator;
     instance->pdata = NULL;
   }
   return NPERR_NO_ERROR;
@@ -78,21 +78,21 @@ NPError NPP_Destroy(NPP instance, NPSavedData** save) {
 // Declaration: local
 // Documentation URL: N/A (not actually an NPAPI function)
 NPObject *NPP_GetScriptableInstance(NPP instance) {
-  struct HelloWorld* hello_world;
+  struct FheCalculator* fhe_calculator;
 
   extern NPClass *GetNPSimpleClass();
 
   if (NULL == instance) {
     return NULL;
   }
-  hello_world = static_cast<HelloWorld*>(instance->pdata);
-  if (NULL == hello_world->npobject) {
-    hello_world->npobject = NPN_CreateObject(instance, GetNPSimpleClass());
+  fhe_calculator = static_cast<FheCalculator*>(instance->pdata);
+  if (NULL == fhe_calculator->npobject) {
+    fhe_calculator->npobject = NPN_CreateObject(instance, GetNPSimpleClass());
   }
-  if (NULL != hello_world->npobject) {
-    NPN_RetainObject(hello_world->npobject);
+  if (NULL != fhe_calculator->npobject) {
+    NPN_RetainObject(fhe_calculator->npobject);
   }
-  return hello_world->npobject;
+  return fhe_calculator->npobject;
 }
 
 // Implemented so the browser can get a scriptable instance from this plugin.

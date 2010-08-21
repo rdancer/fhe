@@ -129,7 +129,7 @@
 	  if ((formula = document.getElementById('formula').value) != '') {
 	      // Valid formula -- call NaCl to compute the result
 	      document.getElementById('resultValue').innerHTML
-			= helloworld(formula);
+			= evaluate(formula);
 	  }
 
 
@@ -153,11 +153,11 @@
   -->
 
   <script type="text/javascript">
-    hello_world = null;  // Global application object.
+    fhe_calculator = null;  // Global application object.
     status_text = 'NO-STATUS';
 
     function moduleDidLoad() {
-      hello_world = document.getElementById('hello_world');
+      fhe_calculator = document.getElementById('fhe_calculator');
       updateStatus('SUCCESS');
     }
 
@@ -165,7 +165,7 @@
     // status message indicating that the module is still loading.  Otherwise,
     // do not change the status message.
     function pageDidLoad() {
-      if (hello_world == null) {
+      if (fhe_calculator == null) {
         updateStatus('LOADING...');
       } else {
         // It's possible that the Native Client module onload event fired
@@ -178,15 +178,15 @@
 
     function fortytwo() {
       try {
-        alert(hello_world.fortytwo());
+        alert(fhe_calculator.fortytwo());
       } catch(e) {
         alert(e.message);
       }
     }
 
-    function helloworld(formula) {
+    function evaluate(formula) {
       try {
-        return(hello_world.helloworld(formula));
+        return(fhe_calculator.evaluate(formula));
       } catch(e) {
         return(e.message);
       }
@@ -242,31 +242,31 @@
   found in the LICENSE file.
   -->
 
-<div id="hello_world_div">
+<div id="hello_world_html_div">
 <p>
   <!-- For development, use a #develop location, which loads the develop
   version of the module.
   -->
-  <div id="nacl_helloworld_content" style="background: blue"></div>
+  <div id="nacl_fhecalculator_content" style="background: blue"></div>
   <script type="text/javascript">
-    contentDiv = document.getElementById('nacl_helloworld_content');
+    contentDiv = document.getElementById('nacl_fhecalculator_content');
     if (window.location.hash == '#develop') {
       // Load the develop version of the module.
       contentDiv.innerHTML = '<embed name="nacl_module" '
-                             + 'id="hello_world" '
+                             + 'id="fhe_calculator" '
                              + 'width=0 height=0 '
-                             + 'type="pepper-application/hello_world" />';
+                             + 'type="pepper-application/fhe_calculator" />';
       moduleDidLoad();
     } else {
       // Load the published .nexe.  This includes the 'nexes' attribute which
       // shows how to load multi-architecture modules.  Each entry in the
       // table is a key-value pair: the key is the runtime ('x86-32',
       // 'x86-64', etc.); the value is a URL for the desired NaCl module.
-      var nexes = 'x86-32: hello_world_x86_32.nexe\n'
-                  + 'x86-64: hello_world_x86_64.nexe\n'
-                  + 'ARM: hello_world_arm.nexe ';
+      var nexes = 'x86-32: fhe_calculator_x86_32.nexe\n'
+                  + 'x86-64: fhe_calculator_x86_64.nexe\n'
+                  + 'ARM: fhe_calculator_arm.nexe ';
       contentDiv.innerHTML = '<embed name="nacl_module" '
-                             + 'id="hello_world" '
+                             + 'id="fhe_calculator" '
                              + 'width=0 height=0 '
                           // + 'nexes="' + nexes + '" '
                              + 'type="application/x-nacl-srpc" '
@@ -274,7 +274,7 @@
       // Note: this code is here to work around a bug in Chromium build
       // #47357.  See also
       // http://code.google.com/p/nativeclient/issues/detail?id=500
-      document.getElementById('hello_world').nexes = nexes;
+      document.getElementById('fhe_calculator').nexes = nexes;
     }
   </script>
 </p>

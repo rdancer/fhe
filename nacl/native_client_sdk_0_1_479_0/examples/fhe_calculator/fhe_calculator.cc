@@ -1,4 +1,4 @@
-/* hello_world.cc -- FHE Calculator demo (NaCl module) */
+/* fhe_calculator.cc -- FHE Calculator demo (NaCl module) */
 
 /*
  * Copyright © 2008 The Native Client Authors
@@ -34,18 +34,8 @@
 #endif
 
 // These are the method names as JavaScript sees them.
-static const char* kHelloWorldMethodId = "helloworld";
-static const char* kFortyTwoMethodId = "fortytwo";
 static const char* kEvaluateMethodId = "evaluate";
-
-/** Return '43' */
-static bool Evaluate(NPVariant *result) {
-  if (result) {
-    INT32_TO_NPVARIANT(43, *result);
-  }
-  return true;
-}
-
+static const char* kFortyTwoMethodId = "fortytwo";
 
 /*
  * Adapted from <http://www.kyzer.me.uk/code/evaluate/eval.c>
@@ -134,7 +124,7 @@ static bool FortyTwo(NPVariant *result) {
 // This function creates a string in the browser's memory pool and then returns
 // a variable containing a pointer to that string.  The variable is later
 // returned back to the browser by the Invoke() function that called this.
-static bool HelloWorld(const NPVariant *args,
+static bool Evaluate(const NPVariant *args,
                        uint32_t arg_count,
 		       NPVariant *result) {
   if (result) {
@@ -178,11 +168,9 @@ static void Deallocate(NPObject* object) {
 static bool HasMethod(NPObject* obj, NPIdentifier method_name) {
   char *name = NPN_UTF8FromIdentifier(method_name);
   bool is_method = false;
-  if (!strcmp((const char *)name, kHelloWorldMethodId)) {
+  if (!strcmp((const char *)name, kEvaluateMethodId)) {
     is_method = true;
   } else if (!strcmp((const char*)name, kFortyTwoMethodId)) {
-    is_method = true;
-  } else if (!strcmp((const char*)name, kEvaluateMethodId)) {
     is_method = true;
   }
   NPN_MemFree(name);
@@ -220,12 +208,10 @@ static bool Invoke(NPObject* obj,
 
   // Map the method name to a function call.  |result| is filled in by the
   // called function, then gets returned to the browser when Invoke() returns.
-  if (!strcmp((const char *)name, kHelloWorldMethodId)) {
-    rval = HelloWorld(args, arg_count, result);
+  if (!strcmp((const char *)name, kEvaluateMethodId)) {
+    rval = Evaluate(args, arg_count, result);
   } else if (!strcmp((const char*)name, kFortyTwoMethodId)) {
     rval = FortyTwo(result);
-  } else if (!strcmp((const char*)name, kEvaluateMethodId)) {
-    rval = Evaluate(result);
   }
   // Since name was allocated above by NPN_UTF8FromIdentifier,
   // it needs to be freed here.
@@ -237,7 +223,7 @@ static bool Invoke(NPObject* obj,
 // can call on this plugin object.  The browser can use the methods in this
 // class to discover the rest of the plugin's interface.
 // Documentation URL: https://developer.mozilla.org/en/NPClass
-static NPClass kHelloWorldClass = {
+static NPClass kFheCalculatorClass = {
   NP_CLASS_STRUCT_VERSION,
   Allocate,
   Deallocate,
@@ -253,5 +239,5 @@ static NPClass kHelloWorldClass = {
 // Called by NPP_GetScriptableInstance to get the scripting interface for
 // this plugin.
 NPClass *GetNPSimpleClass() {
-  return &kHelloWorldClass;
+  return &kFheCalculatorClass;
 }

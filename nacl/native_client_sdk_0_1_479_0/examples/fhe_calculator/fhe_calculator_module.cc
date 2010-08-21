@@ -86,10 +86,11 @@ NPError NP_GetValue(NPP instance, NPPVariable variable, void* value) {
   NPError err = NPERR_NO_ERROR;
   switch (variable) {
     case NPPVpluginNameString:
-      *(static_cast<const char**>(value)) = "Hello World Example";
+      *(static_cast<const char**>(value)) = "FHE Calculator";
       break;
     case NPPVpluginDescriptionString:
-      *(static_cast<const char**>(value)) = "Simple Hello World example";
+      *(static_cast<const char**>(value))
+	    = "Fully Homomorphic Encryption: Calculator Demo";
       break;
     case NPPVpluginNeedsXEmbed:
       *(static_cast<NPBool*>(value)) = TRUE;
@@ -109,7 +110,7 @@ NPError NP_GetValue(NPP instance, NPPVariable variable, void* value) {
 // Declaration: npupp.h
 // Documentation URL: https://developer.mozilla.org/En/NP_GetMIMEDescription
 const char* NP_GetMIMEDescription(void) {
-  return "pepper-application/hello_world:nexe:Hello World example";
+  return "pepper-application/fhe_calculator:nexe:FHE Calculator";
 }
 #endif
 
