@@ -1,0 +1,94 @@
+/* global */
+body {
+  background #fff; color #000; margin: 0; padding: 0;
+  font-family: "Lucida Grande", Geneva, Verdana, Arial, Helvetica, sans-serif; 
+}
+a:link { color: #24e }
+a:visited { color: #73a }
+a:link:hover { text-decoration: underline }
+a:visited:hover { text-decoration: underline }
+a:active:hover { text-decoration: underline }
+p.quotation    { font-style: italic; padding-left: 2em; padding-right: 2em }
+p.attribution  { text-align: right; padding-top: 0 }
+
+/* page header */
+#header { 
+  width: 100%;
+  background: url("/css/blue_fade.png") repeat-x bottom right;
+  margin: 0; padding: 0;
+  border-bottom: 1px solid #000;
+}
+#logo span { display: none }
+#logo h1 {
+  width: 270px; height: 74px;
+  background: url("/css/kaizaa_chunky_purple.png") no-repeat;
+  text-align: bottom left;
+  margin: 0;
+}
+#title h1 {
+  font-weight: bold;
+  font-size: 250%;
+  text-align: bottom center;
+  margin: 0;
+}
+
+/* site navigation */
+#sitenav {
+  width: 14em;
+  font-size: 80%;
+  background: url("/css/mauve_fade.png") repeat-x bottom right;
+  border-right: 1px solid #000;
+  border-bottom: 1px solid #000;
+  border-top: 1px solid #000;
+  margin: 10px 10px 10px 0; /* Top Right Bottom Left */
+  padding: 1px 1px 1px 0;
+}
+#sitenav ul { list-style-type: none; padding: 0; margin: 0 0 5px 1em }
+
+/* main page, news boxes, general boxouts */
+#main { padding-right: 1em }
+
+#news { text-align: center }
+#news .newsitem { width: 100%; border: 1px solid #000; margin-bottom: 2em }
+#news h2 {
+  background: #b8a1ca url("/css/purple_fade.png") repeat-x bottom right;
+  border-bottom: 2px solid #000;
+  color: #fff;
+  margin: 0;
+  text-align: center;
+}
+#news h6 { margin: 1px 4px 2px 4px; text-align: left }
+#news p  { margin: 0px 4px 4px 4px; text-align: left }
+
+.box {
+  float: right;
+  width: 13em;
+  border: 1px solid #000;
+  margin-bottom: 2em;
+  margin-left: 1em;
+  background: url("/css/mauve_fade.png") repeat-x bottom right;
+}
+.box h3 {
+  background: #b8a1ca url("/css/purple_fade.png") repeat-x bottom right;
+  border-bottom: 2px solid #000;
+  color: #fff;
+  margin: 0;
+  text-align: center;
+}
+.box p {
+  margin: 2px 4px 4px 4px;
+}
+
+.chart { border-collapse: collapse; text-align: center }
+.chart td,th { padding-left: 1em; padding-right: 1em }
+
+/* page footer */
+#footer { 
+  font-size: 80%;
+  text-align: right;
+  border-top: 1px solid #aaa;
+  padding-right: 1em;
+}
+#footer p { margin: 0; padding: 0; }
+#footer .copyright { margin-top: 4px; }
+#footer .lastupdate { color: #888; }

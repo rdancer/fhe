@@ -1,0 +1,36 @@
+/* global */
+p { font-family: Tahoma, Verdana, Helvetica, Arial, sans-serif; }
+tt { font-family: "Lucida Typewriter", monospace; }
+p.quotation   { font-style: italic; padding-left: 2em; padding-right: 2em }
+p.attribution { text-align: right; padding-top: 0 }
+
+/* page header */
+#header { border-bottom: 1px solid #000; }
+#logo { display: none; }
+#title h1 {
+  font-family: Helvetica Black, Arial Black, sans-serif;
+  font-weight: bold;
+  font-size: 260%;
+  text-align: bottom center;
+}
+
+/* site navigation */
+#sitenav { display: none }
+
+/* main page, news boxes, general boxouts */
+#news { text-align: center }
+#news .newsitem { width: 100%; border: 1px solid #000; margin-bottom: 2em }
+#news h2 { border-bottom: 2px solid #000; margin: 4px; text-align: center }
+#news h6 { margin: 1px 4px 2px 4px; text-align: left }
+#news p  { margin: 0px 4px 4px 4px; text-align: left }
+.box { float: right; width: 13em; border: 1px solid #000; margin-bottom: 2em }
+.box h3 { border-bottom: 2px solid #000; margin: 4px; text-align: center }
+.box p  { margin: 2px 4px 4px 4px }
+.chart { border-collapse: collapse; text-align: center }
+.chart td,th { padding-left: 1em; padding-right: 1em }
+
+/* page footer */
+#footer { font-size: 80%; text-align: right; border-top: 1px solid }
+#footer p { margin: 1px; padding: 0px }
+#footer .copyright { margin-top: 4px }
+#nectarine { display: none }

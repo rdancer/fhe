@@ -1,0 +1,301 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta name="author" content="Stuart Caie" />
+  <meta name="description" content="Support site for Stuart Caie's work" />
+  <title>How evaluate.c works</title>
+  <link rel="stylesheet" href="/css/purple.css" type="text/css" media="screen" />
+  <link rel="stylesheet" href="/css/print.css" type="text/css" media="print" />
+</head>
+<body>
+
+<!-- page title -->
+<table id="header">
+  <tr>
+    <td id="logo"><h1><span>&#x30AB;&#x30A4;&#x30B6;&#x30FC;</span></h1></td>
+    <td id="title"><h1><span>How evaluate.c works</span></h1></td>
+  </tr>
+</table>
+
+<!-- sitebar -->
+<table><tr><td valign="top" align="left">
+<div id="sitenav">
+<ul>
+<li><a href="http://www.kyzer.me.uk/">News and Updates</a></li>
+<li><a href="http://www.kyzer.me.uk/personal/">My personal world</a>
+  <ul>
+  <li><a href="http://www.kyzer.me.uk/essays/adequacy/">Adequacy.org essay</a></li>
+  <li><a href="http://www.kyzer.me.uk/essays/giflzw/">The LZW controversy</a></li>
+  </ul>
+</li>
+<li><a href="http://www.kyzer.me.uk/pack/">Data Compression</a>
+  <ul>
+  <li><a href="http://www.cabextract.org.uk/libmspack/">libmspack</a></li>
+  <li><a href="http://www.cabextract.org.uk">cabextract</a></li>
+  <li><a href="http://www.kyzer.me.uk/pack/convlit/">Convert .LIT files</a></li>
+  <li><a href="http://www.kyzer.me.uk/pack/xad/">XAD clients</a></li>
+  <li><a href="http://www.kyzer.me.uk/pack/xfd/">XFD slaves</a></li>
+  </ul>
+</li>
+<li><a href="http://www.kyzer.me.uk/code/">Coding</a>
+  <ul>
+  <li><a href="http://www.kyzer.me.uk/code/java/">Java demos</a></li>
+  <li><a href="http://www.kyzer.me.uk/code/installers/">HD installers</a></li>
+  <li><a href="http://www.kyzer.me.uk/code/perl/">Perl scripts</a></li>
+  <li><a href="http://www.kyzer.me.uk/code/e/">Amiga E code</a></li>
+  <li><a href="http://www.kyzer.me.uk/code/ksc/">KSC utilities</a></li>
+  <li><a href="http://www.kyzer.me.uk/code/diskreader/">DiskReader</a></li>
+  <li><a href="http://www.kyzer.me.uk/code/evaluate/">Evaluate</a></li>
+  <li><a href="http://www.kyzer.me.uk/code/shellscr/">ShellScr</a></li>
+  </ul>
+</li>
+<li>Music
+  <ul>
+  <li><a href="http://www.kyzer.me.uk/ahx/">My AHX music</a></li>
+  <li><a href="http://www.kyzer.me.uk/ripping/">Ripping</a></li>
+  </ul>
+</li>
+<li><a href="http://www.kyzer.me.uk/turr2maps/">Turrican 2 maps</a></li>
+</ul>
+</div>
+
+<!-- main page -->
+</td><td valign="top" align="left">
+<div id="main">
+
+<p>
+<tt>evaluate()</tt> is comprised of two main parts - a scanner (also known
+as a tokenizer) and a token evaluator. There is also the variable table,
+but that simply a data structure that maps names to values.
+</p>
+
+<p>
+The scanner turns a stream of characters (the expression string) into a
+stream of tokens.
+</p>
+
+<ol>
+
+<li>The first thing it does is allocate enough memory, where the worst
+case is that every character is an individual token. It now considers this
+as a 'list' of tokens, with a 'list pointer' pointing at the first unused
+token.</li>
+
+<li>We then perform a loop that traverses every character individually. We
+can make the loop pointer 'skip forward' for tokens that have more than
+one character.</li>
+
+<li>To translate characters into tokens very quickly, we have a
+'scantable', where every possible character is given a token value. This
+token value is written into the 'current token'. But that's not enough to
+tokenize. So, we then make a few decisions based on what the token
+was.</li>
+
+<ul>
+
+<li>For most of the operators, all necessary scanning was done with just
+that one non-alphanumeric character, so all they have to do is advance the
+list pointer to the next token. A few other operators might have more
+characters, so they check the next one and advance the stream if
+neccessary.</li>
+
+<li>Assignment is special. As we always have to put a variable name before
+it, all we do is look back one token and if it is a variable, change its
+token from <tt>TK_VAR</tt> to <tt>TK_ASSN</tt>. Of course, if there
+<i>isn't</i> a variable before it, then there's definately a syntax error
+in the string.</li>
+
+<li>For numbers, we have to do a quite a bit of work. The number scanner
+is in another function so we can re-use it later, outside the scanner. The
+basic premise is that while we have another digit that's OK, we can
+multiply by 10 (or 16 for hex numbers) and add the value of the character
+we just read. For decimal numbers, if we finish over a decimal point, we
+can turn the number into a real value and start reading numbers after the
+decimal point.</li>
+
+<li>For strings, written in the scantable as <tt>TK_VAR</tt>, first we
+read on until we know what the whole string is. If we had operators that
+were actually strings instead of symbols, like perl has <tt>"and"</tt>,
+<tt>"or"</tt> and <tt>"not"</tt>, we would make comparisons here. We try
+to see if its a function be comparing it to all the names in the function
+table. If so, we turn it into a <tt>TK_FUNC</tt> token. Otherwise, we can
+assume it's a variable, and thus mark the start and end of the name for
+use later on.</li>
+
+<li>We also have a few special tokens that aren't 'real', that is they're
+part of the scanning process and not part of the evaluation.</li>
+
+<li><tt>TK_SKIP</tt> says that this character isn't part of any token, but
+isn't wrong to see it in the expression. It allows us to have spaces into
+our expressions and not get into trouble for them.</li>
+
+<li><tt>TK_ERROR</tt> says that this character isn't part of any token,
+and it is wrong to see it in the expression.</li>
+
+<li><tt>TK_BREAK</tt> says that the expression scanning is finished and
+OK, even though we haven't reached the end of the character stream
+yet. The main loop that does tokenization and evaluation knows about this
+and will call us again and again until we eventually do reach the
+end.</li>
+
+</ul>
+</li>
+
+<li>After a successful scan, we 'lace up' the tokens with pointers, so we
+can easily insert other tokens without copying them about. We also
+null-terminate any variable names - we couldn't do this earlier as it
+would destroy the character that defined the next token.</li>
+
+</ol>
+
+<p>
+Now we've done the token scan, we must perform work on the tokens until
+they are fit for evaluation.
+</p>
+
+<ul>
+
+<li>The first thing we do is wrap the expression in a set of parentheses,
+because this avoids the use of special cases in our algorithims for the
+start and end. In particular, a closing set of parentheses forces a 'flush'
+of pending operations, so our evaluation is guaranteed to have have no
+remaining operations stacked at the end of evaluation.</li>
+
+<li>Firstly, all the minus signs in the string were converted to
+<tt>TK_SUB</tt>, which is a binary operator, so we have to convert the
+ones we think are unary to <tt>TK_NEG</tt>. In my opinion, they are are
+the ones that follow an open parenthesis or an operator. The opposite is
+also true - the <tt>TK_SUB</tt>s become <tt>TK_NEG</tt>s provided they're
+not preceded by a close parenthesis, a value, or variable.</li>
+
+<li>Implicit multiplication is where you can write <tt>"5a"</tt> and mean
+<tt>"5*a</tt>", however it's my opinion that you really want to mean
+<tt>"(5*a)"</tt>, so I've given implicit multiplication a higher
+precedence than everything else. My opinion for implicit multiplication is
+that it goes between any two tokens where the left one is a variable,
+value or close bracket, and the right one is a variable, value, open
+bracket or function. The only exception is where the left and right tokens
+are the same - it doesn't follow that <tt>"1 2 3"</tt> should evaluate to
+6, it should be a syntax error.</li>
+
+<li>Variables have to exist and be pointed at by tokens, so we look up any
+assignments in the token stream to ensure those tokens are created if
+necessary, and then look for any variable references to ensure that all
+variable already exist or are pulled from the environment. Admittedly,
+this doesn't catch errors like <tt>"x=x+1"</tt> where <tt>x</tt> didn't
+exist before this evaluation, but this is an evaluator, not a programming
+language. In such cases, <tt>x</tt> has a value of 0.</li>
+
+</ul>
+
+<p>
+Finally, we're ready for evaluation. We make two stacks - one for holding
+values and one for holding operators. Why? Well, we'll be using what's
+known as postfix evaluation, which is unambiguous. This requires that we
+stack all values as we see them then apply the operators in the correct
+order. The operators pull as many values as neccesary from the stack, then
+push the result back. Eventually, there's only one value on the stack -
+the result. However the token stream is in infix notation - what can we
+do?  Convert one to the other. The idea of an infix to postfix converter
+is that the innermost operations get done first, then the outermost
+ones. This is done by running from left to right through the token stream
+and pushing operators to a stack. However, for binary operators, all
+higher-precedence operators already on the stack must be output to some
+destination stream before a new operator can go on. Similarly, a close
+bracket forces a 'flush' of the stack back to the nearest open bracket on
+it. The algorithim goes like so:
+</p>
+
+<pre>
+empty postfix list
+FOR all tokens in infix list
+  SELECT current token
+  CASE variable, value
+     append current token to postfix list
+  ENDCASE
+
+  CASE unary operator, open bracket
+    push token onto stack
+  ENDCASE
+
+  CASE binary operator, close bracket
+    WHILE precedence(token on top of stack) &gt; precedence(current token)
+      pull token from stack, append it to postfix list
+    ENDWHILE
+
+    IF current token = close bracket
+      pull token from stack, cause error if it's not an open bracket
+    ELSE
+      push current token onto stack
+    ENDIF
+  ENDCASE
+ENDFOR
+</pre>
+
+<p>
+However we've been a bit clever and instead of appending operators to a
+list, we execute them right away. And that's basically it, apart from a
+few decisions here and there about converting arguments to and from int
+and reals.
+</p>
+
+<ul>
+
+<li><tt>TK_ADD</tt>, <tt>TK_SUB</tt> and <tt>TK_MUL</tt> will pull two
+arguments from the stack. If both are integers, integer operations will be
+used, otherwise real operations will be used. If there is one real and one
+integer, the integer will be converted to a real. The type of the result
+is whatever operation was used.</li>
+
+<li><tt>TK_EQ</tt>, <tt>TK_NE</tt>, <tt>TK_LT</tt>, <tt>TK_LE</tt>,
+<tt>TK_GT</tt> and <tt>TK_GE</tt> will also convert to reals unless two
+integers are present, however the result is always an integer - either
+<tt>1</tt> for true or <tt>0</tt> for false.</li>
+
+<li><tt>TK_DIV</tt>, <tt>TK_POW</tt> and <tt>TK_FUNC</tt> always convert
+to reals and return reals.</li>
+
+<li><tt>TK_MOD</tt>, <tt>TK_AND</tt>, <tt>TK_OR</tt>, <tt>TK_BNOT</tt>,
+<tt>TK_BAND</tt>, <tt>TK_BOR</tt>, <tt>TK_BXOR</tt>, <tt>TK_SHL</tt> and
+<tt>TK_SHR</tt> always convert to integers and return integers.</li>
+
+<li><tt>TK_NEG</tt> and <tt>TK_ASSN</tt> carry the type of their one
+argument.</li>
+
+</ul>
+
+<h2>How do the 'stacks' work?</h2>
+
+<p>
+I don't use some abstract datatype to operate the stacks, I use basic C
+operations. I have an array of the appropriate type which has enough
+entries to hold anything I want. I also have a 'stack pointer', which
+points at the current topmost item on the stack. It is initialised to
+<tt>-1</tt>, to say that the stack is empty. The following C fragments
+show the canonical stack operations:
+</p>
+
+<pre>
+valstk = the stack
+vstk = the stack pointer
+
+if (vstk &lt; 0)           : if the stack is empty
+if (vstk &lt; n)           : if the stack has n items or less on it
+valstk[vstk]            : get the item on top of the stack
+valstk[++vstk] = item   : push an item onto the stack
+valstk[vstk--]          : pull an item from the stack
+</pre>
+
+<!-- end main page -->
+</div></td></tr></table>
+<div id="footer">
+<p class="copyright">&copy;
+2000-2010 Stuart Caie. Email <a href="mailto:kyzer@4u.net">kyzer@4u.net</a></p>
+
+<p class="lastupdate">Last updated:
+  Saturday, 11 August 2007</p>
+</div>
+</body>
+</html>
