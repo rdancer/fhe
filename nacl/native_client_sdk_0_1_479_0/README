@@ -1,0 +1,34 @@
+Welcome to the Native Client SDK.
+
+Native Client SDK Developer Preview
+Updated: 15 June 2010
+
+Please refer to the online documentation here:
+
+  http://code.google.com/p/nativeclient-sdk/wiki/GettingStarted
+
+OTHER DEVELOPMENT
+
+If you want to contribute to the Native Client SDK itself, the code site is
+here:
+
+  http://code.google.com/p/nativeclient-sdk/
+
+Note that this is an internal Google site.
+
+
+KNOWN ISSUES
+
+- [All, Develop]: To debug your .nexe you have to build a special version.  Once
+  you have a development version of your module, you can run Google Chrome in
+  your favorite debugger (e.g. gdb); in addition to the list of flags above, you
+  can add --load-plugin=/path/to/my/plugin (see above).
+
+- [Linux]: Only 32-bit browsers can load .nexes. 64-bit doesn't work yet.
+
+TROUBLESHOOTING
+
+- [Mac]: If you see "Missing Plug-in", check that the symlinks in
+  ~/Library/Internet\ Plug-Ins are correct.  If you need to fix them, you will
+  have to quit and restart the browser.  Make sure you started the browser with
+  the --internal-pepper flag in addition to the --enable-nacl flag.
