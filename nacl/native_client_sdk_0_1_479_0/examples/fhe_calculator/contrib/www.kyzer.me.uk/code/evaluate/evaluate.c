@@ -1,11 +1,30 @@
-/* evaluate.c (C) 2000-2002 Kyzer/CSG. */
-/* Released under the terms of the GNU General Public Licence version 2. */
+/* evaluate.c -- evaluate algebraic strings */
+
+/*
+ * Copyright © 2000-2002 Kyzer/CSG
+ * Copyright © 2010 Jan Minář <rdancer@rdancer.org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 (two),
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
 
 #include "evaluate.h"
 #include <ctype.h>
 #include <limits.h>
 #include <math.h>
 #include <string.h>
+#include <stdio.h>
 
 /* a token structure */
 struct tok {
@@ -54,18 +73,41 @@ enum {
   F_SIN, F_SINH, F_SQR, F_SQRT, F_TAN, F_TANH
 };
 
+/* Static function prototypes */
 
+static int same_str(const char *a, const char *b);
+static int same_str_len(const char *a, const char *b, int len);
 
-
-int same_str(const char *a, const char *b);
-int same_str_len(const char *a, const char *b, int len);
-
-void init_scantable();
-int tokenize(struct memh *mh, char **string, struct tok **listptr);
-int scan_number(char **stringptr, struct val *valptr);
-int precedence(struct tok *t);
-int eval(struct memh *mh, struct tok *list, struct vartable *vt,
+static void init_scantable();
+static int tokenize(struct memh *mh, char **string, struct tok **listptr);
+static int scan_number(char **stringptr, struct val *valptr);
+static int precedence(struct tok *t);
+static int eval(struct memh *mh, struct tok *list, struct vartable *vt,
   struct val *result);
+
+#if DEBUG
+
+// I have just guessed this substitution --rdancer 2010-08-21
+// Note: When #define'd as prt_lst, the program aborts
+# define prt(x) prt_tok(x)
+
+static void prt_tok(struct tok *t);
+static void prt_lst(struct tok *t);
+static void prt_stk(struct tok *stk, int depth);
+static void dump_vars(struct vartable *vt);
+
+#else /* DEBUG */
+
+# define prt(x) do { ; } while (0)
+# define prt_tok(x) do { ; } while (0)
+# define prt_stk(x, y) do { ; } while (0)
+# define prt_lst(x) do { ; } while (0)
+# define dump_vars(x) do { ; } while (0)
+
+#endif
+
+static int same_str(const char *a, const char *b);
+static int same_str_len(const char *a, const char *b, int len);
 
 
 /*** FRONT-END ***/
@@ -102,7 +144,7 @@ int evaluate(char *expr, struct val *result, struct vartable *vartable) {
 
 /**** TOKENIZATION ***/
 
-void init_scantable() {
+static void init_scantable() {
   int i;
 
   if (scantable_ok) return;
@@ -137,7 +179,7 @@ void init_scantable() {
 }
 
 
-int tokenize(struct memh *mh, char **string, struct tok **listptr) {
+static int tokenize(struct memh *mh, char **string, struct tok **listptr) {
   struct tok *list;
   int idx = 0, i, len;
   char *s, *name, c, c2, nt;
@@ -239,7 +281,7 @@ int tokenize(struct memh *mh, char **string, struct tok **listptr) {
 
 
 /* scans some text into a value */
-int scan_number(char **stringptr, struct val *valptr) {
+static int scan_number(char **stringptr, struct val *valptr) {
   struct val v = { T_INT, 0, 0.0 };
   char *s = *stringptr;
   int c;
@@ -282,7 +324,7 @@ int scan_number(char **stringptr, struct val *valptr) {
 /*** EVALUATION ***/
 
 /* returns the precedence of a token */
-int precedence(struct tok *t) {
+static int precedence(struct tok *t) {
   switch (t->token) {
   case TK_MULI:							return 14;
   case TK_NEG:	case TK_NOT:	case TK_BNOT:			return 13;
@@ -303,7 +345,7 @@ int precedence(struct tok *t) {
 }
 
 
-int eval(struct memh *mh, struct tok *list, struct vartable *vt,
+static int eval(struct memh *mh, struct tok *list, struct vartable *vt,
   struct val *result) {
 
   struct val newval = { T_INT, 0, 0.0 }, env, *valstk, *x, *y;
@@ -384,7 +426,9 @@ int eval(struct memh *mh, struct tok *list, struct vartable *vt,
   /* MAIN EVALUATION LOOP */
   prt_lst(list);
   for (t = list; t; t=t->next) {
+#if DEBUG
     printf("tol: ");prt(t);
+#endif /* DEBUG */
     switch (t->token) {
 
     /* unary operators always wait until after what follows is evaluated */
@@ -631,12 +675,10 @@ int eval(struct memh *mh, struct tok *list, struct vartable *vt,
 
 
 
-
-
 /** debugging things **/
-#if 1
+#if DEBUG // XXX #if DEBUG
 /* expression printer */
-void prt_tok(struct tok *t) {
+static void prt_tok(struct tok *t) {
   switch(t->token)  {
   case TK_OPEN:  printf("( ");  break;
   case TK_CLOSE: printf(") ");  break;
@@ -676,22 +718,23 @@ void prt_tok(struct tok *t) {
                  break;
 
   case TK_VAR:   printf("%s ", t->name); break;
-  default:       printf("??(%d)", t->token); break;
+  /* Split the "??(" string so not to be interpreted as trigraph */ 
+  default:       printf("??" "(%d)", t->token); break;
   }
 }
 
-void prt_stk(struct tok *stk, int depth) {
-  do { prt(&stk[depth]) } while (depth-- > 0);
+static void prt_stk(struct tok *stk, int depth) {
+  do { prt(&stk[depth]); } while (depth-- > 0);
   printf("\n");
 }
 
-void prt_lst(struct tok *t) {
+static void prt_lst(struct tok *t) {
   for (; t; t=t->next) prt(t);
   printf("\n");
 }
 
 /* variables dumper */
-void dump_vars(struct vartable *vt) {
+static void dump_vars(struct vartable *vt) {
   struct var *v;
   if (!vt) printf("no vars\n");
   else for (v=vt->first; v; v=v->next) {
@@ -702,14 +745,14 @@ void dump_vars(struct vartable *vt) {
   }
   printf("\n");
 }
-#endif
+#endif /* DEBUG */
 
 
 
 /*** UTILITY FUNCTIONS ***/
 
 /* case-insensitive string comparison, TRUE or FALSE result */
-int same_str(const char *a, const char *b) {
+static int same_str(const char *a, const char *b) {
   if (!a || !b) return 0; /* false even if a == b == null */
   if (a == b) return 1;
 
@@ -727,7 +770,7 @@ int same_str(const char *a, const char *b) {
 }
 
 /* case-insensitive string comparison with maximum length */
-int same_str_len(const char *a, const char *b, int len) {
+static int same_str_len(const char *a, const char *b, int len) {
   if (!a || !b) return 0; /* false even if a == b == null */
   if (len == 0) return 0;
   if (a == b) return 1;

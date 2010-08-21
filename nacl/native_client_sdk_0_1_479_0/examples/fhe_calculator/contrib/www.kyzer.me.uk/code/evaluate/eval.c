@@ -1,3 +1,23 @@
+/* eval.c -- algebraic strings evaluation demo */
+
+/*
+ * Copyright © 2000-2002 Kyzer/CSG
+ * Copyright © 2010 Jan Minář <rdancer@rdancer.org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 (two),
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -14,7 +34,7 @@ int main(int argc, char **argv) {
   if (!vt || !put_var(vt, "e", &e) || !put_var(vt, "pi", &p))
     return EXIT_FAILURE;
 
-  printf("evaluate.c example demo. please enter expressions\n");
+  //printf("evaluate.c example demo. please enter expressions\n");
   while (fgets(buffer, 512, stdin)) {
     switch (evaluate(buffer, &result, vt)) {
     case ERROR_SYNTAX:      printf("syntax error\n");       break;
@@ -22,8 +42,8 @@ int main(int argc, char **argv) {
     case ERROR_NOMEM:       printf("not enough memory\n");  break;
     case ERROR_DIV0:        printf("division by zero\n");   break;
     case RESULT_OK: 
-      if (result.type == T_INT) printf("result = %ld\n", result.ival);
-      else printf("result = %g\n", result.rval);
+      if (result.type == T_INT) printf("%ld\n", result.ival);
+      else printf("%g\n", result.rval);
       
     }
   }
