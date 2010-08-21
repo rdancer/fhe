@@ -41,11 +41,6 @@ all: check_variables fhe_calculator_x86_32.nexe fhe_calculator_x86_64.nexe \
 # common.mk has rules to build .o files from .cc files.
 -include ../common.mk
 
-fhe_calculator_x86_32.nexe: fhe_calculator_x86_32.nexe
-	ln -s fhe_calculator_x86_32.nexe fhe_calculator_x86_32.nexe
-fhe_calculator_x86_64.nexe: fhe_calculator_x86_64.nexe
-	ln -s fhe_calculator_x86_64.nexe fhe_calculator_x86_64.nexe
-
 fhe_calculator_x86_32.nexe: $(OBJECTS_X86_32)
 	$(CPP) $^ $(LDFLAGS) -m32 -o $@
 
