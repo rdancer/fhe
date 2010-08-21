@@ -1,4 +1,4 @@
-/* evaluate.c -- evaluate algebraic strings */
+/* evaluate.cc -- evaluate algebraic strings */
 
 /*
  * Copyright © 2000-2002 Kyzer/CSG
