@@ -28,8 +28,28 @@ static bool Evaluate(NPVariant *result) {
   return true;
 }
 
+/** Evaluate the formula */
+char * DoEvaluate(char *formula) {
+#define BUFFER_SIZE 2000
+    char *s = reinterpret_cast<char*>(NPN_MemAlloc(BUFFER_SIZE));
+
+    snprintf (s, BUFFER_SIZE, "%lld", atoll(formula) + 1);
+
+    return s;
+}
+
+/** Increment number by one */
+char * AddOne(char *number) {
+#define BUFFER_SIZE 2000
+    char *s = reinterpret_cast<char*>(NPN_MemAlloc(BUFFER_SIZE));
+
+    snprintf (s, BUFFER_SIZE, "%lld", atoll(number) + 1);
+
+    return s;
+}
+
 // This is the module's function that does the work to set the value of the
-// result variable to '42'.  The Invoke() function that called this function
+// result variable to '43'.  The Invoke() function that called this function
 // then returns the result back to the browser as a JavaScript value.
 static bool FortyTwo(NPVariant *result) {
   if (result) {
@@ -46,21 +66,17 @@ static bool HelloWorld(const NPVariant *args,
 		       NPVariant *result) {
   if (result) {
     if (arg_count > 0) {
-	const char *format = "formula: »%s«";
 	NPString nps = NPVARIANT_TO_STRING(args[0]);
 
+	// Note: |formula| will be freed later on by the browser, so it needs to
+	// be allocated here with NPN_MemAlloc().
 	char *formula = reinterpret_cast<char*>(NPN_MemAlloc(nps.UTF8Length + 1));
-	memcpy (formula, nps.UTF8Characters, nps.UTF8Length);
+	memcpy(formula, nps.UTF8Characters, nps.UTF8Length);
 	formula[nps.UTF8Length] = '\0';
 
-	const int msg_length = strlen(format) + strlen(formula) + 1;
-	// Note: |msg_copy| will be freed later on by the browser, so it needs to
-	// be allocated here with NPN_MemAlloc().
-	char *msg_copy = reinterpret_cast<char*>(NPN_MemAlloc(msg_length));
-	size_t actual_length = snprintf(msg_copy, msg_length, format, formula);
-	STRINGN_TO_NPVARIANT(msg_copy, actual_length, *result);
+	char *s = DoEvaluate(formula);
 
-	free (s);
+	STRINGN_TO_NPVARIANT(s, strlen(s), *result);
     } else {
 	// XXX Signal error
 	STRINGN_TO_NPVARIANT("", 0, *result);
