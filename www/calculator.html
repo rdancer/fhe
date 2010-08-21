@@ -154,11 +154,11 @@
 
   <script type="text/javascript">
     fhe_calculator = null;  // Global application object.
-    status_text = 'NO-STATUS';
+    status_text = 'Loading...';
 
     function moduleDidLoad() {
       fhe_calculator = document.getElementById('fhe_calculator');
-      updateStatus('SUCCESS');
+      updateStatus('&nbsp;'); // Must not be an empty string
     }
 
     // If the page loads before the Native Client module loads, then set the
@@ -166,7 +166,7 @@
     // do not change the status message.
     function pageDidLoad() {
       if (fhe_calculator == null) {
-        updateStatus('LOADING...');
+        updateStatus('Loading...');
       } else {
         // It's possible that the Native Client module onload event fired
         // before the page's onload event.  In this case, the status message
@@ -211,28 +211,29 @@
 <body style="background: black; font-family: sans-serif;"
     onload="document.getElementById('formula').focus(); pageDidLoad()">
     <!-- background image -->
-    <div style="position: absolute; margin: 0; width: 99%; height: 98%; overflow: hidden;">
+    <div id="background_image" style="position: absolute; margin: 0; width: 99%; height: 98%; overflow: hidden;">
 	<img src="background.jpeg" style="width: 150%" />
-    </div>
+    </div id="background_image">
     <!-- calculator -->
-    <div style="position: absolute; margin-left: 15%; margin-top: 13%; padding: 20pt; color: white">
+    <div id="main_content" style="position: absolute; margin-left: 15%; margin-top: 12%; padding: 20pt; color: white">
       <form action="javascript:calculate()">
+	<div id="status_field">Loading...</div>
 	<input name="formula" id="formula" value="" />
 		<input type="submit" value="Calculate" /><br />
 	<div id="results">
 	    <div id="firstResult" class="firstResult">
 		<!-- <big>1 + 1 = 2</big> ← [throbber] in place of result while
 		calculation is in progress -->
-	    </div>
+	    </div id="firstResult">
 	    <!--
 	    [last formula &amp; result]<br />
 	    [second last formula &amp; result]<br />
 	    [third last formula &amp; result]<br />
 	    …<br />
 	      -->
-	</div>
+	</div id="results">
       </form>
-    </div>
+    </div id="main_content">
 
   <!-- Adapted from hello_world.html -->
 
@@ -278,10 +279,6 @@
     }
   </script>
 </p>
-
-
-<h2>Status</h2>
-<div id="status_field">NO-STATUS</div>
-</div>
+</div id="hello_world_html_div">
 </body>
 </html>
