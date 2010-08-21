@@ -124,6 +124,7 @@
 
       /* Do the gory work and produce the result */
       function calculate() {
+	  // This will start the throbber
 	  updateResult();
 
 	  if ((formula = document.getElementById('formula').value) != '') {
@@ -184,9 +185,33 @@
       }
     }
 
+    /**
+     * Send the xmlRpcRequest to the XML-RPC server, return the XML-RPC
+     * response.
+     */
+    function sendToXmlRpcServer(xmlRpcRequest) {
+	throw new Error("XML-RPC not implemented yet");
+    }
+
     function evaluate(formula) {
       try {
+	// Evaluate locally
         return(fhe_calculator.evaluate(formula));
+
+	/* Let NaCl pre-process the formula into boolean circuit + data,
+	   wrapped in XML-RPC, ready to send to server */ 
+	var xmlRpcRequest = fhe_calculator.formulaToXmlRpcRequest(formula);
+	return (xmlRpcRequest);
+	
+	/* Send the XML-RPC request to server, receive the XML-RPC-encoded
+	   encrypted response */
+	var xmlRpcResponse = sendToXmlRpcServer(xmlRpcRequest);
+	return (xmlRpcResponse);
+
+	/* Pass XML-RPC-encoded result to NaCl */
+	var result = fhe_calculator.xmlRpcResponseToResult(xmlRpcResponse);
+        return(result);
+
       } catch(e) {
         return(e.message);
       }
