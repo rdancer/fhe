@@ -17,7 +17,35 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
+CPP = c++
+SRC_DIR=xmlrpc-c/xmlrpc-c-1.06.27/examples/cpp
+
+
+.PHONY: all
+all: fhe-evaluate-server
+
+fhe-evaluate-server:
+	make -C $(SRC_DIR) xmlrpc_sample_add_server
+	ln -s $(SRC_DIR)/xmlrpc_sample_add_server fhe-evaluate-server
+	
+
+# Convenience target to rebuild the Ubuntu xmlrpc-c package from scratch
+.PHONY: dpkg-buildpackage
+dpkg-buildpackage:
+	cd xmlrpc-c-1.06.27 \
+	&& dpkg-buildpackage -b -us -uc
+		
 .PHONY: test
-test:
+test: fhe-evaluate-server
+	./fhe-evaluate-server& \
+	pid=$$!; \
+	sleep 2; \
 	xmlrpc http://localhost:8080/RPC2 test.add i/37 i/5 \
-	    | tee /dev/fd/2 | grep 'Integer: 42' >/dev/null
+	    | tee /dev/fd/2 | grep 'Integer: 42' >/dev/null \
+	    && echo Test OK; \
+	kill -KILL "$$pid"
+
+.PHONY: clean
+clean:
+	make -C $(SRC_DIR) clean
+	rm -f -- fhe-evaluate-server
