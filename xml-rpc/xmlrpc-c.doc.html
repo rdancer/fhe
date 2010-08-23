@@ -1,0 +1,855 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD><TITLE>User manual for XML-RPC for C/C++</TITLE></HEAD>
+<BODY>
+
+<h1>Table Of Contents</h1>
+
+<ul>
+<li><a href="#preface">Preface: About This Manual</a>
+  <ul>
+  <li><a href="#whatisxml-rpc">What is XML-RPC?</a>
+  <li><a href="#howdoesithelp">How Does XML-RPC For C/C++ Help?</a>
+  <li><a href="#xmlrpc-c">More Information On XML-RPC For C/C++</a>
+  </ul>
+<li><a href="#intro">Introduction to XML-RPC for C/C++</a>
+  <ul>
+  <li><a href="#whatisxml-rpc">What is XML-RPC?</a>
+  <li><a href="#howdoesithelp">How Does XML-RPC For C/C++ Help?</a>
+  </ul>
+<li><a href="#libraries">The Xmlrpc-c Function Libraries</a>
+  <ul>
+  <li><a href="#clibraries">C Libraries</a>
+  <li><a href="#cpplibraries">C++ Libraries</a>
+  </ul>
+<li><a href="#utilities">Utility Programs</a>
+  <ul>
+  <li><a href="#xmlrpc"><b>xmlrpc</b></a>
+  </ul>
+<li><a href="#alternatives">Alternatives</a>
+  <ul>
+  <li><a href="#otherlang">Other Programming Languages</a>
+  <li><a href="#apache">Apache Module</a>
+  </ul>
+<li><a href="#appendices">Appendices</a>
+  <ul>
+  <li><a href="#examples">Introductory Examples</a>
+  <li><a href="#thisdoc">About This Document</a>
+  </ul>
+</ul>
+
+<h1 id="preface">Preface: About This Manual</h1>
+
+<p>This is the manual for users of XML-RPC for C/C++.
+
+<p>The manual documents all current and past releases of XML-RPC for
+C/C++ and even planned future releases.  Each part of the manual
+tells you to what releases it applies.  Since the main difference
+between releases is that newer ones have more features, this mainly
+means that the description of a feature tells you in what release it
+was added to the package.
+
+<p>Compared to the more common system of distributing manuals keyed to
+particular releases, this makes the manual harder to use for some
+users (to wit, a user who has no intention of using any but one
+particular release), but it allows for a higher quality manual for
+past releases, with the same publication effort.  It also allows
+additional uses: writing portable code and discovering when you could
+benefit by moving to a newer release.
+
+<p>For more information about the document, see
+<a href="#thisdoc">About This Document</a>.
+
+
+<h1 id="intro">Introduction</h1>
+
+<p>XML-RPC for C/C++ is a software package of programming libraries to
+help a C or C++ program use XML-RPC.  In particular, a C/C++
+programmer can easily write a program to be an XML-RPC client or
+server.
+
+<P>XML-RPC for C/C++ is also known as Xmlrpc-c.
+
+<h2 id="whatisxml-rpc">What is XML-RPC?</h2>
+
+<p>XML-RPC is a standard network protocol that computers can use to talk
+to each other in a remote procedure call fashion.  Remote procedure call
+essentially means that a program on one computer runs a program on another
+computer.  But a simpler way of looking at this kind of network protocol
+is just that you have clients and servers.  A client makes individual
+isolated requests of a server.  A server sits around waiting for a
+request to arrive from some client, does what the request asks, and 
+sends a response.  It then goes back to waiting for the next request.
+
+<p>Here are some examples of remote procedure call (RPC) style
+communications:
+<ul>
+<li>There is a server that can measure atmospheric temperature.  A client
+anywhere in the world can ask the server at any time what the temperature
+is.  The &quot;what temperature is it?&quot; request and the &quot;the
+temperature is...&quot; response constitute an RPC transaction.
+
+<li>There is a server that can turn a light on or off.  A client can tell
+the server to turn the light on.  A request to turn the light on and the
+acknowledgement that the light has been turned on constitute an RPC
+transaction.
+
+<li>There is a server that knows the phone numbers of a million people.
+A client can supply a name and get back the phone number of the named
+person.
+
+<li>A network of 1000 computers is used to search millions of web
+pages.  A dispatcher computer is a client and the rest are servers.
+The dispatcher sends each of the servers one URL at a time and some
+search terms.  The server responds with yes or no as to whether the
+page with that URL contains the search terms.  The dispatcher keeps a
+list of the URLs that match.  Each of the requests to search a
+particular URL is an RPC transaction.
+
+</ul>
+
+<p>Here are some kinds of communication that are <em>not</em> RPC:
+
+<ul>
+<li>A long-lived connection such as an SSH login session.
+
+<li>A high volume transfer such as an FTP download.
+
+<li>A one-way transmission such as a UDP packet.
+
+<li>A dialogue such as an SMTP (mail) transaction.
+
+</ul>
+
+<p>The original RPC protocol is the ONC RPC protocol -- the one that
+NFS (the network fileystem protocol) uses.  It's often called
+&quot;Sun RPC&quot; because Sun invented and promulgated it.  The ONC
+RPC protocol is layered over UDP or sometimes TCP and uses a
+machine-friendly bits and bytes format, just like the TCP/IP layers
+under it.
+
+<p>XML-RPC differs from ONC RPC in that it encodes the information in
+the requests and responses in XML.  That means they are human friendly
+-- XML is human-readable text, so a human can readily see what's
+going on from a network trace and quickly write code to create and
+decipher XML-RPC streams.  Of course, the tradeoff is that XML-RPC
+uses way more network and computation resources than ONC RPC.  Because
+XML-RPC is meant to be used for relatively small and infrequent
+transactions, this is thought not to matter.
+
+<p>In XML-RPC, the aforementioned XML is transported via HTTP (the
+protocol whose principal purpose is to implement web serving -- web
+browsing is a form of RPC, after all).  HTTP is normally carried over
+TCP, which is carried over IP.
+
+<p>There are lots of servers in the world that use the XML-RPC
+protocol and lots of programs and programming libraries from which
+people can build XML-RPC-based servers and clients.
+
+<p>There are also other HTTP-based RPC protocols.  SOAP and CORBA are
+the most famous.  REST-RPC is a more recent entry.
+
+<p>For more information on XML-RPC, see <a
+href="http://www.xmlrpc.com/">The XML-RPC web site</a> and <a
+href="http://tldp.org/HOWTO/XML-RPC-HOWTO/index.html">The XML-RPC
+Howto</a>.  The latter includes information (with examples) on
+implementing XML-RPC clients and servers in languages other than C and
+C++, which is all that is covered in this document.
+
+<h2 id="howdoesithelp">How Does XML-RPC For C/C++ Help with XML-RPC?</h2>
+
+<p>The function libraries in XML-RPC For C/C++ (Xmlrpc-c) let you
+write a program that makes XML-RPC calls (a client) or executes
+XML-RPC calls (a server program) at any of various levels of
+understanding of the XML-RPC protocol.
+
+<p>Here are <a href="#examples">some examples of client and server code</a>.
+
+
+<h2 id="xmlrpc-c">More Information On XML-RPC For C/C++</h2>
+
+<p>This manual is a user's guide, meant to tell you how to write programs
+using the library.  It does not cover such things as how Xmlrpc-c is developed
+or how to get or install it for use.
+
+<p>The master source of information about Xmlrpc-c is the
+<a href="http://xmlrpc-c.sourceforge.net/">Xmlrpc-c web site</a>.
+
+
+<h1 id="libraries">The Xmlrpc-c Function Libraries</h1>
+
+<p>This is a list of the function libraries Xmlrpc-c provides, with links
+to the manual for each.
+
+<p>There are two sets of libraries -- C and C++.  You can of course
+use the C libraries in a C++ program, but you cannot in general mix
+the two -- you use either the C Xmlrpc-c facilities or the C++
+Xmlrpc-c facilities.  The C++ libraries depend heavily on the C
+libraries, but apart from having to install and link to the C
+libraries, you won't see that from the outside.
+
+<p>The C++ libraries were all new in Xmlrpc-c 1.03 (June 2005).
+
+<p>There is an older C++ facility, which is just a thin wrapper around
+the C libraries.  We do not document it in this manual or recommend
+it, but it remains part of Xmlrpc-c for backward compatibility.  This
+library consists in the header file <b>xmlrpc-c/oldcppwrapper.hpp</b>
+(fka <b>XmlRpcCpp.h</b>) and the library <b>libxmlrpc_cpp</b>.
+
+<h2 id="clibraries">C Libraries</h2>
+
+<p>For information common to all the libraries, see <a
+href="libgeneral.html">General Library Information - C</a>
+
+<ul>
+<li><a href="libxmlrpc.html">libxmlrpc</a> - general facilities, not
+specific to clients or to servers, such as XML encoding and decoding
+and XML-RPC value processing.
+
+<li><a href="libxmlrpc_client.html">libxmlrpc_client</a> - facilities
+for implementing a client
+
+<li><a href="libxmlrpc_server.html">libxmlrpc_server</a> - facilities
+for implementing a server &mdash; facilities which are independent of the
+transport mechanism.
+
+<li><a href="libxmlrpc_server_abyss.html">libxmlrpc_server_abyss</a> -
+facilities for implementing a server, based on an Abyss HTTP
+server.
+
+<li><a href="libxmlrpc_abyss.html">libxmlrpc_abyss</a> - The Abyss
+server software.
+
+<li><a href="libxmlrpc_server_cgi.html">libxmlrpc_server_cgi</a> -
+facilities for implementing a server via CGI scripts under an
+arbitrary HTTP server (i.e. web server).
+
+</ul>
+
+<h2 id="cpplibraries">C++ Libraries</h2>
+
+<p>For information common to all the libraries, see <a
+href="libgeneral.html">General Library Information - C++</a>
+
+<ul>
+
+<li><a href="libxmlrpc++.html">libxmlrpc++</a> - general facilities, not
+specific to clients or to servers, such as XML encoding and decoding
+and XML-RPC value processing.
+
+
+<li><a href="libxmlrpc_client++.html">libxmlrpc_client++</a> -
+facilities for implementing a client
+
+<li><a href="libxmlrpc_server++.html">libxmlrpc_server++</a> -
+facilities for implementing a server &mdash; facilities which are
+independent of the transport mechanism.
+
+<li><a href="libxmlrpc_server_abyss++.html">libxmlrpc_server_abyss++</a> -
+facilities for implementing a server, based on an <a>abyss</a> HTTP
+server.
+
+<li><a href="libxmlrpc_server_cgi++.html">libxmlrpc_server_cgi++</a> -
+facilities for implementing a server via CGI scripts under an
+arbitrary HTTP server (i.e. web server).
+
+<li><a href="libxmlrpc_server_pstream++.html">libxmlrpc_server_pstream++</a> -
+facilities for implementing a pseudo-XML-RPC server that uses a packet
+stream in place of HTTP and has multi-RPC client/server connections.
+
+</ul>
+
+
+
+
+<h1 id="utilities">Utility Programs</h1>
+
+<p>Xmlrpc-c comes with a few utility programs that you can use to
+diagnose problems or learn about XML-RPC or Xmlrpc-c.  These programs
+double as examples of how to use the Xmlrpc-c function libraries.
+
+<p>Because the utility programs are not essential to the package,
+the default install tools don't install them at all.  The builder does
+build them, though, and if you build Xmlrpc-c from source, you will
+find them all in the <b>tools/</b> directory.
+
+<p>You'll also find more complete documentation there.
+
+<h2 id="xmlrpc">xmlrpc</h2>
+
+<p><b>xmlrpc</b> is a general purpose XML-RPC client program.  It
+performs one XML-RPC call, which you describe in its command line
+arguments.
+
+<p>Example:
+
+<pre>
+<kbd>
+$ xmlrpc http://localhost:8080/RPC2 sample.add i/3 i/5
+</kbd>
+</pre>
+
+This makes a call to the XML-RPC server at the indicated URL, for the
+method named &quot;sample.add&quot;, with two arguments: the integer 3
+and the integer 5.
+
+<p><b>xmlrpc</b> prints to Standard Output the result of the call, which
+it gets back from the server.
+
+<p>You can abbreviate the URL; <B>xmlrpc</B> assumes &quot;http://&quot;
+and &quot;/RPC2&quot;:
+
+<pre>
+<kbd>
+$ xmlrpc localhost:8080 sample.add i/3 i/5
+Result:
+  Integer: 8
+</kbd>
+</pre>
+
+<p>The port number defaults to 80, so you can abbreviate even more:
+
+<pre>
+<kbd>
+$ xmlrpc localhost sample.add i/3 i/5
+</kbd>
+</pre>
+
+<p>String arguments look like this:
+
+<pre>
+<kbd>
+$ xmlrpc http://www.xmlrpc.com/RPC2 method_that_takes_string s/hello
+</kbd>
+</pre>
+
+<p>If you don't include a type specifier such as &quot;i/&quot; or
+&quot;s/&quot;, <b>xmlrpc</b> assumes &quot;s/&quot;.  So you can use
+this shortcut, equivalent to the above:
+
+<pre>
+<kbd>
+$ xmlrpc http://www.xmlrpc.com/RPC2 method_that_takes_string hello
+</kbd>
+</pre>
+
+<p>Each argument to <b>xmlrpc</b> describes on XML-RPC parameter.  So
+in a typical command shell, the following would make an XML-RPC call
+with two paramters: &quot;hello&quot; and &quot;see you later&quot;:
+
+<pre>
+<kbd>
+$ xmlrpc http://www.xmlrpc.com/RPC2 mymethod s/hello &quot;s/see you later&quot;
+</kbd>
+</pre>
+
+<p>Compound values for parameters look the following, except that these
+aren't implemented yet.  Only &quot;i/&quot; and &quot;s/&quot; are
+implemented right now.
+
+<p>Note that this is an example of a Bourne shell command, so some of
+the characters (most notably the quotation marks) are part of the shell
+language, not the <b>xmlrpc</b> syntax.
+
+<pre>
+<kbd>
+$ xmlrpc http://www.oreillynet.com/meerkat/xml-rpc/server.php \
+    meerkat.getItems \
+    &quot;struct/{search:linux,descriptions:i/76,time_period:12hour}&quot;
+Result:
+  Array:
+    Struct:
+      title: String: DatabaseJournal: OpenEdge-Based Finance ...
+      link: String: http://linuxtoday.com/news_story.php3?ltsn=...
+      description: String: "Finance application with embedded ...
+    Struct:
+      title: ...
+      link: ...
+      description: ...
+
+</kbd>
+</pre>
+
+<pre>
+<kbd>
+$ xmlrpc localhost:8080 array_processing_method \
+    &quot;array/(i/3,i/49,s/hello,array/(i/-10,i/-9))&quot;
+</kbd>
+</pre>
+
+<p><b>xmlrpc</b> is implemented using the Xmlrpc-c client library, but
+its function is not in any way tied to Xmlrpc-c.  It makes a standard
+XML-RPC call and does not know or care whether the server is
+implemented with Xmlrpc-c or not.
+
+<p>For extra diagnostic information, use the <a
+href="libxmlrpc_client.html#trace_xml"><b>XMLRPC_TRACE_XML</b>
+environment variable</a> so you can see the XML that goes back and
+forth to perform the call.  (This is not specifically <b>xmlrpc</b>
+function -- it's tracing function that's automatically there because
+<b>xmlrpc</b> uses <b>libxmlrpc_client</b>).
+
+<h3>Warning About System Compatibility</h3>
+
+<p><b>xmlrpc</b> from Xmlrpc-c before Release 1.16 doesn't work on some
+platforms &mdash; it crashes due to invalid assumptions it makes about the
+way C variadic functions are implemented.
+
+
+<h1 id="alternatives">Alternatives</h1>
+
+<P>This section describes some alternatives to using XML-RPC For
+C/C++.
+
+<h2 id="otherlang">Other Progamming Languages</h2>
+
+<p>There are plenty of facilities to help you create XML-RPC clients
+and servers in a language other than C or C++.  Search on <a
+href="http://freshmeat.net">Freshmeat</a>.
+
+<p>It is worth mentioning that with some of these other-language
+facilities, the client or server is way slower than with XML-RPC for
+C/C++, due to the nature of the language.  For example, I have used
+the Perl <b>RPC::XML</b> modules from CPAN and found a client program
+that takes 50 milliseconds to run when written with XML-RPC For C And
+C++ takes 2000 milliseconds to run when done with RPC::XML::Client.
+
+<p>In the case of Perl, there is a middle ground.  The
+<b>RPC::Xmlrpc_c</b> modules from CPAN are based on Perl extensions
+that use the libraries of XML-RPC For C And C++.  One reason
+<b>RPC::XML</b> is so slow is that it is built on top of a stack about
+6 layers high, each one implemented in interpreted Perl.  With
+<b>RPC::Xmlrpc_c</b>, all those layers except the top are implemented
+as executable machine code, efficiently compiled from C, so you have
+the same ease of Perl coding, without the slowness.
+
+<p><b>RPC::Xmlrpc_c</b> is much younger than <b>RPC::XML</b>, so
+doesn't have many features, and in fact does not include any server
+facilities.  But you could add missing features yourself (and,
+ideally, submit them for inclusion in the <b>RPC::Xmlrpc_c</b> package
+on CPAN, so others can use them).
+
+<p><b>RPC::Xmlrpc_c</b> was new in December 2006 and needs
+XML-RPC For C And C++ Release 1.08 or better.
+
+<p>In other interpreted languages, the same hybrid may be possible --
+replacing slow interpreted code with executable XML-RPC libraries.
+
+
+<h2 id="apache">Apache Module</h2>
+
+<p>You can make a nice XML-RPC server based on an Apache HTTP server (which
+may or may not simultaneously be a regular web server) using an Apache module.
+
+<p>There once was an Apache module based on Xmlrpc-c, so you could use the <a
+href="libxmlrpc_server.html#howto">same method code</a> as you do for other
+Xmlrpc-c-based implementations.  It was called <b>mod_xmlrpc</b> and is
+described by a <a
+href="http://freshmeat.net/projects/mod_xmlrpc">Freshmeat</a> entry, but as of
+April 2009, the download link is dead.
+
+<p>Another module, also called <b>mod_xmlrpc</b>, is distributed via a <a
+href="http://sourceforge.net/projects/mod-xmlrpc">Sourceforge project</a>, but
+hasn't been updated since 2001, is undocumented, and looks pretty weak.
+
+<p>An even simpler, though less efficient and more limited way to make
+an XML-RPC server out of an Apache server is to do it via a CGI
+script.  That script can be written in a variety of languages, but if
+you write it in C, you can use Xmlrpc-c's <a
+href="libxmlrpc_server_cgi.html">libxmlrpc_server_cgi</a> library.
+
+<h2 id="otherprotocol">Other RPC Protocols</h2>
+
+<p>SOAP and CORBA are common alternatives to XML-RPC.  Lots of expensive
+commercial software helps you use those.  There is more to know and more
+you can do with them.
+
+<p>REST-RPC was invented in 2006 and was meant to be superior to
+XML-RPC for at least some things.  It is easier to use in many ways
+than XML-RPC.  Like XML-RPC, it uses HTTP, and like XML-RPC an RPC's
+result is XML.  But unlike XML-RPC, a call is <em>not</em> XML.  It is
+encoded entirely in the query part of a URL.  (Example:
+<tt>http:/test.rest-rpc.org/?_function=GetCart&amp;cart=1563</tt>).
+In the result, there are no inherent data types; server and client
+agree on those separately.  The <a
+href="http://xins.sourceforge.net/restrpc.html">Xins</a> project has
+more information.
+
+<p><a href="http://json-rpc.org">JSON-RPC</a> is like XML-RPC using JSON
+instead of XML, but isn't really an RPC protocol at all.  It is a protocol for
+sending arbitrary messages back and forth between two communicants (whereas in
+an RPC protocol, the messages must have a request/response relationship).
+JSON is a way of representing typical program data structures such as integers
+and arrays in text, and is much simpler than XML-RPC XML elements or indeed
+any XML.  It is far easier for a person to read a JSON-RPC message than to
+read an XML-RPC message.  JSON-RPC was developed after XML-RPC.
+
+<h1 id="appendices">Appendices</h1>
+
+<h2 id="examples">Introductory Examples</h2>
+
+<p>Here, to show you what Xmlrpc-c is, we present example code (almost
+an entire C program) for a simple XML-RPC client that exploits the
+Xmlrpc-c libraries, and a corresponding simple XML-RPC server.
+
+<p>You can find complete working versions of these, and lots of other
+examples in the <b>examples/</b> directory in the Xmlrpc-c source
+tree.
+
+<p>In these examples, the service to be provided is adding of two
+numbers.  You wouldn't do this with RPC in real life, of course,
+because a program can add two numbers without the help of a remote
+server.  This is just to demonstrate the concept.
+
+<h3>Table Of Contents</h3>
+
+<ul>
+<li><a href="#clientexample">Small C Client Example</a>
+<li><a href="#serverexample">Small C Server Example</a>
+<li><a href="#cgiexample">CGI C Server Example</a>
+<li><a href="#serverexamplepp">Small C++ Server Example</a>
+<li><a href="#clientexamplepp">Small C++ Client Example</a>
+</ul>
+
+
+<h3 id="clientexample">Small C Client Example</h3>
+
+<p>Here is an example of C code that implements an XML-RPC client using
+the highest level facilities of Xmlrpc-c.  This client sends a request
+to add 5 and 7 together to an XMLRPC-C server that is designed to
+provide the service of adding numbers.
+
+<pre>
+<code>
+#include &lt;xmlrpc.h&gt;
+#include &lt;xmlrpc_client.h&gt;
+
+#include &quot;config.h&quot;  /* information about this build environment */
+
+#define NAME &quot;XML-RPC C Test Client&quot;
+#define VERSION &quot;1.0&quot;
+
+int 
+main(int           const argc, 
+     const char ** const argv) {
+
+    xmlrpc_env env;
+    xmlrpc_value * resultP;
+    int sum;
+    char * const url = &quot;http://localhost:8080/RPC2&quot;;
+    char * const methodName = "sample.add";
+
+    /* Initialize our error-handling environment. */
+    xmlrpc_env_init(&amp;env);
+
+    /* Start up our XML-RPC client library. */
+    xmlrpc_client_init2(&amp;env, XMLRPC_CLIENT_NO_FLAGS, NAME, VERSION, NULL, 0);
+    die_if_fault_occurred(&amp;env);
+
+    /* Make the remote procedure call */
+    resultP = xmlrpc_client_call(&amp;env, url, methodName,
+                 &quot;(ii)&quot;, (xmlrpc_int32) 5, (xmlrpc_int32) 7);
+    die_if_fault_occurred(&amp;env);
+    
+    /* Get our state name and print it out. */
+    xmlrpc_parse_value(&amp;env, resultP, &quot;i&quot;, &amp;sum);
+    die_if_fault_occurred(&amp;env);
+    printf(&quot;The sum  is %d\n&quot;, sum);
+    
+    /* Dispose of our result value. */
+    xmlrpc_DECREF(resultP);
+
+    /* Clean up our error-handling environment. */
+    xmlrpc_env_clean(&amp;env);
+    
+    /* Shutdown our XML-RPC client library. */
+    xmlrpc_client_cleanup();
+
+    return 0;
+}
+
+</code>
+</pre>
+
+<h3 id="serverexample">Small C Server Example</h3>
+
+<p>Now, here is code that implements an XML-RPC server that provides
+the number-adding service from the previous section.
+
+<pre>
+<code>
+#include &lt;xmlrpc.h&gt;
+#include &lt;xmlrpc_server.h&gt;
+#include &lt;xmlrpc_server_abyss.h&gt;
+
+static xmlrpc_value *
+sample_add(xmlrpc_env *   const envP,
+           xmlrpc_value * const paramArrayP, 
+           void *         const serverContext) {
+
+    xmlrpc_int32 x, y, z;
+
+    /* Parse our argument array. */
+    xmlrpc_parse_value(envP, paramArrayP, &quot;(ii)&quot;, &amp;x, &amp;y);
+    if (envP-&gt;fault_occurred)
+        return NULL;
+
+    /* Add our two numbers. */
+    z = x + y;
+
+    /* Return our result. */
+    return xmlrpc_build_value(envP, &quot;i&quot;, z);
+}
+
+
+
+int 
+main (int           const argc, 
+      const char ** const argv) {
+
+    xmlrpc_server_abyss_parms serverparm;
+    xmlrpc_registry * registryP;
+    xmlrpc_env env;
+
+    if (argc-1 != 1) {
+        fprintf(stderr, &quot;You must specify 1 argument:  The Abyss &quot; 
+                &quot;configuration file name.  You specified %d.\n&quot;,  argc-1);
+        exit(1);
+    }
+
+    xmlrpc_env_init(&amp;env);
+
+    registryP = xmlrpc_registry_new(&amp;env);
+
+    xmlrpc_registry_add_method(
+        &amp;env, registryP, NULL, "sample.add", &amp;sample_add, NULL);
+
+    serverparm.config_file_name = argv[1];
+    serverparm.registryP = registryP;
+
+    printf(&quot;Starting XML-RPC server...\n&quot;);
+
+    xmlrpc_server_abyss(&amp;env, &amp;serverparm, XMLRPC_APSIZE(registryP));
+
+    return 0;
+}
+</code>
+</pre>
+
+
+<p>There's a lot going on under the covers of this example server.
+What the xmlrpc_server_abyss() statement does is run a whole HTTP
+server.  The function doesn't normally return.  The HTTP server runs
+the <b>abyss</b> web server (i.e. HTTP server) program.  <b>abyss</b>
+is like the more serious web server program <b>apache</b>, but on a
+much smaller scale.  An XML-RPC call is just an HTTP POST request, so
+while <b>abyss</b> was not designed specifically for XML-RPC, it
+provides much of the function an XML-RPC server needs.
+
+<p>The only way this Abyss web server differs from one you would run
+to do traditional web serving is that it contains a special handler to
+call Xmlrpc-c functions to handle an XML-RPC POST request.  The server
+calls that handler for any URI that starts with &quot;/RPC2&quot;,
+which is what XML-RPC URIs conventionally have.
+
+<p>While <b>abyss</b> is distributed independently of Xmlrpc-c,
+Xmlrpc-c contains an old copy of it, somewhat modified.  So you don't
+need to install <b>abyss</b> separately.
+
+<p>In this example, you have to provide an example <b>abyss</b>
+configuration file as a program argument.  The main thing you need
+that file for is to specify on which TCP port the server will listen.
+A single &quot;Port 8080&quot; statement is probably enough.  (I say
+8080, because in the example client code above, I hardcoded 8080 as
+the port in the URI the client uses).
+
+<p>There are lots of other ways to use Xmlrpc-c libraries to build
+XML-RPC clients and servers.  The more code you're willing to write, and
+the more involved in the guts of the protocol you want to get, the more
+control you can have.
+
+<h3 id="cgiexample">CGI Server Example</h3>
+
+<pre>
+<code>
+/* A simple CGI-based XML-RPC server written in C. */
+
+#include &lt;xmlrpc.h&gt;
+#include &lt;xmlrpc_server_cgi.h&gt;
+
+static xmlrpc_value *
+sample_add(xmlrpc_env *   const env, 
+           xmlrpc_value * const param_array, 
+           void *         const user_data) {
+
+    xmlrpc_int32 x, y, z;
+
+    /* Parse our argument array. */
+    xmlrpc_decompose_value(env, param_array, "(ii)", &amp;x, &amp;y);
+    if (env->fault_occurred)
+        return NULL;
+
+    /* Add our two numbers. */
+    z = x + y;
+
+    /* Return our result. */
+    return xmlrpc_int_new(env, z);
+}
+
+
+
+int 
+main(int           const argc, 
+     const char ** const argv) {
+
+    /* Process our request. */
+    xmlrpc_cgi_init(XMLRPC_CGI_NO_FLAGS);
+    xmlrpc_cgi_add_method_w_doc("sample.add", &amp;sample_add, NULL,
+                                "i:ii", "Add two integers.");
+    xmlrpc_cgi_process_call();
+    xmlrpc_cgi_cleanup();
+
+    return 0;
+}
+
+</code>
+</pre>
+
+
+<h3 id="clientexamplepp">Small C++ Client Example</h3>
+
+<p>Here is an example of C++ code that implements an XML-RPC client using
+the highest level facilities of Xmlrpc-c.  This client sends a request
+to add 5 and 7 together to an XMLRPC-C server that is designed to
+provide the service of adding numbers.
+
+<p>The example server <a href="#serverexample">above</a> would be a suitable
+server for this client.
+
+<pre>
+<code>
+#include &lt;string&gt;
+#include &lt;iostream&gt;
+#include &lt;xmlrpc-c/base.hpp&gt;
+#include &lt;xmlrpc-c/client_simple.hpp&gt;
+
+using namespace std;
+
+int
+main(int argc, char **argv) {
+
+    if (argc-1 &gt; 0) {
+        if (argv) {}
+        cerr &lt;&lt; "This program has no arguments" &lt;&lt; endl;
+        exit(1);
+    }
+
+    string const serverUrl(&quot;http://localhost:8080/RPC2&quot;);
+    string const methodName(&quot;sample.add&quot;);
+
+    xmlrpc_c::clientSimple myClient;
+    xmlrpc_c::value result;
+        
+    myClient.call(serverUrl, methodName, &quot;ii&quot;, &amp;result, 5, 7);
+
+    int const sum((xmlrpc_c::value_int(result)));
+        // Assume the method returned an integer; throws error if not
+
+    cout &lt;&lt; "Result of RPC (sum of 5 and 7): " &lt;&lt; sum &lt;&lt; endl;
+
+    return 0;
+}
+</code>
+</pre>
+
+<p>To keep it brief, we don't catch any thrown errors, though various
+parts of this program can throw them.
+
+
+<h3 id="serverexamplepp">Small C++ Server Example</h3>
+
+<p>Here is C++ code that implements the same kind of XML-RPC server
+shown in C <a href="#serverexample">above</a>.
+
+<pre>
+<code>
+#include &lt;cassert&gt;
+
+#include &lt;xmlrpc-c/base.hpp&gt;
+#include &lt;xmlrpc-c/registry.hpp&gt;
+#include &lt;xmlrpc-c/server_abyss.hpp&gt;
+
+using namespace std;
+
+class sampleAddMethod : public xmlrpc_c::method {
+public:
+    sampleAddMethod() {}
+
+    void
+    execute(xmlrpc_c::paramList const&amp; paramList,
+            xmlrpc_c::value *   const  retvalP) {
+        
+        int const addend(paramList.getInt(0));
+        int const adder(paramList.getInt(1));
+        
+        paramList.verifyEnd(2);
+        
+        *retvalP = xmlrpc_c::value_int(addend + adder);
+    }
+};
+
+
+
+int 
+main(int           const argc, 
+     const char ** const argv) {
+
+    xmlrpc_c::registry myRegistry;
+
+    xmlrpc_c::methodPtr const sampleAddMethodP(new sampleAddMethod);
+
+    myRegistry.addMethod(&quot;sample.add&quot;, sampleAddMethodP);
+
+    xmlrpc_c::serverAbyss myAbyssServer(
+        myRegistry,
+        8080,              // TCP port on which to listen
+        &quot;/tmp/xmlrpc_log&quot;  // Log file
+        );
+
+    myAbyssServer.run();
+    // xmlrpc_c::serverAbyss.run() never returns
+    assert(false);
+
+    return 0;
+}
+
+</code>
+</pre>
+
+
+
+<h2 id="thisdoc">About This Document</h2>
+
+<p>This document is part of the XML-RPC For C/C++ project.  It is the
+main user documentation for the project.
+
+<p>The master copy of this document lives at <a
+href="http://xmlrpc-c.sourceforge.net/doc/">http://xmlrpc-c.sourceforge.net/doc/</a>.
+The HTML copy there is the original source -- it is hand edited.
+
+<p>This is a living document.  It gets updated continuously, both to
+document changes in Xmlrpc-c and to improve the documentation.  It
+documents all current and past, and, where possible, future releases
+of Xmlrpc-c.  There is no benefit to keeping an old copy of the
+document to use with an old copy of the code.
+
+<p>Bryan Henderson wrote and published the first draft of this
+document in November 2004, as an entirely original work.  Bryan placed
+it in the public domain.
+
+<p>Bryan enthusiastically maintains the document.  If you have a
+problem with it, from typos to missing topics, please email Bryan at
+bryanh@giraffe-data.com.
+
+</BODY>
+</HTML>
