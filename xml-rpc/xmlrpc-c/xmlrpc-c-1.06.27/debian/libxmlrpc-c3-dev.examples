@@ -1,0 +1,4 @@
+examples/*.c
+examples/*.cc
+examples/Win32*
+conf

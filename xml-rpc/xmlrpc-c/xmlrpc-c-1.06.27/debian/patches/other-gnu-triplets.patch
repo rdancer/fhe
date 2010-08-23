@@ -1,0 +1,14 @@
+Fixed FTBFS on lpia by supporting its i686-linux-gnulp triplet
+
+--- a/Makefile.config.in
++++ b/Makefile.config.in
+@@ -136,7 +136,8 @@
+ # out how.  For the rest, we have this default:
+ SHARED_LIB_TYPE = NONE
+ 
+-ifeq ($(HOST_OS),linux-gnu)
++# linux-gnu, linux-gnueabi and linux-gnulp
++ifneq ($(filter linux-gnu linux-gnueabi linux-gnulp, $(HOST_OS)),)
+   # Assume linker is GNU Compiler (gcc)
+   SHARED_LIB_TYPE = unix
+   SHLIB_SUFFIX = so

@@ -1,0 +1,5 @@
+libxmlrpc 3 libxmlrpc-core-c3
+libxmlrpc_xmlparse 3 libxmlrpc-core-c3
+libxmlrpc_client 3 libxmlrpc-core-c3
+libxmlrpc_util 3 libxmlrpc-core-c3
+libxmlrpc_xmltok 3 libxmlrpc-core-c3

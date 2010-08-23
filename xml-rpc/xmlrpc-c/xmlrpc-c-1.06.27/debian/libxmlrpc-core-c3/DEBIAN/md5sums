@@ -1,0 +1,7 @@
+1c02d3d87e352b107c27d62cfa454302  usr/share/doc/libxmlrpc-core-c3/copyright
+846a85968f66aa3a08beaa38928e0074  usr/share/doc/libxmlrpc-core-c3/changelog.Debian.gz
+7a95516634909699e55abee81d46a621  usr/lib/libxmlrpc.so.3.6.15
+7e770520194f7900445ef1912aadd67c  usr/lib/libxmlrpc_xmlparse.so.3.6.15
+0c60ab096257d9ccb530e049738101d7  usr/lib/libxmlrpc_client.so.3.6.15
+dbab120b4d0c88c0d95fdf8cddb99483  usr/lib/libxmlrpc_util.so.3.6.15
+515fc4d0d95f1e7ec67753d46665d68c  usr/lib/libxmlrpc_xmltok.so.3.6.15

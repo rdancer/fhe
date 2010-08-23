@@ -1,0 +1,145 @@
+#!/usr/bin/make -f
+# Sample debian/rules that uses debhelper.
+# GNU copyright 1997 to 1999 by Joey Hess.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+
+
+# These are used for cross-compiling and for saving the configure script
+# from having to guess our platform (since we know it already)
+DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+
+ifeq ($(DEB_BUILD_GNU_TYPE), $(DEB_HOST_GNU_TYPE))
+  confflags += --build $(DEB_BUILD_GNU_TYPE)
+else
+  confflags += --build $(DEB_BUILD_GNU_TYPE) --host $(DEB_HOST_GNU_TYPE)
+endif
+
+
+CFLAGS = -Wall -g
+
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+  CFLAGS += -O0
+else
+  CFLAGS += -O2
+endif
+
+# upstream build doesn't honor CFLAGS but CFLAGS_PERSONAL
+CFLAGS_PERSONAL = $(CFLAGS)
+export CFLAGS_PERSONAL
+
+# include the patch/unpatch rules from quilt
+include /usr/share/quilt/quilt.make
+
+muckfiles:=config.sub config.guess
+
+config.status: configure $(QUILT_STAMPFN)
+	dh_testdir
+	# backup files that either we or upstream muck with
+	for f in $(muckfiles); do cp -a $$f $$f.orig; done
+	ln -sf /usr/share/misc/config.sub config.sub
+	ln -sf /usr/share/misc/config.guess config.guess
+	./configure $(confflags) \
+	            --prefix=/usr \
+		    --disable-libwww-client \
+		    --mandir=\$${prefix}/share/man \
+		    --infodir=\$${prefix}/share/info
+
+
+build: build-arch-stamp build-indep-stamp
+
+build-arch: build-arch-stamp
+build-arch-stamp: config.status
+	dh_testdir
+	$(MAKE) CADD=-fPIC
+	touch build-arch-stamp
+
+build-indep: build-indep-stamp
+build-indep-stamp: config.status
+	dh_testdir
+	# nothing to build
+	touch build-indep-stamp
+
+clean: unpatch
+	dh_testdir
+	dh_testroot
+	rm -f build-arch-stamp build-indep-stamp
+	# Add here commands to clean up after the build process.
+	# xxx upstream build process still breaks on distclean...
+	[ ! -f Makefile ] || [ ! -f config.status ] || $(MAKE) distclean || true
+	# restore files mucked by us or upstream during build/clean
+	for f in $(muckfiles); do \
+		[ ! -e $$f.orig ] || ( rm -rf $$f; mv $$f.orig $$f ) ; \
+	done
+	dh_clean -X autom4te.cache
+
+#install: install-indep install-arch
+install: install-arch
+
+install-arch: build-arch
+	dh_testdir
+	dh_testroot
+	dh_clean -k -a $(addprefix -X,$(muckfiles))
+	dh_installdirs -a
+
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
+
+	dh_install -a --list-missing
+	# plop in our lintian override file
+	mkdir -p debian/libxmlrpc-c3/usr/share/lintian/overrides/
+	cp debian/xmlrpc-c.lintian-overrides debian/libxmlrpc-c3/usr/share/lintian/overrides/libxmlrpc-c3
+
+install-indep: build-indep
+	dh_testdir
+	dh_testroot
+	dh_clean -k -i $(addprefix -X,$(muckfiles))
+	dh_installdirs -i
+	dh_install -i --list-missing
+
+
+# Common target for binary-indep/binary-arch.  Must not depend on anything and
+# will get called by another 'make' thread.
+binary-common:
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs
+	dh_installdocs
+	dh_installexamples
+#	dh_installmenu
+#	dh_installdebconf
+#	dh_installlogrotate
+#	dh_installemacsen
+#	dh_installpam
+#	dh_installmime
+#	dh_installinit
+#	dh_installcron
+#	dh_installinfo
+	dh_installman
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+#	dh_perl
+#	dh_python
+	dh_makeshlibs
+	dh_shlibdeps
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+#binary: binary-indep binary-arch
+binary: binary-arch
+
+# Build architecture-independent files using the common target.
+binary-indep: install-indep
+	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
+
+# Build architecture-dependent files using the common target.
+binary-arch: install-arch
+	$(MAKE) -f debian/rules DH_OPTIONS=-a binary-common
+
+.PHONY: build clean install install-indep install-arch install binary binary-common binary-indep binary-arch

@@ -1,0 +1,93 @@
+Source: xmlrpc-c
+Priority: optional
+Section: libs
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: Sean Finney <seanius@debian.org>
+Build-Depends: autotools-dev, debhelper, libcurl4-openssl-dev | libcurl3-openssl-dev, quilt
+Standards-Version: 3.7.3
+
+Package: libxmlrpc-c3-dev
+Section: libdevel
+Architecture: any
+Depends: libxmlrpc-c3 (= ${binary:Version}), libc6-dev, libxmlrpc-core-c3-dev
+Conflicts: libxmlrpc-c-dev, libxmlrpc-c0-dev, xmlrpc-c-dev, libxmlrpc++-dev
+Replaces: libxmlrpc-c-dev
+Suggests: xml-rpc-api2cpp, xml-rpc-api2txt
+Description: A lightweight RPC library based on XML and HTTP for C and C++
+ XML-RPC is a quick-and-easy way to make procedure calls over the Internet.
+ It converts the procedure call into an XML document, sends it to a remote
+ server using HTTP, and gets back the response as XML.
+ .
+ This library provides a modular implementation of XML-RPC for C and C++.
+ .
+ Install this package if you wish to develop your own programs using this
+ library.
+ .
+ xmlrpc-c homepage: http://xmlrpc-c.sourceforge.net/
+
+Package: libxmlrpc-c3
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}
+Conflicts: libxmlrpc-c0, xmlrpc-c0
+Description: A lightweight RPC library based on XML and HTTP for C and C++
+ XML-RPC is a quick-and-easy way to make procedure calls over the Internet.
+ It converts the procedure call into an XML document, sends it to a remote
+ server using HTTP, and gets back the response as XML.
+ .
+ This library provides a modular implementation of XML-RPC for C and C++.
+ .
+ xmlrpc-c homepage: http://xmlrpc-c.sourceforge.net/
+
+Package: libxmlrpc-core-c3-dev
+Section: libdevel
+Architecture: any
+Depends: libxmlrpc-core-c3 (= ${binary:Version}), libc6-dev
+Conflicts: libxmlrpc-c-dev, libxmlrpc-c0-dev, xmlrpc-c-dev, libxmlrpc++-dev
+Replaces: libxmlrpc-c-dev, libxmlrpc-c3-dev (<= 1.06.27-1ubuntu5)
+Description: A lightweight RPC library based on XML and HTTP (core libraries)
+ XML-RPC is a quick-and-easy way to make procedure calls over the Internet.
+ It converts the procedure call into an XML document, sends it to a remote
+ server using HTTP, and gets back the response as XML.
+ .
+ This library provides a modular implementation of XML-RPC for C and C++.
+ .
+ Install this package if you wish to develop your own programs using this
+ library.
+ .
+ xmlrpc-c homepage: http://xmlrpc-c.sourceforge.net/
+
+Package: libxmlrpc-core-c3
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}
+Conflicts: libxmlrpc-c0, xmlrpc-c0
+Replaces: libxmlrpc-c3 (<= 1.06.27-1ubuntu1)
+Description: A lightweight RPC library based on XML and HTTP (core libraries)
+ XML-RPC is a quick-and-easy way to make procedure calls over the Internet.
+ It converts the procedure call into an XML document, sends it to a remote
+ server using HTTP, and gets back the response as XML.
+ .
+ This library provides a modular implementation of XML-RPC for C and C++.
+ .
+ xmlrpc-c homepage: http://xmlrpc-c.sourceforge.net/
+
+Package: xml-rpc-api2cpp
+Architecture: any
+Section: devel
+Depends: libxmlrpc-c3 (= ${binary:Version}), libc6-dev
+Description: Generate C++ wrapper classes for XML-RPC servers
+ A utility for generating C++ wrapper classes based on an XML-RPC API,
+ obtained by interrogating an XML-RPC server.
+ .
+ xmlrpc-c homepage: http://xmlrpc-c.sourceforge.net/
+
+Package: xml-rpc-api2txt
+Architecture: any
+Section: devel
+Depends: libxmlrpc-c3 (= ${binary:Version}), libc6-dev, libfrontier-rpc-perl
+Description: Dump an XML-RPC API as a text file
+ A utility for printing out an XML-RPC API as a text file.  The API is
+ obtained by interrogating an XML-RPC server.
+ .
+ xmlrpc-c homepage: http://xmlrpc-c.sourceforge.net/

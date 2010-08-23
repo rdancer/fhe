@@ -1,0 +1,178 @@
+#!/bin/sh
+# Stolen from rep-config and adapted for use with xmlrpc-c.
+# Other bits stolen from gnome-config & automake output.
+
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
+
+bindir="@bindir@"
+datadir="@datadir@"
+libdir="@libdir@"
+includedir="@includedir@"
+
+ENABLE_LIBXML2_BACKEND='@ENABLE_LIBXML2_BACKEND@'
+ENABLE_ABYSS_THREADS='@ENABLE_ABYSS_THREADS@'
+MUST_BUILD_CURL_CLIENT='@MUST_BUILD_CURL_CLIENT@'
+MUST_BUILD_WININET_CLIENT='@MUST_BUILD_WININET_CLIENT@'
+MUST_BUILD_LIBWWW_CLIENT='@MUST_BUILD_LIBWWW_CLIENT@'
+LSOCKET='@LSOCKET@'
+
+usage="Usage: xmlrpc-c-config <feature> ... <option> ...
+
+The features are:
+  c++            legacy C++ wrapper API
+  c++2           modern C++ API
+  client         client functions
+  cgi-server     CGI-based server functions
+  abyss-server   ABYSS-based server functions
+  server-util    basic server functions (implied by *-server)
+
+Options are:
+  --version      The version number of the package
+  --features     List all features (aka modules) currently installed
+  --cflags       C compiler flags to use when '#include'ing package headers
+  --libs         Libraries and flags to use when linking programs normally
+  --ldadd        Libraries to use with automake
+  --ldflags      Flags to use with automake & libtool
+  --prefix       The prefix under which the package was installed
+  --exec-prefix  The executable prefix under which the package was installed
+  --*dir         The various directories under which the package was installed"
+
+if test $# -eq 0; then
+      echo "You must specify at least one option."
+      echo "${usage}" 1>&2
+      exit 1
+fi
+
+if test "${ENABLE_LIBXML2_BACKEND}" = "yes"; then
+  LIBXML=`xml2-config --libs`
+else
+  LIBXML="-lxmlrpc_xmlparse -lxmlrpc_xmltok"
+fi
+
+needCpp=no
+
+the_libdirs=
+
+# If Xmlrpc-c libraries are installed in the standard linker search
+# path on this system, you should remove the following line:
+the_libdirs="-L$libdir $the_libdirs"
+
+the_libs="-lxmlrpc -lxmlrpc_util ${LIBXML}"
+the_rpath=
+the_wl_rpath=
+cpp_libs=
+
+cflags=
+# If Xmlrpc-c library interface header files are installed in the standard
+# compiler search path on this system, you should remove the following line:
+cflags="-I$includedir $cflags"
+
+while test $# -gt 0; do
+  case $1 in
+    c++)
+      the_libs="-lxmlrpc_cpp $the_libs"
+
+      # Unfortunately, there is just one legacy CPP library for
+      # everything, and it needs all the C libraries -- base, client,
+      # and server.  So all legacy C++ programs get linked with client
+      # and server libraries, whether they need them or not.
+
+      the_libs="-lxmlrpc_server_abyss $the_libs"
+      the_libs="-lxmlrpc_server $the_libs"
+      the_libs="-lxmlrpc_client $the_libs"
+      ;;
+    c++2)
+      needCpp=yes
+      the_libs="-lxmlrpc++ $the_libs"
+      ;;
+    server-util)
+      the_libs="-lxmlrpc_server $the_libs"
+      ;;
+    cgi-server)
+      the_libs="-lxmlrpc_server $the_libs"
+      the_libs="-lxmlrpc_server_cgi $the_libs"
+      ;;
+    abyss-server)
+      if test "${ENABLE_ABYSS_THREADS}" = "yes"; then
+        the_libs="-lpthread $the_libs"
+        fi
+      the_libs="${LSOCKET} $the_libs"
+      the_libs="-lxmlrpc_abyss $the_libs"
+      the_libs="-lxmlrpc_server $the_libs"
+      the_libs="-lxmlrpc_server_abyss $the_libs"
+      if test "${needCpp}" = "yes"; then
+        the_libs="-lxmlrpc_server++ $the_libs"
+        the_libs="-lxmlrpc_server_abyss++ $the_libs"
+        fi
+      ;;
+    client|libwww-client)
+      # libwww-client is for backward compatibility
+      the_libs="-lxmlrpc_client $the_libs"
+
+      if test "${MUST_BUILD_WININET_CLIENT}" = "yes"; then
+        the_libs="@WININET_LDADD@ $the_libs"
+        the_rpath="@WININET_RPATH@ $the_rpath"
+        the_wl_rpath="@WININET_WL_RPATH@ $the_wl_rpath"
+      fi
+      if test "${MUST_BUILD_CURL_CLIENT}" = "yes"; then
+        the_libs="@CURL_LDADD@ $the_libs"
+        the_rpath="@CURL_RPATH@ $the_rpath"
+        the_wl_rpath="@CURL_WL_RPATH@ $the_wl_rpath"
+      fi
+      if test "${MUST_BUILD_LIBWWW_CLIENT}" = "yes"; then
+        the_libs="@LIBWWW_LDADD@ $the_libs"
+        the_rpath="@LIBWWW_RPATH@ $the_rpath"
+        the_wl_rpath="@LIBWWW_WL_RPATH@ $the_wl_rpath"
+      fi
+      if test "${needCpp}" = "yes"; then
+        the_libs="-lxmlrpc_client++ $the_libs"
+        fi
+      ;;
+    --version)
+      echo "@VERSION@"
+      ;;
+    --modules)
+      echo "@FEATURE_LIST@"
+      ;;
+    --features)
+      echo "@FEATURE_LIST@"
+      ;;
+    --cflags)
+      echo "$cflags"
+      ;;
+    --libs)
+      echo "$the_libdirs $the_libs $the_wl_rpath"
+      ;;
+    --ldadd)
+      echo "$the_libdirs $the_libs"
+      ;;
+    --ldflags)
+      echo "$the_rpath"
+      ;;
+    --prefix)
+      echo "@prefix@"
+      ;;
+    --exec-prefix)
+      echo "@exec_prefix@"
+      ;;
+    --*dir)
+      # Swiped from gnome-config.
+      dirname=\$`echo $1 | sed -e 's,^--,,'`
+      dirname=`eval echo $dirname`
+      test -z "$dirname" && exit 1
+      echo $dirname
+      ;;
+    --help)
+      echo "${usage}" 1>&2
+      ;;
+    *)
+      echo "Unrecognized token '$1'"
+      echo "${usage}" 1>&2
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+exit 0

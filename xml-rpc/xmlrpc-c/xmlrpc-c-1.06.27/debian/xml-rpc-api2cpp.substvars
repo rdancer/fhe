@@ -1,0 +1,2 @@
+shlibs:Depends=libc6 (>= 2.2.5), libcurl3 (>= 7.16.2-1), libgcc1 (>= 1:4.1.1), libstdc++6 (>= 4.4.0), libxmlrpc-c3, libxmlrpc-core-c3
+misc:Depends=

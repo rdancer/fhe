@@ -1,0 +1,5 @@
+debian/tmp/usr/lib/libxmlrpc.so.*
+debian/tmp/usr/lib/libxmlrpc_client.so.*
+debian/tmp/usr/lib/libxmlrpc_util.so.*
+debian/tmp/usr/lib/libxmlrpc_xmlparse.so.*
+debian/tmp/usr/lib/libxmlrpc_xmltok.so.*

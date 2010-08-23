@@ -1,0 +1,6 @@
+meerkat-app-list
+xmlrpc_inetd_server
+xmlrpc_loop_server
+xmlrpc_sample_add_server
+xmlrpc_sample_add_client
+sample_add_client_complex

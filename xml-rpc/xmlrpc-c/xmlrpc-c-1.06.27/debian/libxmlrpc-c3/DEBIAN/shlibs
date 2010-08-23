@@ -1,0 +1,9 @@
+libxmlrpc_server++ 3 libxmlrpc-c3
+libxmlrpc_cpp 3 libxmlrpc-c3
+libxmlrpc_server 3 libxmlrpc-c3
+libxmlrpc_abyss 3 libxmlrpc-c3
+libxmlrpc_server_abyss 3 libxmlrpc-c3
+libxmlrpc++ 3 libxmlrpc-c3
+libxmlrpc_client++ 3 libxmlrpc-c3
+libxmlrpc_server_abyss++ 3 libxmlrpc-c3
+libxmlrpc_server_cgi 3 libxmlrpc-c3

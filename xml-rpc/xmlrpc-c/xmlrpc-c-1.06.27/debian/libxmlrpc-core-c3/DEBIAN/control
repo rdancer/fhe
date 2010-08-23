@@ -1,0 +1,20 @@
+Package: libxmlrpc-core-c3
+Source: xmlrpc-c
+Version: 1.06.27-1ubuntu7
+Architecture: amd64
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Installed-Size: 308
+Depends: libc6 (>= 2.8), libcurl3 (>= 7.16.2-1)
+Conflicts: libxmlrpc-c0, xmlrpc-c0
+Replaces: libxmlrpc-c3 (<= 1.06.27-1ubuntu1)
+Section: libs
+Priority: optional
+Description: A lightweight RPC library based on XML and HTTP (core libraries)
+ XML-RPC is a quick-and-easy way to make procedure calls over the Internet.
+ It converts the procedure call into an XML document, sends it to a remote
+ server using HTTP, and gets back the response as XML.
+ .
+ This library provides a modular implementation of XML-RPC for C and C++.
+ .
+ xmlrpc-c homepage: http://xmlrpc-c.sourceforge.net/
+Original-Maintainer: Sean Finney <seanius@debian.org>

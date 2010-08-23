@@ -1,0 +1,5 @@
+old-libtool.patch
+curl_easy_setopt.patch
+other-gnu-triplets.patch
+CVE-2009-3720.patch
+CVE-2009-3560.patch

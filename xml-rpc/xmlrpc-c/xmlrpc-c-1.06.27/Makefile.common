@@ -1,0 +1,452 @@
+# -*-makefile-*-    <-- an Emacs control
+
+# This file contains rules and variable settings for the convenience
+# of every other make file in the package.
+
+# No make file is required to use this file, but it usually saves a lot
+# of duplication.
+
+# The following make variables are meaningful as input to this file:
+#
+# SRCDIR:  Name of directory which is the top of the Xmlrpc-c source tree.
+# BUILDDIR: Name of directory which is the top of the Xmlrpc-c build tree.
+
+LIBTOOL = $(SRCDIR)/libtool
+LINK = $(LIBTOOL) --mode=link $(CCLD)
+
+GCC_WARNINGS = -Wall -Wundef -Wimplicit -W -Winline -Wundef
+  # We need -Wwrite-strings after we fix all the missing consts
+
+GCC_C_WARNINGS = $(GCC_WARNINGS) \
+  -Wmissing-declarations -Wstrict-prototypes -Wmissing-prototypes
+
+GCC_CXX_WARNINGS = $(GCC_WARNINGS) -Woverloaded-virtual -Wsynth
+
+# The NDEBUG macro says not to build code that assumes there are no bugs.
+# This makes the code go faster.  The main thing it does is tell the C library
+# to make assert() a no-op as opposed to generating code to check the
+# assertion and crash the program if it isn't really true.  You can add
+# -UNDEBUG (in any of various ways) to override this.
+#
+CFLAGS_COMMON = -DNDEBUG
+CXXFLAGS_COMMON = -DNDEBUG
+
+ifeq ($(C_COMPILER_GNU),yes)
+  CFLAGS_COMMON += $(GCC_C_WARNINGS) -fno-common -g -O3
+endif
+
+ifeq ($(CXX_COMPILER_GNU),yes)
+  CXXFLAGS_COMMON += $(GCC_CXX_WARNINGS) -g
+endif
+
+DISTDIR = $(BUILDDIR)/$(PACKAGE)-$(VERSION)/$(SUBDIR)
+
+# MAJ and MIN are major and minor version numbers for shared libraries.
+# Libtool builds are controlled by LDFLAGS_VERSINFO instead.
+MAJ = 3
+MIN = 06
+
+# LDFLAGS_VERSINFO is a libtool link option (--version-info) that
+# tells it what version numbers to put on the shared libraries (and
+# maybe in those special libtool link files).  Exactly how it works is
+# somewhat mysterious; it's designed to be part of a linking system
+# where you always use libtool to link the libraries, and libtool
+# figures out which if any version of a library meets the link's
+# requirements.  But we expect our libraries to be linked with the
+# regular (non-libtool) linker, so what we care about is the major,
+# minor, and revision numbers in the file names and sonames.  Libtool
+# has an option --version-number that supposedly lets us specify that,
+# but it doesn't seem to work.  All I get is 0.0.0.  So we manipulate
+# --version-info instead.
+#
+# This appears to work: in the option --version-info A.B.C:
+#
+#   C is the minor number
+#   B is the revision number
+#   A minus C is the major number.
+#
+# So you would get libxmlrpc.so.A-C.C.B .
+#
+# Our strategy is to make the library version numbers the same as the
+# Xmlrpc-c version numbers except that we update the major number when and
+# only when we make a non-backward-compatible change to the library.  So
+# e.g. libxmlrpc for Xmlrpc-c 1.06.01 is named libxmlrpc.so.3.6.1.
+
+LDFLAGS_VERSINFO = -version-info 9:15:6  # 3.6.15
+
+# CURDIR was introduced in GNU Make 3.77.
+ifeq ($(CURDIR)x,x)
+  CURDIR := $(shell /bin/pwd)
+endif
+
+LIBXMLRPC_UTIL           = $(BUILDDIR)/lib/libutil/libxmlrpc_util.la
+LIBXMLRPC                = $(BUILDDIR)/src/libxmlrpc.la
+LIBXMLRPC_CLIENT         = $(BUILDDIR)/src/libxmlrpc_client.la
+LIBXMLRPC_SERVER         = $(BUILDDIR)/src/libxmlrpc_server.la
+LIBXMLRPC_SERVER_ABYSS   = $(BUILDDIR)/src/libxmlrpc_server_abyss.la
+LIBXMLRPC_SERVER_CGI     = $(BUILDDIR)/src/libxmlrpc_server_cgi.la
+LIBXMLRPC_ABYSS          = $(BUILDDIR)/lib/abyss/src/libxmlrpc_abyss.la
+LIBXMLRPC_XMLPARSE       = $(BUILDDIR)/lib/expat/xmlparse/libxmlrpc_xmlparse.la
+LIBXMLRPC_XMLTOK         = $(BUILDDIR)/lib/expat/xmltok/libxmlrpc_xmltok.la
+LIBXMLRPC_UTIL_A         = $(BUILDDIR)/lib/libutil/.libs/libxmlrpc_util.a
+LIBXMLRPC_A              = $(BUILDDIR)/src/.libs/libxmlrpc.a
+LIBXMLRPC_CLIENT_A       = $(BUILDDIR)/src/.libs/libxmlrpc_client.a
+LIBXMLRPC_SERVER_A       = $(BUILDDIR)/src/.libs/libxmlrpc_server.a
+LIBXMLRPC_SERVER_ABYSS_A = $(BUILDDIR)/src/.libs/libxmlrpc_server_abyss.a
+LIBXMLRPC_SERVER_CGI_A   = $(BUILDDIR)/src/.libs/libxmlrpc_server_cgi.a
+LIBXMLRPC_ABYSS_A        = $(BUILDDIR)/lib/abyss/src/.libs/libxmlrpc_abyss.a
+LIBXMLRPC_XMLPARSE_A     = $(BUILDDIR)/lib/expat/xmlparse/.libs/libxmlrpc_xmlparse.a
+LIBXMLRPC_XMLTOK_A       = $(BUILDDIR)/lib/expat/xmltok/.libs/libxmlrpc_xmltok.a
+LIBXMLRPC_CPP            = $(BUILDDIR)/src/cpp/libxmlrpc_cpp.a
+LIBXMLRPC++              = $(BUILDDIR)/src/cpp/libxmlrpc++.a
+LIBXMLRPC_CLIENT++       = $(BUILDDIR)/src/cpp/libxmlrpc_client++.a
+LIBXMLRPC_SERVER++       = $(BUILDDIR)/src/cpp/libxmlrpc_server++.a
+LIBXMLRPC_SERVER_ABYSS++ = $(BUILDDIR)/src/cpp/libxmlrpc_server_abyss++.a
+
+CASPRINTF                = $(BUILDDIR)/lib/util/casprintf.o
+
+UTILS = $(CASPRINTF)
+
+
+# LIBXMLRPC_XML is the list of Xmlrpc-c libraries we need to parse
+# XML.  If we're using an external library to parse XML, this is null.
+# LDLIBS_XMLRPC_XML is the corresonding -l options.
+
+ifneq ($(ENABLE_LIBXML2_BACKEND),yes)
+  # We're using the internal Expat XML parser
+  LIBXMLRPC_XML = $(LIBXMLRPC_XMLPARSE) $(LIBXMLRPC_XMLTOK)
+  LDLIBS_XML = \
+        -L$(BUILDDIR)/lib/expat/xmlparse/.libs \
+	-lxmlrpc_xmlparse \
+        -L$(BUILDDIR)/lib/expat/xmltok/.libs \
+	-lxmlrpc_xmltok
+else
+  LDLIBS_XML = $(shell xml2-config --libs)
+endif
+
+
+##############################################################################
+#                           BUILD RULES                                      #
+##############################################################################
+
+# We use the srcdir and blddir symbolic links simply to make the make
+# rules easier to read in the make output.  We could use $(SRCDIR) and
+# $(BLDDIR) variables, but that makes the compile and link commands
+# a mile long.  Note that Make sometime figures that a directory which
+# is a dependency is newer than the symbolic link pointing to it and wants
+# to rebuild the symbolic link.  So we don't make $(BLDDIR) a
+# dependency of 'blddir'.
+
+blddir:
+	$(LN_S) $(BLDDIR) $@
+
+srcdir:
+	$(LN_S) $(SRCDIR) $@
+
+$(SUBDIRS:%=%/all): %/all: $(CURDIR)/%
+	$(MAKE) -C $(dir $@) -f $(SRCDIR)/$(SUBDIR)/$(dir $@)Makefile \
+	    $(notdir $@) 
+
+$(SUBDIRS:%=%/install): %/install: $(CURDIR)/%
+	$(MAKE) -C $(dir $@) -f $(SRCDIR)/$(SUBDIR)/$(dir $@)Makefile \
+	    $(notdir $@) 
+
+$(SUBDIRS:%=%/clean): %/clean: $(CURDIR)/%
+	$(MAKE) -C $(dir $@) -f $(SRCDIR)/$(SUBDIR)/$(dir $@)Makefile \
+	    $(notdir $@) 
+
+$(SUBDIRS:%=%/distclean): %/distclean: $(CURDIR)/%
+	$(MAKE) -C $(dir $@) -f $(SRCDIR)/$(SUBDIR)/$(dir $@)Makefile \
+	    $(notdir $@) 
+
+$(SUBDIRS:%=%/check): %/check: $(CURDIR)/%
+	$(MAKE) -C $(dir $@) -f $(SRCDIR)/$(SUBDIR)/$(dir $@)Makefile \
+	    $(notdir $@) 
+
+$(SUBDIRS:%=%/distdir): %/distdir: $(CURDIR)/%
+	$(MAKE) -C $(dir $@) -f $(SRCDIR)/$(SUBDIR)/$(dir $@)Makefile \
+	    $(notdir $@) 
+
+$(SUBDIRS:%=%/dep): %/dep: $(CURDIR)/%
+	$(MAKE) -C $(dir $@) -f $(SRCDIR)/$(SUBDIR)/$(dir $@)Makefile \
+	    $(notdir $@) 
+
+$(BUILDDIR)/lib/wininet_transport/xmlrpc_wininet_transport.lo: FORCE
+	$(MAKE) -C $(dir $@) -f $(SRCDIR)/lib/wininet_transport/Makefile \
+	    $(notdir $@)
+
+$(BUILDDIR)/lib/curl_transport/xmlrpc_curl_transport.lo: FORCE
+	$(MAKE) -C $(dir $@) -f $(SRCDIR)/lib/curl_transport/Makefile \
+	    $(notdir $@)
+
+$(BUILDDIR)/lib/libwww_transport/xmlrpc_libwww_transport.lo: FORCE
+	$(MAKE) -C $(dir $@) -f $(SRCDIR)/lib/libwww_transport/Makefile \
+	    $(notdir $@)
+
+$(LIBXMLRPC_ABYSS): FORCE
+	$(MAKE) -C $(dir $@) -f $(SRCDIR)/lib/abyss/src/Makefile \
+	    $(notdir $@)
+
+$(LIBXMLRPC_XMLPARSE): FORCE
+	$(MAKE) -C $(dir $@) -f $(SRCDIR)/lib/expat/xmlparse/Makefile \
+	    $(notdir $@)
+
+$(LIBXMLRPC_XMLTOK): FORCE
+	$(MAKE) -C $(dir $@) -f $(SRCDIR)/lib/expat/xmltok/Makefile \
+	    $(notdir $@)
+
+$(LIBXMLRPC_UTIL): FORCE
+	$(MAKE) -C $(dir $@) -f $(SRCDIR)/lib/libutil/Makefile \
+	    $(notdir $@)
+
+$(LIBXMLRPC) $(LIBXMLRPC_CLIENT) $(LIBXMLRPC_SERVER): FORCE
+	$(MAKE) -C $(dir $@) -f $(SRCDIR)/src/Makefile \
+	    $(notdir $@)
+
+$(LIBXMLRPC++) $(LIBXMLRPC_CLIENT++) $(LIBXMLRPC_SERVER++) \
+  $(LIBXMLRPC_SERVER_ABYSS++): FORCE
+	$(MAKE) -C $(dir $@) -f $(SRCDIR)/src/cpp/Makefile \
+	    $(notdir $@)
+
+$(LIBXMLRPC_UTIL_A): $(LIBXMLRPC_UTIL)
+$(LIBXMLRPC_A): $(LIBXMLRPC)
+$(LIBXMLRPC_CLIENT_A): $(LIBXMLRPC_CLIENT)
+$(LIBXMLRPC_SERVER_ABYSS_A): $(LIBXMLRPC_SERVER_ABYSS)
+$(LIBXMLRPC_CGI_A): $(LIBXMLRPC_CGI)
+$(LIBXMLRPC_ABYSS_A): $(LIBXMLRPC_ABYSS)
+$(LIBXMLRPC_XMLPARSE_A): $(LIBXMLRPC_XMLPARSE)
+$(LIBXMLRPC_XMLTOK_A): $(LIBXMLRPC_XMLTOK)
+
+$(UTILS): FORCE
+	$(MAKE) -C $(dir $@) -f $(SRCDIR)/lib/util/Makefile \
+	    $(notdir $@)
+
+# About version.h:  This is a built header file, which means it is a supreme
+# pain in the ass.  The biggest problem is that when we automatically make
+# dependencies (Makefile.depend), it doesn't exist yet.  This means Gcc
+# generates a dependency on it being in the local directory.  Therefore,
+# we generate it in the local directory, as a symbolic link, wherever it
+# is needed.  But the original is always in the top level directory,
+# generated by a rule in that directory's make file.  Problem 2 is that
+# the top directory's make file includes Makefile.common, so the rules
+# below conflict with it.  That's what OMIT_VERSION_H is for.
+
+ifneq ($(OMIT_VERSION_H),Y)
+
+$(BUILDDIR)/version.h:
+	$(MAKE) -C $(dir $@) -f $(SRCDIR)/GNUmakefile $(notdir $@)
+
+version.h: $(BUILDDIR)/version.h
+	$(LN_S) $< $@
+
+endif
+
+$(BUILDDIR)/include/xmlrpc-c/config.h:
+	$(MAKE) -C $(BUILDDIR)/include -f $(SRCDIR)/include/Makefile \
+          xmlrpc-c/config.h
+
+ifneq ($(OMIT_TRANSPORT_CONFIG_H),Y)
+$(BUILDDIR)/transport_config.h:
+	$(MAKE) -C $(dir $@) $(notdir $@)
+endif
+
+$(ALL_OBJS): $(BUILDDIR)/include/xmlrpc-c/config.h
+
+
+##############################################################################
+#                          SHARED LIBRARY RULES                              #
+##############################################################################
+
+ifeq ($(SHARED_LIB_TYPE),unix)
+  include $(SRCDIR)/unix-common.make
+  endif
+
+ifeq ($(SHARED_LIB_TYPE),irix)
+  include $(SRCDIR)/irix-common.make
+  endif
+
+ifeq ($(SHARED_LIB_TYPE),dll)
+  include $(SRCDIR)/dll-common.make
+  endif
+
+ifeq ($(SHARED_LIB_TYPE),dylib)
+  include $(SRCDIR)/dylib-common.make
+  endif
+
+ifeq ($(SHARED_LIB_TYPE),NONE)
+  install-shared-libraries:
+  endif
+
+
+##############################################################################
+#                           INSTALL RULES                                    #
+#                      (except shared libraries)                             #
+##############################################################################
+
+MKINSTALLDIRS = $(SHELL) $(SRCDIR)/mkinstalldirs
+
+.PHONY: install-common install-libraries install-headers install-bin
+install-common: \
+  install-ltlibraries install-static-libraries install-shared-libraries \
+  install-headers install-bin
+
+INSTALL_LIB_CMD = $(INSTALL_DATA) $$p $(DESTDIR)$(LIBINST_DIR)/$$p
+RANLIB_CMD = $(RANLIB) $(DESTDIR)$(LIBINST_DIR)/$$p
+
+install-static-libraries: $(STATIC_LIBRARIES_TO_INSTALL)
+	$(MKINSTALLDIRS) $(DESTDIR)$(LIBINST_DIR)
+	@list='$(STATIC_LIBRARIES_TO_INSTALL)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    echo " $(INSTALL_LIB_CMD)"; \
+	    $(INSTALL_LIB_CMD); \
+	  else :; fi; \
+	done
+	@$(POST_INSTALL)
+	@list='$(STATIC_LIBRARIES_TO_INSTALL)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    echo " $(RANLIB_CMD)"; \
+	    $(RANLIB_CMD); \
+	  else :; fi; \
+	done
+
+LIBTOOL_INSTALL_CMD = $(LIBTOOL) --mode=install \
+  $(INSTALL_SHLIB) $$p $(DESTDIR)$(LIBINST_DIR)/$$p
+
+install-ltlibraries: $(LTLIBRARIES_TO_INSTALL)
+	$(MKINSTALLDIRS) $(DESTDIR)$(LIBINST_DIR)
+	@list='$(LTLIBRARIES_TO_INSTALL)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    echo " $(LIBTOOL_INSTALL_CMD)"; \
+	    $(LIBTOOL_INSTALL_CMD); \
+	  else :; fi; \
+	done
+
+HEADERDESTDIR = $(DESTDIR)$(HEADERINST_DIR)
+INSTALL_HDR_CMD = $(INSTALL_DATA) $$d$$p $(HEADERDESTDIR)/$$p 
+
+install-headers: $(HEADERS_TO_INSTALL)
+	$(MKINSTALLDIRS) $(HEADERDESTDIR)
+	$(MKINSTALLDIRS) $(HEADERDESTDIR)/xmlrpc-c
+	@list='$(HEADERS_TO_INSTALL)'; for p in $$list; do \
+	  if test -f "$$p"; then d= ; else d="$(srcdir)/"; fi; \
+	  echo " $(INSTALL_HDR_CMD)"; \
+	  $(INSTALL_HDR_CMD); \
+	done
+
+
+INSTALL_PROGRAM_CMD = $(INSTALL_PROGRAM) $$p $(DESTDIR)$(PROGRAMINST_DIR)/$$p
+
+install-bin: $(PROGRAMS_TO_INSTALL) $(DESTDIR)$(PROGRAMINST_DIR)
+	@list='$(PROGRAMS_TO_INSTALL)'; \
+         for p in $$list; do \
+	   echo "$(INSTALL_PROGRAM_CMD)"; \
+	   $(INSTALL_PROGRAM_CMD); \
+	   done
+
+$(DESTDIR)$(PROGRAMINST_DIR):
+	$(MKINSTALLDIRS) $@
+
+
+##############################################################################
+#                           MISCELLANEOUS RULES                              #
+##############################################################################
+
+.PHONY: clean-common
+clean-common:
+	rm -f *.o *.a *.s *.i *.la *.lo
+	rm -f *.$(SHLIB_SUFFIX) *.$(SHLIB_SUFFIX).*
+	rm -rf .libs
+
+.PHONY: distclean-common
+distclean-common:
+# Makefile.depend is generated by 'make dep' and contains only dependencies
+# that make parts get _rebuilt_ when parts upon which they depend change.
+# It does not contain dependencies that are necessary to cause a part to
+# get built in the first place.  E.g. if foo.c uses bar.h and bar.h gets built
+# by a make rule, you must put the dependency of foo.c on bar.h somewhere
+# besides Makefile.depend.
+#
+# Because of this, a user doesn't need Makefile.depend, because he
+# doesn't modify source files.  A developer, on the other hand, must make his
+# own Makefile.depend, because 'make dep' creates Makefile.depend with 
+# absolute pathnames, specific to the developer's system.
+#
+# So we empty out Makefile.depend here.  The developer must do 'make dep' if
+# he wants to edit and rebuild.
+#
+# Other projects have 'make distclean' _remove_ Makefile.depend and then
+# have 'make' automatically build Makefile.depend.  We have
+# found that to be an utter disaster -- it's way too complicated and prone
+# to failure, especially with built .h files.  Better not to burden the user,
+# who gains nothing from it, with that.
+#
+	cat /dev/null >Makefile.depend
+	rm -f TAGS
+	rm -f blddir srcdir
+ifneq ($(OMIT_VERSION_H),Y)
+	rm -f version.h
+endif
+
+.PHONY: distdir-common
+distdir-common:
+	@for file in $(DISTFILES); do \
+	  d=$(SRCDIR); \
+	  if test -d $$d/$$file; then \
+	    cp -pr $$d/$$file $(DISTDIR)/$$file; \
+	  else \
+	    test -f $(DISTDIR)/$$file \
+	    || ln $$d/$$file $(DISTDIR)/$$file 2> /dev/null \
+	    || cp -p $$d/$$file $(DISTDIR)/$$file || :; \
+	  fi; \
+	done
+
+TAGS: $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) $(LISP)
+	tags=; \
+	here=`pwd`; \
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+   if test "$$subdir" = .; then :; else \
+	    test -f $$subdir/TAGS && tags="$$tags -i $$here/$$subdir/TAGS"; \
+   fi; \
+	done; \
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	test -z "$(ETAGS_ARGS)$$unique$(LISP)$$tags" \
+	  || (cd $(srcdir) && etags $(ETAGS_ARGS) $$tags  $$unique $(LISP) -o $$here/TAGS)
+
+DEP_SOURCES = $(wildcard *.c *.cpp)
+
+# This is a filter to turn "foo.o:" rules into "foo.o foo.lo:" because Libtool
+# uses .lo for object files.  I'd like to purge the build of Libtool some day
+# and eliminate this complication.
+
+LIBTOOL_DEPEND_MASSAGER = perl -walnpe's{^(.*)\.o:}{$$1.o $$1.lo:}'
+
+
+
+.PHONY: dep-common
+dep-common: FORCE
+ifneq ($(DEP_SOURCES)x,x)
+	-$(CC) -MM -MG -I. $(INCLUDES) $(DEP_SOURCES) | \
+	  $(LIBTOOL_DEPEND_MASSAGER) \
+	  >Makefile.depend
+endif
+
+Makefile.depend:
+	cat /dev/null >$@
+
+# The automatic dependency generation is a pain in the butt and
+# totally unnecessary for people just installing the distributed code,
+# so to avoid needless failures in the field and a complex build, the
+# 'distclean' target simply makes Makefile.depend an empty file.  A
+# developer may do 'make dep' to create a Makefile.depend full of real
+# dependencies.
+
+# Tell versions [3.59,3.63) of GNU make to not export all variables.
+# Otherwise a system limit (for SysV at least) may be exceeded.
+.NOEXPORT:
+
+
+# Use the FORCE target as a dependency to force a target to get remade
+FORCE:

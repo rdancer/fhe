@@ -1,0 +1,129 @@
+These are instructions for building Xmlrpc-c from source and installing
+it on a system.
+
+See the README file for information on prerequisites (things you need to 
+have installed before you can build).
+
+
+Essentially, it's just the conventional
+
+  $ ./configure
+  $ make
+  $ make install
+
+You can also do
+
+  $ make check
+
+to run a battery of tests before you install.  But note that it's as common
+for the tests to fail because the tests are broken as because the product
+is broken, so consider the results carefully.
+
+To see it work, run a simple server like this:
+
+  $ examples/xmlrpc_sample_add_server 8080
+
+Then run a client that does an RPC to this server:
+
+  $ examples/xmlrpc_sample_add_client
+
+(I don't mean to imply that the above are consecutive shell commands;
+They can't be, because the server program runs indefinitely).
+
+Also try other sample servers and clients, described in examples/README.
+
+
+You may want to pass a '--prefix' argument to 'configure'.  See
+'./configure --help' for details.
+
+You may also want to disable client XML transports that you won't be
+using.  In particular, the Libwww transport can be inconvenient, because
+it typically uses about 20 shared libraries.  Any XML-RPC client
+program that uses Xmlrpc-c, whether or not the program uses any of the
+libwww facilities, must attach all those libraries, and that can take
+a significant amount of time.
+
+See './configure --help' for the options that disable certain transports.
+
+
+COMMON PROBLEMS
+---------------
+
+Improper -config files
+----------------------
+
+The most common problem building Xmlrpc-c is one of improperly installed
+prerequisite libraries, namely Libwww and Curl.  These libraries are
+designed to be installed along with a -config program (libwww-config
+and curl-config) that tells builders of dependent packages (such as
+Xmlrpc-c) how to use them.  When the -config program is wrong, you get
+Xmlrpc-c build failures with messages about undefined references.
+
+The exact nature of the problems with -config programs can be quite
+involved, especially since there is no guarantee that a -config
+program can do what's required of it in every situation.  But I'll
+explain the basic problem.  For simplicity, I'll talk specifically
+about Curl, but the principles apply to any library that has a -config
+program.
+
+The point of curl-config is to describe how Curl is installed on your
+particular system.  You have choices of where to install the various parts
+and what prerequisites to build into them, and curl-config is how you
+communicate those choices to the Xmlrpc-c make files.
+
+Curl's builder automatically creates a curl-config program for you,
+but you should not think of it as part of Curl.  It's really a
+configuration file -- something that tells how your particular system
+is put together.  The Curl builder is not smart enough to know exactly
+what to put in curl-config; it just builds one that works for most
+people.  The local system administrator is actually responsible for
+the contents of curl-config.
+
+One rather complex way in which the curl-config that the Curl builder
+builds can be wrong is that it often indicates that to link to the
+Curl library, you need a "-L /usr/lib" option (or something like that
+-- an option that adds to the linker's search path a directory that is
+already in it).  This is usually unnecessary because the directory is
+already in the search path, and often breaks things because it puts
+the directory too early in the search path.  If your curl-config says to
+link with -L /usr/lib, you should normally edit it to remove that.
+
+As an example of how -L /usr/lib breaks things, here is a problem that
+is often reported: The user has Xmlrpc-c installed on his system, but
+wants to build a new one to replace it, or to use for a particular
+project instead of the system version.  But the build of the new
+version fails with undefined references to symbol "xmlrpc_foo".
+xmlrpc_foo is a new symbol - it was added to Xmlrpc-c in a recent
+release.  The version of Xmlrpc-c installed on the system is too old
+to have it.  The make file obviously specifies the path to the current
+libraries that the user just built in the link library search order,
+but the link is picking up the old system version instead.  Why?
+Because the link options say to search /usr/lib _before_ the local
+build directory.  And it does that because curl-config erroneously
+says that you need a -L /usr/lib link option to find the Curl library.
+
+64 Bit Linux -fPIC 
+------------------
+
+The GNU link-editor produces this error message when building the C++
+libraries for certain 64 bit machines:
+
+  relocation R_X86_64_32 against `a local symbol' can not be used when
+  making a shared object; recompile with -fPIC
+
+Xmlrpc-c 1.06 C++ libraries are not designed for these platforms.
+(Releases starting with 1.07 are).
+
+You can work around this by adding a setting of the CADD make variable
+to your make command:
+
+  make CADD=-fPIC
+
+
+WINDOWS
+-------
+
+All of the above is essentially for Unix-type operating systems.  To
+build and use Xmlrpc-c on Windows, see the file
+Windows/ReadMeWin32.txt.
+

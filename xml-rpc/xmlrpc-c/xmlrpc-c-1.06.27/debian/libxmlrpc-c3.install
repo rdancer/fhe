@@ -1,0 +1,9 @@
+debian/tmp/usr/lib/libxmlrpc++.so.*
+debian/tmp/usr/lib/libxmlrpc_abyss.so.*
+debian/tmp/usr/lib/libxmlrpc_client++.so.*
+debian/tmp/usr/lib/libxmlrpc_cpp.so.*
+debian/tmp/usr/lib/libxmlrpc_server++.so.*
+debian/tmp/usr/lib/libxmlrpc_server.so.*
+debian/tmp/usr/lib/libxmlrpc_server_abyss++.so.*
+debian/tmp/usr/lib/libxmlrpc_server_abyss.so.*
+debian/tmp/usr/lib/libxmlrpc_server_cgi.so.*

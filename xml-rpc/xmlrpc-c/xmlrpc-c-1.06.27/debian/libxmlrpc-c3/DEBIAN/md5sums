@@ -1,0 +1,12 @@
+1c02d3d87e352b107c27d62cfa454302  usr/share/doc/libxmlrpc-c3/copyright
+846a85968f66aa3a08beaa38928e0074  usr/share/doc/libxmlrpc-c3/changelog.Debian.gz
+deac8cd3bfcb62b1b58cc16d427a369c  usr/share/lintian/overrides/libxmlrpc-c3
+09427c664e396ebb4448619da16b72d6  usr/lib/libxmlrpc_server++.so.3.06
+883e9827fea51da3f743c2cc7331ee93  usr/lib/libxmlrpc_cpp.so.3.06
+cc4681a229b59f5ed7358a35753303b1  usr/lib/libxmlrpc_server.so.3.6.15
+39a8f8cfdf0fe79a0b9ba9e824b2d686  usr/lib/libxmlrpc_abyss.so.3.6.15
+7712af7b48bb432b496677d15c99bf99  usr/lib/libxmlrpc_server_abyss.so.3.6.15
+922109656da5b94daf22a8873fd0bbd7  usr/lib/libxmlrpc++.so.3.06
+7baec60603d2c55eeb6cc4503a1f414c  usr/lib/libxmlrpc_client++.so.3.06
+c01fd05bf11856ee49dc937ce6834d44  usr/lib/libxmlrpc_server_abyss++.so.3.06
+3bbf67800587102b218f058025334f8b  usr/lib/libxmlrpc_server_cgi.so.3.6.15

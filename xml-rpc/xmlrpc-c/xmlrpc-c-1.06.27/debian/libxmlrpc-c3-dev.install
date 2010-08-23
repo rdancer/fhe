@@ -1,0 +1,29 @@
+tools/xmlrpc/xmlrpc usr/bin
+tools/xmlrpc/xmlrpc.html usr/share/doc/libxmlrpc-c3-dev
+debian/tmp/usr/include/xmlrpc-c/server_cgi.h
+debian/tmp/usr/include/xmlrpc-c/server_abyss.hpp
+debian/tmp/usr/include/xmlrpc-c/server_abyss.h
+debian/tmp/usr/include/xmlrpc-c/server_w32httpsys.h
+debian/tmp/usr/include/xmlrpc_server_w32httpsys.h
+debian/tmp/usr/lib/libxmlrpc++.so
+debian/tmp/usr/lib/libxmlrpc_abyss.so
+debian/tmp/usr/lib/libxmlrpc_client++.so
+debian/tmp/usr/lib/libxmlrpc_cpp.so
+debian/tmp/usr/lib/libxmlrpc_server++.so
+debian/tmp/usr/lib/libxmlrpc_server.so
+debian/tmp/usr/lib/libxmlrpc_server_abyss++.so
+debian/tmp/usr/lib/libxmlrpc_server_abyss.so
+debian/tmp/usr/lib/libxmlrpc_server_cgi.so
+debian/tmp/usr/lib/libxmlrpc_abyss.la
+debian/tmp/usr/lib/libxmlrpc_server.la
+debian/tmp/usr/lib/libxmlrpc_server_abyss.la
+debian/tmp/usr/lib/libxmlrpc_server_cgi.la
+debian/tmp/usr/lib/libxmlrpc++.a
+debian/tmp/usr/lib/libxmlrpc_abyss.a
+debian/tmp/usr/lib/libxmlrpc_client++.a
+debian/tmp/usr/lib/libxmlrpc_cpp.a
+debian/tmp/usr/lib/libxmlrpc_server++.a
+debian/tmp/usr/lib/libxmlrpc_server.a
+debian/tmp/usr/lib/libxmlrpc_server_abyss++.a
+debian/tmp/usr/lib/libxmlrpc_server_abyss.a
+debian/tmp/usr/lib/libxmlrpc_server_cgi.a

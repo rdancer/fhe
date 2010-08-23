@@ -1,0 +1,13 @@
+Index: xmlrpc-c/ltconfig
+===================================================================
+--- xmlrpc-c.orig/ltconfig
++++ xmlrpc-c/ltconfig
+@@ -1957,7 +1957,7 @@
+   ;;
+ 
+ # This must be Linux ELF.
+-linux-gnu*)
++linux-gnu*|k*bsd*-gnu*)
+   version_type=linux
+   need_lib_prefix=no
+   need_version=no

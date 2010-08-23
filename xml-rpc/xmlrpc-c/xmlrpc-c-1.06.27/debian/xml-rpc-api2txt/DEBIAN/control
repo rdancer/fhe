@@ -1,0 +1,15 @@
+Package: xml-rpc-api2txt
+Source: xmlrpc-c
+Version: 1.06.27-1ubuntu7
+Architecture: amd64
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Installed-Size: 60
+Depends: libxmlrpc-c3 (= 1.06.27-1ubuntu7), libc6-dev, libfrontier-rpc-perl
+Section: devel
+Priority: optional
+Description: Dump an XML-RPC API as a text file
+ A utility for printing out an XML-RPC API as a text file.  The API is
+ obtained by interrogating an XML-RPC server.
+ .
+ xmlrpc-c homepage: http://xmlrpc-c.sourceforge.net/
+Original-Maintainer: Sean Finney <seanius@debian.org>
