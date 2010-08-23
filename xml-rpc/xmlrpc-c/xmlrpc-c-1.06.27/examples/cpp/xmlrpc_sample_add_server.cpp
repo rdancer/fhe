@@ -47,7 +47,7 @@ main(int           const,
         xmlrpc_c::serverAbyss myAbyssServer(
             myRegistry,
             8080,              // TCP port on which to listen
-            "/tmp/xmlrpc_log"  // Log file
+            "/dev/fd/2"	       // Log file
             );
         
         myAbyssServer.run();
