@@ -24,9 +24,10 @@ SRC_DIR=xmlrpc-c/xmlrpc-c-1.06.27/examples/cpp
 .PHONY: all
 all: fhe-evaluate-server
 
+.PHONY: fhe-evaluate-server
 fhe-evaluate-server:
 	make -C $(SRC_DIR) xmlrpc_sample_add_server
-	ln -s $(SRC_DIR)/xmlrpc_sample_add_server fhe-evaluate-server
+	ln -sf $(SRC_DIR)/xmlrpc_sample_add_server fhe-evaluate-server
 	
 
 # Convenience target to rebuild the Ubuntu xmlrpc-c package from scratch

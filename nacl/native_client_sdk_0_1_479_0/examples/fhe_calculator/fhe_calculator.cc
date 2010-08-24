@@ -35,7 +35,7 @@
 
 // These are the method names as JavaScript sees them.
 static const char* kEvaluateMethodId = "evaluate";
-static const char* kFortyTwoMethodId = "fortytwo";
+static const char* kFormulaToXmlRpcRequestMethodId = "formulaToXmlRpcRequest";
 
 /*
  * Adapted from <http://www.kyzer.me.uk/code/evaluate/eval.c>
@@ -111,12 +111,45 @@ char * AddOne(char *number) {
     return s;
 }
 
-// This is the module's function that does the work to set the value of the
-// result variable to '43'.  The Invoke() function that called this function
-// then returns the result back to the browser as a JavaScript value.
-static bool FortyTwo(NPVariant *result) {
+char *DoFormulaToXmlRpcRequest(static char *formula) {
+    /** The hard-coded XML-RPC request */
+#define XML_RPC_REQUEST ""
+
+
+    char *s = reinterpret_cast<char*>(NPN_MemAlloc(strlen(XML_RPC_REQUEST)));
+    strcpy (s, XML_RPC_REQUEST);
+
+    return s;
+#undef XML_RPC_REQUEST
+}
+
+/**
+ * This function converts the algebraic formula to a XML-RPC request ready to
+ * be passed to the FHE XML-RPC server.
+ */
+static bool FormulaToXmlRpcRequest(const NPVariant *args,
+                       uint32_t arg_count,
+		       NPVariant *result) {
+  // Return an empty string by default
+  STRINGN_TO_NPVARIANT("", 0, *result);
   if (result) {
-    INT32_TO_NPVARIANT(43, *result);
+    if (arg_count > 0) {
+	NPString nps = NPVARIANT_TO_STRING(args[0]);
+
+	// Note: |formula| will be freed later on by the browser, so it needs to
+	// be allocated here with NPN_MemAlloc().
+	char *formula = reinterpret_cast<char*>(NPN_MemAlloc(nps.UTF8Length + 1));
+	memcpy(formula, nps.UTF8Characters, nps.UTF8Length);
+	formula[nps.UTF8Length] = '\0';
+
+	if (char *xmlRpcRequest = DoFormulaToXmlRpcRequest(formula)) {
+	    STRINGN_TO_NPVARIANT(xmlRpcRequest, strlen(s), *result);
+	} else {
+	    // XXX Signal error
+	}
+    } else {
+	// XXX Signal error
+    }
   }
   return true;
 }
@@ -170,7 +203,7 @@ static bool HasMethod(NPObject* obj, NPIdentifier method_name) {
   bool is_method = false;
   if (!strcmp((const char *)name, kEvaluateMethodId)) {
     is_method = true;
-  } else if (!strcmp((const char*)name, kFortyTwoMethodId)) {
+  } else if (!strcmp((const char*)name, kFormulaToXmlRpcRequestMethodId)) {
     is_method = true;
   }
   NPN_MemFree(name);
@@ -210,8 +243,8 @@ static bool Invoke(NPObject* obj,
   // called function, then gets returned to the browser when Invoke() returns.
   if (!strcmp((const char *)name, kEvaluateMethodId)) {
     rval = Evaluate(args, arg_count, result);
-  } else if (!strcmp((const char*)name, kFortyTwoMethodId)) {
-    rval = FortyTwo(result);
+  } else if (!strcmp((const char*)name, kFormulaToXmlRpcRequestMethodId)) {
+    rval = FormulaToXmlRpcRequest(args, arg_count, result);
   }
   // Since name was allocated above by NPN_UTF8FromIdentifier,
   // it needs to be freed here.
