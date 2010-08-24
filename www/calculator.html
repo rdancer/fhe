@@ -55,6 +55,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <title>Fully Homomorphic Encryption Demo: Calculator</title>
+
+  <!-- favicon linking code courtesy of
+  <http://www.winterdrache.de/freeware/png2ico/favicon.html>; accessed on
+  2010-08-24 -->
+  <link rel="icon" href="favicon.ico" type="image/x-icon"> 
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"> 
+
   <style type="text/css">
       /* .firstResult { font-size: 120%; font-weight: bold; } */
   </style>
@@ -196,7 +203,7 @@
     function evaluate(formula) {
       try {
 	// Evaluate locally
-        return(fhe_calculator.evaluate(formula));
+        //return(fhe_calculator.evaluate(formula));
 
 	/* Let NaCl pre-process the formula into boolean circuit + data,
 	   wrapped in XML-RPC, ready to send to server */ 
