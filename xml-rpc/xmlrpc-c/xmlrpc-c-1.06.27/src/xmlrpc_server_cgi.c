@@ -206,10 +206,14 @@ xmlrpc_server_cgi_process_call(xmlrpc_registry * const registryP) {
         code = 405; message = "Method Not Allowed";
         XMLRPC_FAIL(&env, XMLRPC_INTERNAL_ERROR, "Expected HTTP method POST");
     }
-    if (!type || 0 != strcmp(type, "text/xml")) {
-        code = 400; message = "Bad Request";
-        XMLRPC_FAIL(&env, XMLRPC_INTERNAL_ERROR, "Expected text/xml content");
-    }
+    //// The MIME type can be text/xml, or application/xml, or even something
+    //// else, so don't check for it.  Note: If you do check for it, be aware
+    //// that type contains not only the MIME type but the whole Content-Type
+    //// header, which may look like this: ``text/xml; charset="utf-8"''
+    //if (!type || 0 != strncmp(type, "text/xml", strlen("text/html"))) {
+    //    code = 400; message = "Bad Request";
+    //    XMLRPC_FAIL(&env, XMLRPC_INTERNAL_ERROR, "Expected text/xml content");
+    //}
     if (!length_str) {
         code = 411; message = "Length Required";
         XMLRPC_FAIL(&env, XMLRPC_INTERNAL_ERROR, "Content-length required");
