@@ -1,0 +1,33 @@
+libfhe -- fully homomorphic encryption library routines
+
+
+WHAT DOES THIS LIBRARY DO
+
+This library implements the Fully Homomorphic Encryption schemes described in
+Gentry (2008).
+
+
+FILES
+
+Makefile
+    This project's make file
+
+README
+    This file
+
+lib/*
+    Libraries used by this library
+
+license/*
+    License texts for code distributed with this library
+
+
+LEGAL STUFF
+
+Copyright 2010 Jan Minar <rdancer@rdancer.org>
+
+
+REFERENCES
+
+Gentry, Craig: Computing Arbitrary Functions of Encrypted Data (2008), URL:
+<http://crypto.stanford.edu/craig/easy-fhe.pdf>
