@@ -8,7 +8,6 @@
     Copyright © 2010 Jan Minář <rdancer@rdancer.org>
     Copyright © 2010 Google Inc.
     Copyright © 2010 The Native Client Authors
-    Copyright © 2007 Weston Ruter <http://weston.ruter.net/>
 
 
     This program is free software; you can redistribute it and/or modify
@@ -69,55 +68,9 @@
 
   <!-- jQuery -->
   <script type="text/javascript" src="jquery-1.4.2.js"></script>
-  <!-- jQuery RPC plug-in -->
-  <script type="text/javascript" src="jquery.rpc.js"></script>
 
   <!-- JSON/XML-RPC Client <http://code.google.com/p/json-xml-rpc/> -->
   <script type="text/javascript" src="rpc.js"></script>
-
-  <!-- Adapted from <http://plugins.jquery.com/project/rpc>, accessed on
-       2010-08-25 -->
-  <!-- script type="text/javascript">
-       $(document).ready(function() {
-           $.rpc("RPC2", "xml", 
-	       function(server) {
-		   alert (server.sample.add(3, 5));
-	       }
-	   
-	   );
-	   // call system.getCapabilities like this
-	   //server.system.getCapabilities(function(data){console.log(data)});
-	      
-
-           window.xmlrpc = $.rpc(
-               "RPC2" /* rpc server URL */
-               , "xml" /* say that our server is xml */
-               , function(server) { /* this is executed when the rpc server is prepared */
-                   /* The rpc server should have a system object .. */
-                   if(!server || !server.system) {
-		       $("#demo").change("Error setting up XML-RPC");
-                       return;
-                   }
-                   /* show the function list */
-                   var demo = $("#demo");
-                   var func = null;
-		   var first = true;
-		   //demo.append("Available from XML-RPC: ");
-                   for(func in server.sample) {
-		       if (first) {
-		           // reset
-		           first = false;
-		       } else {
-		           // insert delimiter between the last function name and this one
-		           demo.append(", ");
-		       }
-                       demo.append(func + "()");
-                   }
-               }
-           );
-       });
-  </script -->
-
 
   <!-- Following script fragment uses and is based on
        JSON/XML-RPC Client <http://code.google.com/p/json-xml-rpc/>
@@ -125,7 +78,7 @@
        Copyright: 2007, Weston Ruter <http://weston.ruter.net/>
     -->
   <script type="text/javascript">
-      var service = new rpc.ServiceProxy("RPC2", {
+      xmlrpc = new rpc.ServiceProxy("RPC2", {
                               asynchronous: false,  //default: true
                               sanitize: true,       //default: true
 			      // default: null (synchronous introspection
@@ -148,14 +101,13 @@
       //});
       
       /* Synchronous semantics (set ‘asynchronous’ to false) */
-      
-      try {
-         var message = service.sample.add(3, 5);
-         alert(message);
-      }
-      catch(e){
-         alert("Unable to perform addition because: " + e);
-      }
+      //try {
+      //   var message = xmlrpc.sample.add(3, 5);
+      //   alert(message);
+      //}
+      //catch(e){
+      //   alert("Unable to perform addition because: " + e);
+      //}
   </script>
 
   <script type="text/javascript">
@@ -291,6 +243,13 @@
      */
     function sendToXmlRpcServer(xmlRpcRequest) {
 	//throw new Error("XML-RPC not implemented yet");
+        try {
+           var message = xmlrpc.sample.add(parseInt(xmlRpcRequest), 0);
+           return(message);
+        }
+        catch(e){
+           return("XML-RPC server error: " + e);
+        }
     }
 
     function evaluate(formula) {
@@ -342,10 +301,6 @@
     <!-- calculator -->
     <div id="main_content" style="position: absolute; margin-left: 15%; margin-top: 12%; padding: 20pt">
       <form action="javascript:calculate()">
-
-        <!-- This DIV is used by the jQuery RPC demo -->
-	<div id="demo"></div>
-
 	<div id="status_field">Loading...</div>
 	<input name="formula" id="formula" value="" />
 		<input type="submit" value="Calculate" /><br />
