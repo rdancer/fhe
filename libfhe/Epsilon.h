@@ -16,6 +16,16 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
+/* Only include this file once */
+#ifndef EPSILON_H
+#define EPSILON_H
+
+#include <gmp.h>
+#include <gmpxx.h>
+
+#include "PrivateKey.h"
+#include "EncryptedBit.h"
 
 /**
  * This class implements the somewhat homomorphic encryption scheme described
@@ -25,8 +35,10 @@ class Epsilon {
     public:
 	Epsilon(unsigned long long int securityParameter);
 	//Evaluate(function, EncryptedBit[] encryptedBits);
+	mpz_class Random(unsigned long long int numberOfBits);
 	
     private:
 	const unsigned long long int securityParameter;
 	PrivateKey privateKey;
-}
+};
+#endif // EPSILON_H

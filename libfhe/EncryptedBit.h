@@ -16,17 +16,22 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
+#ifndef ENCRYPTED_BIT_H
+#define ENCRYPTED_BIT_H
 
 #include "Epsilon.h"
 
 /**
  * This class instance corresponds to a single bit encrypted under Epsilon.
  */
-class EncryptedBit {
+class EncryptedBit
+	: private mpz_class {
     public:
 	EncryptedBit(PrivateKey privateKey, bool plainTextBit);
 	bool Decrypt(PrivateKey privateKey);
 	EncryptedBit Add(EncryptedBit other);
 	EncryptedBit Sub(EncryptedBit other);
 	EncryptedBit Mult(EncryptedBit other);
-}
+};
+#endif // ENCRYPTED_BIT_H
