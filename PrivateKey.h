@@ -16,13 +16,20 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
+#ifndef PRIVATE_KEY_H
+#define PRIVATE_KEY_H
 
-#include "Epsilon.h"
+#include <gmp.h>
+#include <gmpxx.h>
+//#include "Epsilon.h"
 
 /**
  * This class implements the private key of Epsilon
  */
-class PrivateKey {
+class PrivateKey
+{
     public:
-	PrivateKey(unsigned long long int securityParameter);
-}
+	PrivateKey(unsigned long int securityParameter);
+};
+#endif // PRIVATE_KEY_H
