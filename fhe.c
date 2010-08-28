@@ -165,7 +165,7 @@ mpz_t *encryptOneBit(bool plainTextBit) {
 /**
  * Initialize the security scheme.
  *
- * @param securityParameter lambda, from this the bit-widths of the various
+ * @param mySecurityParameter lambda, from this the bit-widths of the various
  * parts of the security scheme derive.
  */
 void initialize(unsigned long int mySecurityParameter) {
