@@ -102,6 +102,10 @@ mpz_t *randomInteger(unsigned long long int numberOfBits) {
 #endif // __linux__
 }
 
+/**
+ * This function implements the special modulo operation found in §3.2:
+ * “(c mod p) is the integer c' in (-p/2, p/2> such that p divides c − c')”
+ */
 mpz_t *modulo(mpz_t *divident, mpz_t *divisor) {
     INIT_MPZ_T(remainder);
 
@@ -170,6 +174,45 @@ void initialize(unsigned long int mySecurityParameter) {
     privateKey = randomInteger(bitsP);
 }
 
+
+/****************************************************************************
+ **                        Arithmetical Operations                         **
+ ****************************************************************************/
+
+/**
+ * Exclusive or — boolean exclusive disjunction.  This function is called Add()
+ * in Gentry (2008).  Note: The Sub() function in Gentry (2008) gives the
+ * exactly same results for single bits.
+ *
+ * @param bit1 Single encrypted bit
+ * @param bit2 Single encrypted bit
+ * @return _Exclusive_or_ of the parameters
+ */
+mpz_t *xorBits(mpz_t *bit1, mpz_t *bit2) {
+    INIT_MPZ_T(result);
+    
+    mpz_add(*result, *bit1, *bit2);
+
+    return result;
+}
+
+/**
+ * And — boolean multiplication. This function is called Mult() in Gentry
+ * (2008) §3.2.
+ *
+ * @param bit1 Single encrypted bit
+ * @param bit2 Single encrypted bit
+ * @return Logical _and_ of the parameters
+ */
+mpz_t *andBits(mpz_t *bit1, mpz_t *bit2) {
+    INIT_MPZ_T(result);
+
+    mpz_mul(*result, *bit1, *bit2);
+
+    return result;
+}
+
+
 /**
  * Program entry point -- used to test the library
  */
@@ -194,6 +237,32 @@ int main(int argc, char **argv) {
     (void)gmp_printf("Encrypted bit (0): 0x%Zx\n", *bitValue0);
     (void)    printf("Decrypted bit (0): %d\n",
 	    (int)decryptOneBit(bitValue0));
+
+    /*
+     * Arithmetics
+     */
+
+    /* XOR */
+
+    (void)gmp_printf("\n0 ⊕ 0 = %d\n",
+	    (int)decryptOneBit(xorBits(bitValue0, bitValue0)));
+    (void)gmp_printf("0 ⊕ 1 = %d\n",
+	    (int)decryptOneBit(xorBits(bitValue0, bitValue1)));
+    (void)gmp_printf("1 ⊕ 0 = %d\n",
+	    (int)decryptOneBit(xorBits(bitValue1, bitValue0)));
+    (void)gmp_printf("1 ⊕ 1 = %d\n",
+	    (int)decryptOneBit(xorBits(bitValue1, bitValue1)));
+
+    /* Sub() */ 
+
+    (void)gmp_printf("\n0 × 0 = %d\n",
+	    (int)decryptOneBit(andBits(bitValue0, bitValue0)));
+    (void)gmp_printf("0 × 1 = %d\n",
+	    (int)decryptOneBit(andBits(bitValue0, bitValue1)));
+    (void)gmp_printf("1 × 0 = %d\n",
+	    (int)decryptOneBit(andBits(bitValue1, bitValue0)));
+    (void)gmp_printf("1 × 1 = %d\n",
+	    (int)decryptOneBit(andBits(bitValue1, bitValue1)));
 
     DESTROY_MPZ_T(bitValue0);
     DESTROY_MPZ_T(bitValue1);
