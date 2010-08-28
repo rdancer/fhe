@@ -30,5 +30,7 @@ mpz_t *randomInteger(unsigned long long int numberOfBits);
 mpz_t *encryptOneBit(bool plainTextBit);
 bool decryptOneBit(mpz_t *encryptedBit);
 void initialize(unsigned long int mySecurityParameter);
+mpz_t *xorBits(mpz_t *bit1, mpz_t *bit2);
+mpz_t *andBits(mpz_t *bit1, mpz_t *bit2);
 
 #endif // FHE_H
