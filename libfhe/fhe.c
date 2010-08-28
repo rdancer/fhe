@@ -56,38 +56,47 @@ unsigned long int securityParameter;
 
 
 /**
- * Generate a numberOfBits-bit long random number
+ * Generate a numberOfBits-bit long random integer.  Note: The most-significant
+ * bit will not be random: it will always be 1.  The number of random bits
+ * therefore is numberOfBits - 1.
  *
  * @return random number
  */
-mpz_t *randomNumber(unsigned long long int numberOfBits) {
+mpz_t *randomInteger(unsigned long long int numberOfBits) {
 #if defined(__linux__)
     FILE *randomFile;
     int c;
     unsigned int bitmask;
-    unsigned long int i;
-    INIT_MPZ_T(randomNumber);
+    long int i;
+    INIT_MPZ_T(randomInteger);
 
-    if ((randomFile = fopen("/dev/random", "r")) == NULL) {
-        perror("Error opening /dev/random");
+    if ((randomFile = fopen(RANDOM_FILE , "r")) == NULL) {
+        perror("Error opening " RANDOM_FILE);
 	exit(EXIT_FAILURE);
     }
 
     /* The whole bytes */
-    for (bitmask = 0xff, i = 0; i < numberOfBits; i += 8) {
+    for (bitmask = 0xff, i = numberOfBits; i > 0; i -= 8) {
         if ((c = fgetc(randomFile)) == EOF) {
-	    perror("Error reading /dev/random");
+	    perror("Error reading " RANDOM_FILE);
 	    exit(EXIT_FAILURE);
         }
-        if (numberOfBits - i < 8) {
+
+	/* Ensure the most-significant bit of the random integer is always 1 */
+	if (i == numberOfBits) {
+	    assert(i > 0);
+	    c |= 0x1 << ((i < 8 ? i : 8) - 1);
+	}
+
+        if (i < 8) {
             // The last few bits will have a bitmask
-            bitmask = 0xff >> (8 - (numberOfBits - i));
+            bitmask = 0xff >> (8 - i);
         }
-        mpz_mul_ui(*randomNumber, *randomNumber, bitmask + 1);
-        mpz_add_ui(*randomNumber, *randomNumber, c & bitmask);
+        mpz_mul_ui(*randomInteger, *randomInteger, bitmask + 1);
+        mpz_add_ui(*randomInteger, *randomInteger, c & bitmask);
     }
 
-    return randomNumber;
+    return randomInteger;
 #else // __linux__
 # error This function is only implemented for Linux
 #endif // __linux__
@@ -96,6 +105,7 @@ mpz_t *randomNumber(unsigned long long int numberOfBits) {
 mpz_t *modulo(mpz_t *divident, mpz_t *divisor) {
     INIT_MPZ_T(remainder);
 
+    assert(mpz_cmp_ui(*divisor, 0) != 0);
     mpz_mod(*remainder, *divident, *divisor);
 
     /* Adjust (divident/2, divident) -> (-divident/2, 0) */
@@ -118,6 +128,7 @@ bool decryptOneBit(mpz_t *encryptedBit) {
     bool result;
     INIT_MPZ_T(modulus);
 
+    assert(mpz_cmp_ui(*privateKey, 0) != 0);
     mpz_mod(*modulus, *encryptedBit, *privateKey);
     result = mpz_tstbit(*modulus, 0);
     DESTROY_MPZ_T(modulus);
@@ -135,12 +146,12 @@ mpz_t *encryptOneBit(bool plainTextBit) {
 
     /* noise: 2r */
     assert(bitsN > 0);
-    mpz_mul_ui(*encryptedBit, *randomNumber(bitsN - 1), 2);
+    mpz_mul_ui(*encryptedBit, *randomInteger(bitsN - 1), 2);
     /* add parity */
     mpz_add_ui(*encryptedBit, *encryptedBit, plainTextBit);
     /* add pq */
     INIT_MPZ_T(pq);
-    mpz_mul(*pq, *privateKey, *randomNumber(bitsQ));
+    mpz_mul(*pq, *privateKey, *randomInteger(bitsQ));
     mpz_add(*encryptedBit, *encryptedBit, *pq);
     DESTROY_MPZ_T(pq);
 
@@ -156,7 +167,7 @@ mpz_t *encryptOneBit(bool plainTextBit) {
 void initialize(unsigned long int mySecurityParameter) {
     securityParameter = mySecurityParameter;
 
-    privateKey = randomNumber(bitsP);
+    privateKey = randomInteger(bitsP);
 }
 
 /**

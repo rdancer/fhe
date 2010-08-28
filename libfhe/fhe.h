@@ -24,7 +24,9 @@
 #include <gmp.h>
 #include <stdbool.h>
 
-mpz_t *randomNumber(unsigned long long int numberOfBits);
+#define RANDOM_FILE "/dev/urandom" // XXX unsecure -- not random, but fast
+
+mpz_t *randomInteger(unsigned long long int numberOfBits);
 mpz_t *encryptOneBit(bool plainTextBit);
 bool decryptOneBit(mpz_t *encryptedBit);
 void initialize(unsigned long int mySecurityParameter);
