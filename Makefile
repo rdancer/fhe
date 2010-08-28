@@ -15,17 +15,23 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-CPP = c++
-LDFLAGS = -lgmp -lgmpxx
+CC = gcc
+LDFLAGS = -lgmp
 
 .PHONY: all
-all: test
+all: fhe
 
-Epsilon.o: Epsilon.cc Epsilon.h *.h
-	$(CPP) -o $@ $^
+fhe: fhe.h
 
-PrivateKey: PrivateKey.cc *.h
-	$(CPP) $(CFLAGS) $(LDFLAGS) -o $@ $^
+.PHONY: test
+test: fhe
+	./fhe
 
-test: Epsilon.o
-	$(CPP) -o $@ $^
+.PHONY: clean
+clean:
+	rm -f -- fhe
+	rm -f -- ./*.o
+
+.PHONY: dist-clean
+dist-clean: clean
+	rm -f -- core
