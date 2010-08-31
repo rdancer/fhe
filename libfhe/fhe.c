@@ -62,7 +62,7 @@ unsigned long int securityParameter;
  *
  * @return random number
  */
-mpz_t *randomInteger(unsigned long long int numberOfBits) {
+mpz_t *fhe_new_random_integer(unsigned long long int numberOfBits) {
 #if defined(__linux__)
     FILE *randomFile;
     int c;
@@ -128,7 +128,7 @@ mpz_t *modulo(mpz_t *divident, mpz_t *divisor) {
  * @param encryptedBit Single bit, encrypted
  * @return Decrypted bit
  */
-bool decryptOneBit(mpz_t *encryptedBit) {
+bool fhe_decrypt_one_bit(mpz_t *encryptedBit) {
     bool result;
     INIT_MPZ_T(modulus);
 
@@ -145,17 +145,17 @@ bool decryptOneBit(mpz_t *encryptedBit) {
  * @param plainTextBit One-bit number to be encrypted
  * @return Cryptotext under this scheme
  */
-mpz_t *encryptOneBit(bool plainTextBit) {
+mpz_t *fhe_encrypt_one_bit(bool plainTextBit) {
     INIT_MPZ_T(encryptedBit);
 
     /* noise: 2r */
     assert(bitsN > 0);
-    mpz_mul_ui(*encryptedBit, *randomInteger(bitsN - 1), 2);
+    mpz_mul_ui(*encryptedBit, *fhe_new_random_integer(bitsN - 1), 2);
     /* add parity */
     mpz_add_ui(*encryptedBit, *encryptedBit, plainTextBit);
     /* add pq */
     INIT_MPZ_T(pq);
-    mpz_mul(*pq, *privateKey, *randomInteger(bitsQ));
+    mpz_mul(*pq, *privateKey, *fhe_new_random_integer(bitsQ));
     mpz_add(*encryptedBit, *encryptedBit, *pq);
     DESTROY_MPZ_T(pq);
 
@@ -168,10 +168,10 @@ mpz_t *encryptOneBit(bool plainTextBit) {
  * @param mySecurityParameter lambda, from this the bit-widths of the various
  * parts of the security scheme derive.
  */
-void initialize(unsigned long int mySecurityParameter) {
+void fhe_initialize(unsigned long int mySecurityParameter) {
     securityParameter = mySecurityParameter;
 
-    privateKey = randomInteger(bitsP);
+    privateKey = fhe_new_random_integer(bitsP);
 }
 
 
@@ -188,7 +188,7 @@ void initialize(unsigned long int mySecurityParameter) {
  * @param bit2 Single encrypted bit
  * @return _Exclusive_or_ of the parameters
  */
-mpz_t *xorBits(mpz_t *bit1, mpz_t *bit2) {
+mpz_t *fhe_xor_bits(mpz_t *bit1, mpz_t *bit2) {
     INIT_MPZ_T(result);
     
     mpz_add(*result, *bit1, *bit2);
@@ -204,7 +204,7 @@ mpz_t *xorBits(mpz_t *bit1, mpz_t *bit2) {
  * @param bit2 Single encrypted bit
  * @return Logical _and_ of the parameters
  */
-mpz_t *andBits(mpz_t *bit1, mpz_t *bit2) {
+mpz_t *fhe_and_bits(mpz_t *bit1, mpz_t *bit2) {
     INIT_MPZ_T(result);
 
     mpz_mul(*result, *bit1, *bit2);
@@ -222,21 +222,21 @@ int main(int argc, char **argv) {
     argc = argc;
     argv = argv;
 
-    initialize(argc > 1 ? atoi(argv[1]): 2);
+    fhe_initialize(argc > 1 ? atoi(argv[1]): 2);
 
     INIT_MPZ_T(bitValue0);
     INIT_MPZ_T(bitValue1);
 
-    bitValue1 = encryptOneBit(1);
-    bitValue0 = encryptOneBit(0);
+    bitValue1 = fhe_encrypt_one_bit(1);
+    bitValue0 = fhe_encrypt_one_bit(0);
 
     (void)gmp_printf("Private key: 0x%Zx\n", privateKey);
     (void)gmp_printf("Encrypted bit (1): 0x%Zx\n", *bitValue1);
     (void)    printf("Decrypted bit (1): %d\n",
-	    (int)decryptOneBit(bitValue1));
+	    (int)fhe_decrypt_one_bit(bitValue1));
     (void)gmp_printf("Encrypted bit (0): 0x%Zx\n", *bitValue0);
     (void)    printf("Decrypted bit (0): %d\n",
-	    (int)decryptOneBit(bitValue0));
+	    (int)fhe_decrypt_one_bit(bitValue0));
 
     /*
      * Arithmetics
@@ -245,24 +245,24 @@ int main(int argc, char **argv) {
     /* XOR */
 
     (void)gmp_printf("\n0 ⊕ 0 = %d\n",
-	    (int)decryptOneBit(xorBits(bitValue0, bitValue0)));
+	    (int)fhe_decrypt_one_bit(fhe_xor_bits(bitValue0, bitValue0)));
     (void)gmp_printf("0 ⊕ 1 = %d\n",
-	    (int)decryptOneBit(xorBits(bitValue0, bitValue1)));
+	    (int)fhe_decrypt_one_bit(fhe_xor_bits(bitValue0, bitValue1)));
     (void)gmp_printf("1 ⊕ 0 = %d\n",
-	    (int)decryptOneBit(xorBits(bitValue1, bitValue0)));
+	    (int)fhe_decrypt_one_bit(fhe_xor_bits(bitValue1, bitValue0)));
     (void)gmp_printf("1 ⊕ 1 = %d\n",
-	    (int)decryptOneBit(xorBits(bitValue1, bitValue1)));
+	    (int)fhe_decrypt_one_bit(fhe_xor_bits(bitValue1, bitValue1)));
 
     /* Sub() */ 
 
     (void)gmp_printf("\n0 × 0 = %d\n",
-	    (int)decryptOneBit(andBits(bitValue0, bitValue0)));
+	    (int)fhe_decrypt_one_bit(fhe_and_bits(bitValue0, bitValue0)));
     (void)gmp_printf("0 × 1 = %d\n",
-	    (int)decryptOneBit(andBits(bitValue0, bitValue1)));
+	    (int)fhe_decrypt_one_bit(fhe_and_bits(bitValue0, bitValue1)));
     (void)gmp_printf("1 × 0 = %d\n",
-	    (int)decryptOneBit(andBits(bitValue1, bitValue0)));
+	    (int)fhe_decrypt_one_bit(fhe_and_bits(bitValue1, bitValue0)));
     (void)gmp_printf("1 × 1 = %d\n",
-	    (int)decryptOneBit(andBits(bitValue1, bitValue1)));
+	    (int)fhe_decrypt_one_bit(fhe_and_bits(bitValue1, bitValue1)));
 
     DESTROY_MPZ_T(bitValue0);
     DESTROY_MPZ_T(bitValue1);
