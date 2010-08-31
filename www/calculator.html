@@ -56,6 +56,34 @@
 <head>
   <title>Fully Homomorphic Encryption Demo: Calculator</title>
 
+  <script type="text/javascript">
+    // <![CDATA[
+
+    /*
+     * This little exercise alternately stores and deletes a small piece of
+     * data in the HTML 5 Web Storage.
+     *
+     * This will be useful to store the private key so that it does not have to
+     * be generated each time this page is loaded.
+     */
+
+    var key = "PRIVATE KEY";
+    var value = 123456;
+    try {
+	if ((data = window.localStorage.getItem(key)) == null) {
+	    //alert("Key not present -- storing again.");
+	    window.localStorage.setItem(key, value);
+	} else {
+	    //alert("Key retrieved: " + data + " -- deleting.");
+	    window.localStorage.clear();
+	}
+    } catch(e) {
+	alert("Web Storage error: " + e);
+    }
+
+    // ]]>
+  </script>
+
   <!-- favicon linking code courtesy of
   <http://www.winterdrache.de/freeware/png2ico/favicon.html>; accessed on
   2010-08-24 -->
