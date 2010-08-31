@@ -8,7 +8,9 @@ TEMPLATE = lib
 DEFINES += FHE_LIBRARY
 SOURCES += fhe.cpp \
     privatekey.cpp \
-    test.cpp
+    test.cpp \
+    encryptedbit.cpp
 HEADERS += fhe.h \
     FHE_global.h \
-    privatekey.h
+    privatekey.h \
+    encryptedbit.h

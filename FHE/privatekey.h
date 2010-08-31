@@ -18,8 +18,8 @@
 #ifndef PRIVATEKEY_H
 #define PRIVATEKEY_H
 
-#include "fhe.h"
-
+#include <gmp.h>
+#include <gmpxx.h>
 
 /**
  * This class implements the private key of Epsilon

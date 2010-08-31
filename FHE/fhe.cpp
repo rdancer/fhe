@@ -15,12 +15,18 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include <vector>
+
 #include "fhe.h"
 
+using namespace std;
 
 FHE::FHE(unsigned long int securityParameter)
 {
     this->securityParameter = securityParameter;
+
+    /* Create and store the private key */
+    this->privateKey = new PrivateKey(this->securityParameter);
 }
 
 /**
@@ -28,10 +34,17 @@ FHE::FHE(unsigned long int securityParameter)
  *
  * @return Array of encrypted bits
  */
-mpz_class *FHE::encrypt(unsigned long int integer)
+vector<EncryptedBit *> FHE::encrypt(uint32_t integer)
 {
+    vector<EncryptedBit *> result[32];
+
+    // Loop through the bits of typeof(integer)
+    for (int shift = 0; shift < 32; shift++) {
+        result[shift] = new EncryptedBit(this->privateKey, (integer >> shift) & 0x1);
+    }
+
     // XXX not actually working
-    return new mpz_class;
+    return result;
 }
 
 /**
@@ -39,7 +52,7 @@ mpz_class *FHE::encrypt(unsigned long int integer)
  *
  * @return Plaintext integer
  */
-unsigned long int *FHE::decrypt(mpz_class *cypherText)
+uint32_t *FHE::decrypt(mpz_class *cypherText)
 {
     // XXX not actually working
     return (unsigned long int)0;

@@ -18,17 +18,21 @@
 #ifndef FHE_H
 #define FHE_H
 
+#include <stdint.h>
+#include <vector>
+
 #include "FHE_global.h"
 #include "privatekey.h"
+#include "encryptedbit.h"
 
 class FHESHARED_EXPORT FHE {
 public:
    FHE(unsigned long int securityParameter);
-   mpz_class *encrypt(unsigned long int integer);
-   unsigned long int *decrypt(mpz_class *cypherText);
+   std::vector<EncryptedBit *> encrypt(uint32_t integer);
+   uint32_t *decrypt(mpz_class *cypherText);
 private:
    mpz_class securityParameter;
-   mpz_class privateKey;
+   PrivateKey *privateKey;
    mpz_class publicKey;
 };
 
