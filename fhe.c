@@ -55,7 +55,6 @@ unsigned long int securityParameter;
  * Add two signed integers together
  *
  * TODO: Determine the bit-length dynamically
- * TODO: Do negative numbers work correctly?
  *
  * @param integer1 First addend
  * @param integer1 Second addend
