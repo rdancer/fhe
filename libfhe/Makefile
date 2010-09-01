@@ -16,8 +16,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 CC = gcc
-CFLAGS += -std=c99
-LDFLAGS = -lgmp
+CFLAGS += -std=c99 -ggdb -Wall -pg
+LDFLAGS = -lgmp -pg
 
 .PHONY: all
 all: fhe
@@ -27,6 +27,11 @@ fhe: fhe.h
 .PHONY: test
 test: fhe
 	./fhe
+
+.PHONY: valgrind
+valgrind: fhe
+	valgrind --tool=memcheck --leak-check=full --show-reachable=yes \
+	    ./fhe 1 2>&1
 
 .PHONY: clean
 clean:
