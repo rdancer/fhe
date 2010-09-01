@@ -27,9 +27,17 @@
 
 #define RANDOM_FILE "/dev/urandom" // XXX unsecure -- not random, but fast
 
+
 /* TODO Do not hard-code bit width */
+/*
+ * Multiplication consumes too much memory in 32 bits.  Therefore it may be
+ * advantageous to set it separately.  However, if we set all precision to 16
+ * bits, everything runs very quickly, and we are able to perform arithmetic
+ * operations on 2-digit denary numbers.
+ *
+ * Then again that breaks our tests, so not so fast.
+ */ 
 #define FHE_INTEGER_BIT_WIDTH 32
-/* Multiplication consumes too much memory in 32 bits */
 #define FHE_INTEGER_BIT_WIDTH_MULTIPLY (10)
 typedef int32_t fhe_integer;
 
@@ -83,5 +91,6 @@ mpz_t **fhe_encrypt_integer(fhe_integer integer);
 fhe_integer fhe_decrypt_integer(mpz_t **encryptedInteger);
 mpz_t **fhe_add_integers(mpz_t **integer1, mpz_t **integer2);
 mpz_t **fhe_multiply_integers(mpz_t **integer1, mpz_t **integer2);
+long int fhe_random(unsigned long long int numberOfBits);
 
 #endif // FHE_H
