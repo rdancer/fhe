@@ -37,8 +37,8 @@
  *
  * Then again that breaks our tests, so not so fast.
  */ 
-#define FHE_INTEGER_BIT_WIDTH 32
-#define FHE_INTEGER_BIT_WIDTH_MULTIPLY (10)
+#define FHE_INTEGER_BIT_WIDTH 16
+#define FHE_INTEGER_BIT_WIDTH_MULTIPLY (FHE_INTEGER_BIT_WIDTH)
 typedef int32_t fhe_integer;
 
 
