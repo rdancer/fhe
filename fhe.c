@@ -55,7 +55,7 @@ static FILE *randomFile;
 
 
 /**
- * Multiply two signed integers together.  Hard-coded to compute 16-bit numbers
+ * Multiply two signed integers together.
  *
  * TODO: Determine the bit-length dynamically
  *
@@ -128,6 +128,8 @@ P[15]  P[14]  P[13]  P[12]  P[11]  P[10]   P[9]   P[8]   P[7]   P[6]   P[5]   P[
 	    intermediate_product[j + i] = fhe_and_bits(factor2[i], factor1[j]);
 	}
 
+// This is important for signed integers -- or something like this...
+//
 //	//if (i == FHE_INTEGER_BIT_WIDTH_MULTIPLY - 1) {
 //	//    /* The last line -- invert all the bits */
 //	//} else {
@@ -261,19 +263,7 @@ mpz_t *fhe_new_random_integer(unsigned long long int numberOfBits) {
     int c;
     unsigned int bitmask;
     long int i;
-    //INIT_MPZ_T(randomInteger);
-    mpz_t *randomInteger;
-    do {
-	if (
-		(randomInteger = malloc(sizeof(void *)
-					+ /* placate valgrind */ 8)) == NULL
-//           || (*randomInteger = (mpz_t)malloc(sizeof(mpz_t))) == NULL
-		) {
-	    perror("malloc");
-	    exit(EXIT_FAILURE);
-	}
-	mpz_init(*randomInteger);
-    } while (0);
+    INIT_MPZ_T(randomInteger);
 
     /* The whole bytes */
     for (bitmask = 0xff, i = numberOfBits; i > 0; i -= 8) {
@@ -347,16 +337,23 @@ bool fhe_decrypt_one_bit(mpz_t *encryptedBit) {
  */
 mpz_t *fhe_encrypt_one_bit(bool plainTextBit) {
     INIT_MPZ_T(encryptedBit);
+    mpz_t *tmp1;
 
     /* noise: 2r */
     assert(bitsN > 0);
-    mpz_mul_ui(*encryptedBit, *fhe_new_random_integer(bitsN - 1), 2);
+    tmp1 = fhe_new_random_integer(bitsN - 1);
+    mpz_mul_ui(*encryptedBit, *tmp1, 2);
+    DESTROY_MPZ_T(tmp1);
+
     /* add parity */
     mpz_add_ui(*encryptedBit, *encryptedBit, plainTextBit);
+
     /* add pq */
     INIT_MPZ_T(pq);
-    mpz_mul(*pq, *privateKey, *fhe_new_random_integer(bitsQ));
+    tmp1 = fhe_new_random_integer(bitsQ);
+    mpz_mul(*pq, *privateKey, *tmp1);
     mpz_add(*encryptedBit, *encryptedBit, *pq);
+    DESTROY_MPZ_T(tmp1);
     DESTROY_MPZ_T(pq);
 
     return encryptedBit;
@@ -434,6 +431,7 @@ mpz_t *fhe_and_bits(mpz_t *bit1, mpz_t *bit2) {
 int main(int argc, char **argv) {
 
     int retval = 0, ok;
+    mpz_t **tmp1;
 
     // Get rid of compiler warning about unused parameters
     argc = argc;
@@ -446,28 +444,28 @@ int main(int argc, char **argv) {
 
     bitValue1 = fhe_encrypt_one_bit(1);
     bitValue0 = fhe_encrypt_one_bit(0);
+    mpz_t *bitValues[2] = {
+	bitValue0,
+	bitValue1
+    };
 
     do {
 	bool result;
 
 	(void)gmp_printf("Private key: 0x%Zx\n", privateKey);
-	(void)gmp_printf("Encrypted bit (1): 0x%Zx\n", *bitValue1);
 
-	result = fhe_decrypt_one_bit(bitValue1);
-	ok = (result == 1);
-	(void)    printf("Decrypted bit (1): %d %s\n",
-		(int)result,
-		ok ? "OK" : "FAIL");
-	assert(ok);
+	for (int i = 0; i < 2; i++) {
+	    (void)gmp_printf("Encrypted bit (%d): 0x%Zx\n", i, *bitValues[i]);
 
-	(void)gmp_printf("Encrypted bit (0): 0x%Zx\n", *bitValue0);
+	    result = fhe_decrypt_one_bit(bitValues[i]);
+	    ok = (result == i);
+	    (void)    printf("Decrypted bit (%d): %d %s\n",
+		    i,
+		    (int)result,
+		    ok ? "OK" : "FAIL");
+	    assert(ok);
+	}
 
-	result = fhe_decrypt_one_bit(bitValue0);
-	ok = (result == 0);
-	(void)    printf("Decrypted bit (0): %d %s\n",
-		(int)result,
-		ok ? "OK" : "FAIL");
-	assert(ok);
     } while (0);
 
     /*
@@ -479,71 +477,45 @@ int main(int argc, char **argv) {
     do {
 	bool result;
 
-	result = fhe_decrypt_one_bit(fhe_xor_bits(bitValue0, bitValue0));
-	retval |= !(ok = (result == (0 ^ 0)));
-	(void)gmp_printf("\n0 ⊕ 0 = %d %s\n",
-		result,
-		ok ? "OK" : "FAIL");
-	assert(ok);
-
-	result = (int)fhe_decrypt_one_bit(fhe_xor_bits(bitValue0, bitValue1));
-	retval |= !(ok = (result == (0 ^ 1)));
-	(void)gmp_printf("0 ⊕ 1 = %d %s\n",
-		result,
-		ok ? "OK" : "FAIL");
-	assert(ok);
-
-	result = (int)fhe_decrypt_one_bit(fhe_xor_bits(bitValue1, bitValue0));
-	retval |= !(ok = (result == (1 ^ 0)));
-	(void)gmp_printf("1 ⊕ 0 = %d %s\n",
-		result,
-		ok ? "OK" : "FAIL");
-	assert(ok);
-
-	result = (int)fhe_decrypt_one_bit(fhe_xor_bits(bitValue1, bitValue1));
-	retval |= !(ok = (result == (1 ^ 1)));
-	(void)gmp_printf("1 ⊕ 1 = %d %s\n",
-		result,
-		ok ? "OK" : "FAIL");
-	assert(ok);
-
+	(void)printf("\n");
+	for (int i = 0; i < 2; i++) {
+	    for (int j = 0; j < 2; j++) {
+		result = fhe_decrypt_one_bit(/* leak */fhe_xor_bits(bitValues[i],
+			    bitValues[j]));
+		retval |= !(ok = (result == (i ^ j)));
+		(void)gmp_printf("%d ⊕ %d = %d %s\n",
+			i,
+			j,
+			result,
+			ok ? "OK" : "FAIL");
+		assert(ok);
+	    }
+	}
 
 	/* Sub() */ 
 
-	result = fhe_decrypt_one_bit(fhe_and_bits(bitValue0, bitValue0));
-	retval |= !(ok = (result == (0 & 0)));
-	(void)gmp_printf("\n0 × 0 = %d %s\n",
-		result,
-		ok ? "OK" : "FAIL");
-	assert(ok);
+	(void)printf("\n");
+	for (int i = 0; i < 2; i++) {
+	    for (int j = 0; j < 2; j++) {
+		result = fhe_decrypt_one_bit(/* leak */fhe_and_bits(bitValues[i],
+			    bitValues[j]));
+		retval |= !(ok = (result == (i & j)));
+		(void)gmp_printf("%d × %d = %d %s\n",
+			i,
+			j,
+			result,
+			ok ? "OK" : "FAIL");
+		assert(ok);
+	    }
+	}
+	break;
 
-	result = (int)fhe_decrypt_one_bit(fhe_and_bits(bitValue0, bitValue1));
-	retval |= !(ok = (result == (0 & 1)));
-	(void)gmp_printf("0 × 1 = %d %s\n",
-		result,
-		ok ? "OK" : "FAIL");
-	assert(ok);
-
-	result = (int)fhe_decrypt_one_bit(fhe_and_bits(bitValue1, bitValue0));
-	retval |= !(ok = (result == (1 & 0)));
-	(void)gmp_printf("1 × 0 = %d %s\n",
-		result,
-		ok ? "OK" : "FAIL");
-	assert(ok);
-
-	result = (int)fhe_decrypt_one_bit(fhe_and_bits(bitValue1, bitValue1));
-	retval |= !(ok = (result == (1 & 1)));
-	(void)gmp_printf("1 × 1 = %d %s\n",
-		result,
-		ok ? "OK" : "FAIL");
-	assert(ok);
     } while (0);
 
     DESTROY_MPZ_T(bitValue0);
     DESTROY_MPZ_T(bitValue1);
 
     /* Encrypt and decrypt an integer */
-#if 0
 
     do {
 	fhe_integer integer = 0x12345678;
@@ -558,7 +530,6 @@ int main(int argc, char **argv) {
 	assert(ok);
     } while (0);
 
-#endif /* 0 */
 
     /*
      * Integral arithmetics
@@ -572,11 +543,12 @@ int main(int argc, char **argv) {
 	
 
 	result = fhe_decrypt_integer(
-	    fhe_add_integers(
+	    tmp1 = fhe_add_integers(
 		fhe_encrypt_integer(addend),
 		fhe_encrypt_integer(addend)
 		)
 	);
+	DESTROY_ENCRYPTED_INTEGER(tmp1);
 	retval |= !(ok = (result ==  (addend + addend)));
 
 	(void)gmp_printf("0x%08x + 0x%08x = 0x%08x %s\n",
@@ -597,11 +569,12 @@ int main(int argc, char **argv) {
 	
 
 	result = fhe_decrypt_integer(
-	    fhe_add_integers(
+	    tmp1 = fhe_add_integers(
 		fhe_encrypt_integer(addend1),
 		fhe_encrypt_integer(addend2)
 		)
 	);
+	DESTROY_ENCRYPTED_INTEGER(tmp1);
 	retval |= !(ok = (result == addend1 + addend2));
 
 	(void)gmp_printf("0x%08x + 0x%08x = 0x%08x %s\n",
@@ -621,11 +594,12 @@ int main(int argc, char **argv) {
 	
 
 	result = fhe_decrypt_integer(
-	    fhe_multiply_integers(
+	    tmp1 = fhe_multiply_integers(
 		fhe_encrypt_integer(factor),
 		fhe_encrypt_integer(factor)
 		)
 	);
+	DESTROY_ENCRYPTED_INTEGER(tmp1);
 	retval |= !(ok = (result == factor * factor));
 
 	(void)gmp_printf("0x%08x × 0x%08x = 0x%08x %s\n",
@@ -646,11 +620,12 @@ int main(int argc, char **argv) {
         
 
         result = fhe_decrypt_integer(
-            fhe_multiply_integers(
+            tmp1 = fhe_multiply_integers(
         	fhe_encrypt_integer(factor1),
         	fhe_encrypt_integer(factor2)
         	)
         );
+	DESTROY_ENCRYPTED_INTEGER(tmp1);
         retval |= !(ok = (result == factor1 * factor2));
 
         (void)gmp_printf("%1$ 8d × %2$ 8d = %3$ 8d"
