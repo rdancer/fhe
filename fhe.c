@@ -60,7 +60,7 @@ static FILE *randomFile;
  * TODO: Determine the bit-length dynamically
  *
  * @param integer1 Multiplier
- * @param integer1 Multiplicand
+ * @param integer2 Multiplicand
  * @return The product of the two integers
  */
 mpz_t **fhe_multiply_integers(mpz_t **integer1, mpz_t **integer2) {
