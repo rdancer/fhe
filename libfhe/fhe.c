@@ -83,11 +83,9 @@ mpz_t **fhe_multiply_integers(mpz_t **integer1, mpz_t **integer2) {
 	intermediate_product[i] = checkMalloc(sizeof(void *));
 	mpz_init(*intermediate_product[i]);
 
-	/* Work on the lower half of the function paramters */
-	if (i < FHE_INTEGER_BIT_WIDTH_MULTIPLY) {
-	    mpz_set (*factor1[i], *integer1[i]);
-	    mpz_set (*factor2[i], *integer2[i]);
-	}
+	/* Create a local deep copy of the parameters */
+	mpz_set (*factor1[i], *integer1[i]);
+	mpz_set (*factor2[i], *integer2[i]);
     }
 
     /*
