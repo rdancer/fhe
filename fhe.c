@@ -1,4 +1,4 @@
-/* Epsilon.cc -- Fully homorphic encryption Gentry (2008) §3.2 */
+/* fhe.c -- Fully homorphic encryption after Gentry (2008) §3.2 */
 
 /*
 Copyright © 2010 Jan Minář <rdancer@rdancer.org>
@@ -52,6 +52,100 @@ unsigned long int securityParameter;
 
 
 /**
+ * Multiply two signed integers together.  Hard-coded to compute 16-bit numbers
+ *
+ * TODO: Determine the bit-length dynamically
+ *
+ * @param integer1 Multiplier
+ * @param integer1 Multiplicand
+ * @return The product of the two integers
+ */
+mpz_t **fhe_multiply_integers(mpz_t **integer1, mpz_t **integer2) {
+    mpz_t **result, **intermediate_product, **factor1, **factor2;
+    mpz_t **tmp;
+
+    factor1 = checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
+    factor2 = checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
+    result = checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
+    intermediate_product = checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
+
+    /* Initialize the objects that we need to be zero */
+    for (int i = 0; i < FHE_INTEGER_BIT_WIDTH; i++) {
+	factor1[i] = checkMalloc(sizeof(void *));
+	mpz_init(*factor1[i]);
+	factor2[i] = checkMalloc(sizeof(void *));
+	mpz_init(*factor2[i]);
+	result[i] = checkMalloc(sizeof(void *));
+	mpz_init(*result[i]);
+	intermediate_product[i] = checkMalloc(sizeof(void *));
+	mpz_init(*intermediate_product[i]);
+
+	/* Work on the lower half of the function paramters */
+	if (i < FHE_INTEGER_BIT_WIDTH_MULTIPLY / 2) {
+	    mpz_set (*factor1[i], *integer1[i]);
+	    mpz_set (*factor2[i], *integer2[i]);
+	}
+    }
+
+    /*
+     * Signed integers multiplier adapted from:
+     * <http://en.wikipedia.org/w/index.php?title=Binary_multiplier&oldid=382215754#Engineering_approach:_signed_integers>
+     * (retrieved on 2010-09-01)
+     *
+                                                    1  -p0[7]  p0[6]  p0[5]  p0[4]  p0[3]  p0[2]  p0[1]  p0[0]
+                                                -p1[7] +p1[6] +p1[5] +p1[4] +p1[3] +p1[2] +p1[1] +p1[0]   0
+                                         -p2[7] +p2[6] +p2[5] +p2[4] +p2[3] +p2[2] +p2[1] +p2[0]   0      0
+                                  -p3[7] +p3[6] +p3[5] +p3[4] +p3[3] +p3[2] +p3[1] +p3[0]   0      0      0
+                           -p4[7] +p4[6] +p4[5] +p4[4] +p4[3] +p4[2] +p4[1] +p4[0]   0      0      0      0
+                    -p5[7] +p5[6] +p5[5] +p5[4] +p5[3] +p5[2] +p5[1] +p5[0]   0      0      0      0      0
+             -p6[7] +p6[6] +p6[5] +p6[4] +p6[3] +p6[2] +p6[1] +p6[0]   0      0      0      0      0      0
+   1  +p7[7] -p7[6] -p7[5] -p7[4] -p7[3] -p7[2] -p7[1] -p7[0]   0      0      0      0      0      0      0
+ ------------------------------------------------------------------------------------------------------------
+P[15]  P[14]  P[13]  P[12]  P[11]  P[10]   P[9]   P[8]   P[7]   P[6]   P[5]   P[4]   P[3]   P[2]   P[1]  P[0]
+     *
+     */
+
+
+    /* Add to the result, then shift left and repeat */
+    for (int i = 0; i < FHE_INTEGER_BIT_WIDTH_MULTIPLY / 2; i++) {
+
+	// Unfortunately we cannot know whether a given bit is zero, therefore
+	// we have to perform all the multiplications, blindly
+
+	/* Compute the product of the multiplicand × i-th bit of the multiplier
+	 */
+	/* The zeroes on the right */
+	for (int j = 0; j < FHE_INTEGER_BIT_WIDTH_MULTIPLY / 2; j++) {
+	    intermediate_product[j] = fhe_encrypt_one_bit((bool)0);
+	    //(void)printf("i: % 2d j: % 2d\n", i, j);
+	}
+	/* Now the product on this line itself */
+	for (int j = 0; j < FHE_INTEGER_BIT_WIDTH_MULTIPLY / 2 - i; j++) {
+	    intermediate_product[j + i] = fhe_and_bits(factor2[i], factor1[j]);
+	}
+
+//	//if (i == FHE_INTEGER_BIT_WIDTH_MULTIPLY - 1) {
+//	//    /* The last line -- invert all the bits */
+//	//} else {
+//	//    /* Invert the most-significant bit */
+//	//    intermediate_product[FHE_INTEGER_BIT_WIDTH_MULTIPLY] = fhe_xor_bits(
+//	//	    intermediate_product[FHE_INTEGER_BIT_WIDTH_MULTIPLY],
+//	//	    intermediate_product[FHE_INTEGER_BIT_WIDTH_MULTIPLY]);
+//	//}
+
+	/* Add the this product (this line) to the overall result (the grand
+	 * total) */
+	tmp = fhe_add_integers(result, intermediate_product);
+	for (int k = 0; k < FHE_INTEGER_BIT_WIDTH; k++) {
+	    DESTROY_MPZ_T(result[k]);
+	}
+	result = tmp;
+    }
+
+    return result;
+}
+
+/**
  * Add two signed integers together
  *
  * TODO: Determine the bit-length dynamically
@@ -61,7 +155,7 @@ unsigned long int securityParameter;
  * @return The sum of the two addends
  */
 mpz_t **fhe_add_integers(mpz_t **integer1, mpz_t **integer2) {
-    mpz_t **sum;
+    mpz_t **sum, *tmp1, *tmp2, *tmp3;
     INIT_MPZ_T(carry);
 
     sum = checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
@@ -73,14 +167,25 @@ mpz_t **fhe_add_integers(mpz_t **integer1, mpz_t **integer2) {
 	 * Full adder adapted from (retrieved on 2010-09-01):
 	 * <http://en.wikipedia.org/w/index.php?title=Adder_(electronics)&oldid=381607326#Full_adder>
 	 */
-	sum[i] = fhe_xor_bits(fhe_xor_bits(integer1[i], integer2[i]), carry);
-	carry = fhe_xor_bits(
-	    fhe_and_bits(integer1[i], integer2[i]),
-	    fhe_and_bits(carry, fhe_xor_bits(integer1[i], integer2[i]))
-	);
+
+	/* S = A ⊕ B ⊕ C_in */
+	tmp1 = fhe_xor_bits(integer1[i], integer2[i]);
+	sum[i] = fhe_xor_bits(tmp1, carry);
+
+	/* C_out = (A × B) ⊕ (C_in × (A ⊕ B)) */
+	tmp2 = fhe_and_bits(integer1[i], integer2[i]);
+	tmp3 = fhe_and_bits(carry, tmp1);
+
+	DESTROY_MPZ_T(carry);
+	carry = fhe_xor_bits(tmp2, tmp3);
+
+	DESTROY_MPZ_T(tmp1);
+	DESTROY_MPZ_T(tmp2);
+	DESTROY_MPZ_T(tmp3);
     }
 
     DESTROY_MPZ_T(carry);
+
 
     return sum;
 }
@@ -419,6 +524,7 @@ int main(int argc, char **argv) {
      * Integral arithmetics
      */
 
+#ifdef FHE_TEST_ADDITION
     /* Addition: hard-coded numbers */
 
     (void)printf("\n");
@@ -443,6 +549,7 @@ int main(int argc, char **argv) {
     }
 
     /* Addition: random numbers  */
+
     (void)printf("\n");
     for (int i = 0; i < 16; i++) {
 	fhe_integer result, addend1, addend2;
@@ -464,6 +571,60 @@ int main(int argc, char **argv) {
 		result,
 		ok ? "OK" : "FAIL");
 	assert(ok);
+    }
+#endif /* FHE_TEST_ADDITION */
+
+
+#if 0
+    /* Multiplication: hard-coded numbers */
+
+    (void)printf("\n");
+    for (int i = 0; i < 16; i++) {
+	fhe_integer result, factor = 0x1 * i;
+	
+
+	result = fhe_decrypt_integer(
+	    fhe_multiply_integers(
+		fhe_encrypt_integer(factor),
+		fhe_encrypt_integer(factor)
+		)
+	);
+	retval |= !(ok = (result == factor * factor));
+
+	(void)gmp_printf("0x%08x × 0x%08x = 0x%08x %s\n",
+		factor,
+		factor,
+		result,
+		ok ? "OK" : "FAIL");
+	assert(ok);
+    }
+#endif /* 0 */
+
+    /* Multiplication: random numbers  */
+
+    (void)printf("\n");
+    for (int i = 0; i < 16; i++) {
+        fhe_integer result, factor1, factor2;
+        factor1 = mpz_get_si(*fhe_new_random_integer(
+		    FHE_INTEGER_BIT_WIDTH_MULTIPLY / 4 + 2));
+        factor2 = mpz_get_si(*fhe_new_random_integer(
+		    FHE_INTEGER_BIT_WIDTH_MULTIPLY / 4 + 2));
+        
+
+        result = fhe_decrypt_integer(
+            fhe_multiply_integers(
+        	fhe_encrypt_integer(factor1),
+        	fhe_encrypt_integer(factor2)
+        	)
+        );
+        retval |= !(ok = (result == factor1 * factor2));
+
+        (void)gmp_printf("0x%08x × 0x%08x = 0x%08x %s\n",
+        	factor1,
+        	factor2,
+        	result,
+        	ok ? "OK" : "FAIL");
+        assert(ok);
     }
 
 
