@@ -72,5 +72,6 @@ mpz_t *fhe_xor_bits(mpz_t *bit1, mpz_t *bit2);
 mpz_t *fhe_and_bits(mpz_t *bit1, mpz_t *bit2);
 mpz_t **fhe_encrypt_integer(fhe_integer integer);
 fhe_integer fhe_decrypt_integer(mpz_t **encryptedInteger);
+mpz_t **fhe_add_integers(mpz_t **integer1, mpz_t **integer2);
 
 #endif // FHE_H
