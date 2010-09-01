@@ -16,6 +16,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 CC = gcc
+CFLAGS += -std=c99
 LDFLAGS = -lgmp
 
 .PHONY: all
