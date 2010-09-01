@@ -447,6 +447,7 @@ int main(int argc, char **argv) {
 	bitValue1
     };
 
+#if 0
     do {
 	bool result;
 
@@ -582,6 +583,7 @@ int main(int argc, char **argv) {
 		ok ? "OK" : "FAIL");
 	assert(ok);
     }
+#endif /* 0 */
 
 
     /* Multiplication: hard-coded numbers */
