@@ -588,10 +588,14 @@ int main(int argc, char **argv) {
 
     /* Multiplication: hard-coded numbers */
 
-    (void)printf("\n");
+
+    (void)printf("\nUsing %d-bit precision for multiplication\n\n",
+	    FHE_INTEGER_BIT_WIDTH_MULTIPLY);
+
+    unsigned long int mask = (0x1 << FHE_INTEGER_BIT_WIDTH_MULTIPLY) - 1;
+
     for (int i = 0; i < 16; i++) {
-	fhe_integer result, factor = 0x1 * i;
-	
+	fhe_integer result, factor = mask / 0xf * i;
 
 	result = fhe_decrypt_integer(
 	    tmp1 = fhe_multiply_integers(
@@ -600,13 +604,14 @@ int main(int argc, char **argv) {
 		)
 	);
 	DESTROY_ENCRYPTED_INTEGER(tmp1);
-	retval |= !(ok = (result == factor * factor));
+	retval |= !(ok = (result == ((factor * factor) & mask)));
 
-	(void)gmp_printf("0x%08x × 0x%08x = 0x%08x %s\n",
+	(void)gmp_printf("0x%0*5$x × 0x%0*5$x = 0x%0*5$x %s\n",
 		factor,
 		factor,
 		result,
-		ok ? "OK" : "FAIL");
+		ok ? "OK" : "FAIL",
+		FHE_INTEGER_BIT_WIDTH_MULTIPLY / 4);
 	assert(ok);
     }
 
@@ -626,14 +631,16 @@ int main(int argc, char **argv) {
         	)
         );
 	DESTROY_ENCRYPTED_INTEGER(tmp1);
-        retval |= !(ok = (result == factor1 * factor2));
+	retval |= !(ok = (result == ((factor1 * factor2) & mask)));
 
-        (void)gmp_printf("%1$ 8d × %2$ 8d = %3$ 8d"
-		"  0x%1$08x × 0x%2$08x = 0x%3$08x %4$s\n",
+        (void)gmp_printf("%1$ *6$d × %2$ *6$d = %3$ *6$d"
+		"    0x%1$0*5$x × 0x%2$0*5$x = 0x%3$0*5$x %4$s\n",
         	factor1,
         	factor2,
         	result,
-        	ok ? "OK" : "FAIL");
+		ok ? "OK" : "FAIL",
+		FHE_INTEGER_BIT_WIDTH_MULTIPLY / 4,
+		FHE_INTEGER_BIT_WIDTH_MULTIPLY / 2);
         assert(ok);
     }
 
