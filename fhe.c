@@ -235,6 +235,21 @@ fhe_integer fhe_decrypt_integer(mpz_t **encryptedInteger) {
 }
 
 /**
+ * Generate random number from range: (–2^numberOfBits, 2^numberOfBits>.
+ *
+ * @numberOfBits Number of bits this random integer will have
+ * @return Random integer
+ */
+long int fhe_random(unsigned long long int numberOfBits) {
+    mpz_t *randomInteger;
+
+    randomInteger = fhe_new_random_integer(numberOfBits + 1);
+    mpz_clrbit(*randomInteger, numberOfBits);
+
+    return mpz_get_si(*randomInteger);
+}
+
+/**
  * Generate a numberOfBits-bit long random integer.  Note: The most-significant
  * bit will not be random: it will always be 1.  The number of random bits
  * therefore is numberOfBits - 1.
@@ -528,6 +543,7 @@ int main(int argc, char **argv) {
     DESTROY_MPZ_T(bitValue1);
 
     /* Encrypt and decrypt an integer */
+#if 0
 
     do {
 	fhe_integer integer = 0x12345678;
@@ -542,12 +558,12 @@ int main(int argc, char **argv) {
 	assert(ok);
     } while (0);
 
+#endif /* 0 */
 
     /*
      * Integral arithmetics
      */
 
-#ifdef FHE_TEST_ADDITION
     /* Addition: hard-coded numbers */
 
     (void)printf("\n");
@@ -561,7 +577,7 @@ int main(int argc, char **argv) {
 		fhe_encrypt_integer(addend)
 		)
 	);
-	retval |= !(ok = (result == addend + addend));
+	retval |= !(ok = (result ==  (addend + addend)));
 
 	(void)gmp_printf("0x%08x + 0x%08x = 0x%08x %s\n",
 		addend,
@@ -576,8 +592,8 @@ int main(int argc, char **argv) {
     (void)printf("\n");
     for (int i = 0; i < 16; i++) {
 	fhe_integer result, addend1, addend2;
-	addend1 = mpz_get_si(*fhe_new_random_integer(FHE_INTEGER_BIT_WIDTH));
-	addend2 = mpz_get_si(*fhe_new_random_integer(FHE_INTEGER_BIT_WIDTH));
+	addend1 = fhe_random(FHE_INTEGER_BIT_WIDTH);
+	addend2 = fhe_random(FHE_INTEGER_BIT_WIDTH);
 	
 
 	result = fhe_decrypt_integer(
@@ -595,10 +611,8 @@ int main(int argc, char **argv) {
 		ok ? "OK" : "FAIL");
 	assert(ok);
     }
-#endif /* FHE_TEST_ADDITION */
 
 
-#if 0
     /* Multiplication: hard-coded numbers */
 
     (void)printf("\n");
@@ -621,17 +635,14 @@ int main(int argc, char **argv) {
 		ok ? "OK" : "FAIL");
 	assert(ok);
     }
-#endif /* 0 */
 
     /* Multiplication: random numbers  */
 
     (void)printf("\n");
     for (int i = 0; i < 16; i++) {
         fhe_integer result, factor1, factor2;
-        factor1 = mpz_get_si(*fhe_new_random_integer(
-		    FHE_INTEGER_BIT_WIDTH_MULTIPLY / 2));
-        factor2 = mpz_get_si(*fhe_new_random_integer(
-		    FHE_INTEGER_BIT_WIDTH_MULTIPLY / 2));
+        factor1 = fhe_random(FHE_INTEGER_BIT_WIDTH_MULTIPLY / 2);
+        factor2 = fhe_random(FHE_INTEGER_BIT_WIDTH_MULTIPLY / 2);
         
 
         result = fhe_decrypt_integer(
