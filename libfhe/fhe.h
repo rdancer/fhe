@@ -29,6 +29,8 @@
 
 /* TODO Do not hard-code bit width */
 #define FHE_INTEGER_BIT_WIDTH 32
+/* Multiplication consumes too much memory in 32 bits */
+#define FHE_INTEGER_BIT_WIDTH_MULTIPLY (FHE_INTEGER_BIT_WIDTH / 2 + 4)
 typedef int32_t fhe_integer;
 
 
