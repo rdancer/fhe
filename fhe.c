@@ -242,7 +242,9 @@ mpz_t *fhe_encrypt_one_bit(bool plainTextBit) {
 void fhe_initialize(unsigned long int mySecurityParameter) {
     securityParameter = mySecurityParameter;
 
-    privateKey = fhe_new_random_integer(bitsP);
+    /* Private key is a bitsP-bit wide even integer */
+    privateKey = fhe_new_random_integer(bitsP - 1);
+    mpz_mul_ui(*privateKey, *privateKey, 2);
 }
 
 
