@@ -30,7 +30,7 @@
 /* TODO Do not hard-code bit width */
 #define FHE_INTEGER_BIT_WIDTH 32
 /* Multiplication consumes too much memory in 32 bits */
-#define FHE_INTEGER_BIT_WIDTH_MULTIPLY (FHE_INTEGER_BIT_WIDTH / 2 + 4)
+#define FHE_INTEGER_BIT_WIDTH_MULTIPLY (10)
 typedef int32_t fhe_integer;
 
 
@@ -50,10 +50,7 @@ typedef int32_t fhe_integer;
 #define INIT_MPZ_T(x) \
     mpz_t *x; \
     do { \
-	if ((x = malloc(sizeof(void *))) == NULL) { \
-	    perror("malloc"); \
-	    exit(EXIT_FAILURE); \
-	} \
+	x = checkMalloc(sizeof(void *)); \
 	mpz_init(*x); \
     } while (0)
 
@@ -63,6 +60,16 @@ typedef int32_t fhe_integer;
 	   mpz_clear(*x); \
 	   free(x); \
 	} \
+    } while (0)
+
+#define DESTROY_ENCRYPTED_INTEGER(x) \
+    do { \
+	assert(x != NULL); \
+	for (int i = 0; i < FHE_INTEGER_BIT_WIDTH; i++) { \
+	    assert (x[i] != NULL); \
+	    DESTROY_MPZ_T(x[i]); \
+	} \
+	free(x); \
     } while (0)
 
 

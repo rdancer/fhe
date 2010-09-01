@@ -39,7 +39,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 static inline void *checkMalloc(size_t size) {
     void *ptr = NULL;
 
-    if ((ptr = malloc(size)) == NULL) {
+    if ((ptr = malloc(size
+		+ /* valgrind complaints about invalid reads/writes */ 8))
+		== NULL) {
 	perror("malloc");
 	exit(EXIT_FAILURE);
     }
@@ -49,6 +51,7 @@ static inline void *checkMalloc(size_t size) {
 
 mpz_t *privateKey;
 unsigned long int securityParameter;
+static FILE *randomFile;
 
 
 /**
@@ -81,7 +84,7 @@ mpz_t **fhe_multiply_integers(mpz_t **integer1, mpz_t **integer2) {
 	mpz_init(*intermediate_product[i]);
 
 	/* Work on the lower half of the function paramters */
-	if (i < FHE_INTEGER_BIT_WIDTH_MULTIPLY / 2) {
+	if (i < FHE_INTEGER_BIT_WIDTH_MULTIPLY) {
 	    mpz_set (*factor1[i], *integer1[i]);
 	    mpz_set (*factor2[i], *integer2[i]);
 	}
@@ -107,7 +110,8 @@ P[15]  P[14]  P[13]  P[12]  P[11]  P[10]   P[9]   P[8]   P[7]   P[6]   P[5]   P[
 
 
     /* Add to the result, then shift left and repeat */
-    for (int i = 0; i < FHE_INTEGER_BIT_WIDTH_MULTIPLY / 2; i++) {
+    for (int i = 0; i < FHE_INTEGER_BIT_WIDTH_MULTIPLY; i++) {
+	//(void)printf("i: % 2d\n", i);
 
 	// Unfortunately we cannot know whether a given bit is zero, therefore
 	// we have to perform all the multiplications, blindly
@@ -115,12 +119,12 @@ P[15]  P[14]  P[13]  P[12]  P[11]  P[10]   P[9]   P[8]   P[7]   P[6]   P[5]   P[
 	/* Compute the product of the multiplicand × i-th bit of the multiplier
 	 */
 	/* The zeroes on the right */
-	for (int j = 0; j < FHE_INTEGER_BIT_WIDTH_MULTIPLY / 2; j++) {
+	for (int j = 0; j < FHE_INTEGER_BIT_WIDTH_MULTIPLY; j++) {
 	    intermediate_product[j] = fhe_encrypt_one_bit((bool)0);
 	    //(void)printf("i: % 2d j: % 2d\n", i, j);
 	}
 	/* Now the product on this line itself */
-	for (int j = 0; j < FHE_INTEGER_BIT_WIDTH_MULTIPLY / 2 - i; j++) {
+	for (int j = 0; j < FHE_INTEGER_BIT_WIDTH_MULTIPLY - i; j++) {
 	    intermediate_product[j + i] = fhe_and_bits(factor2[i], factor1[j]);
 	}
 
@@ -136,11 +140,17 @@ P[15]  P[14]  P[13]  P[12]  P[11]  P[10]   P[9]   P[8]   P[7]   P[6]   P[5]   P[
 	/* Add the this product (this line) to the overall result (the grand
 	 * total) */
 	tmp = fhe_add_integers(result, intermediate_product);
-	for (int k = 0; k < FHE_INTEGER_BIT_WIDTH; k++) {
-	    DESTROY_MPZ_T(result[k]);
-	}
+	DESTROY_ENCRYPTED_INTEGER(result);
 	result = tmp;
     }
+
+    /*
+     * Clean-up and return the result
+     */
+
+    DESTROY_ENCRYPTED_INTEGER(factor1);
+    DESTROY_ENCRYPTED_INTEGER(factor2);
+    DESTROY_ENCRYPTED_INTEGER(intermediate_product);
 
     return result;
 }
@@ -223,7 +233,7 @@ fhe_integer fhe_decrypt_integer(mpz_t **encryptedInteger) {
 
     return integer;
 }
-
+
 /**
  * Generate a numberOfBits-bit long random integer.  Note: The most-significant
  * bit will not be random: it will always be 1.  The number of random bits
@@ -233,17 +243,22 @@ fhe_integer fhe_decrypt_integer(mpz_t **encryptedInteger) {
  */
 mpz_t *fhe_new_random_integer(unsigned long long int numberOfBits) {
 #if defined(__linux__)
-    FILE *randomFile;
     int c;
     unsigned int bitmask;
     long int i;
-    INIT_MPZ_T(randomInteger);
-
-    // TODO Maybe just open once per program run?
-    if ((randomFile = fopen(RANDOM_FILE , "r")) == NULL) {
-        perror("Error opening " RANDOM_FILE);
-	exit(EXIT_FAILURE);
-    }
+    //INIT_MPZ_T(randomInteger);
+    mpz_t *randomInteger;
+    do {
+	if (
+		(randomInteger = malloc(sizeof(void *)
+					+ /* placate valgrind */ 8)) == NULL
+//           || (*randomInteger = (mpz_t)malloc(sizeof(mpz_t))) == NULL
+		) {
+	    perror("malloc");
+	    exit(EXIT_FAILURE);
+	}
+	mpz_init(*randomInteger);
+    } while (0);
 
     /* The whole bytes */
     for (bitmask = 0xff, i = numberOfBits; i > 0; i -= 8) {
@@ -264,11 +279,6 @@ mpz_t *fhe_new_random_integer(unsigned long long int numberOfBits) {
         }
         mpz_mul_ui(*randomInteger, *randomInteger, bitmask + 1);
         mpz_add_ui(*randomInteger, *randomInteger, c & bitmask);
-    }
-
-    if (fclose(randomFile) == EOF) {
-        perror("Error closing " RANDOM_FILE);
-	// Does not have adverse effect on program run
     }
 
     return randomInteger;
@@ -345,6 +355,19 @@ mpz_t *fhe_encrypt_one_bit(bool plainTextBit) {
  */
 void fhe_initialize(unsigned long int mySecurityParameter) {
     securityParameter = mySecurityParameter;
+
+    // TODO Possibly close the file when we're finished, like so:
+    //
+    //if (fclose(randomFile) == EOF) {
+    //    perror("Error closing " RANDOM_FILE);
+    //    // Does not have adverse effect on program run
+    //}
+
+    if ((randomFile = fopen(RANDOM_FILE , "r")) == NULL) {
+        perror("Error opening " RANDOM_FILE);
+	exit(EXIT_FAILURE);
+    }
+
 
     /* Private key is a bitsP-bit wide even integer */
     privateKey = fhe_new_random_integer(bitsP - 1);
@@ -606,9 +629,9 @@ int main(int argc, char **argv) {
     for (int i = 0; i < 16; i++) {
         fhe_integer result, factor1, factor2;
         factor1 = mpz_get_si(*fhe_new_random_integer(
-		    FHE_INTEGER_BIT_WIDTH_MULTIPLY / 4 + 2));
+		    FHE_INTEGER_BIT_WIDTH_MULTIPLY / 2));
         factor2 = mpz_get_si(*fhe_new_random_integer(
-		    FHE_INTEGER_BIT_WIDTH_MULTIPLY / 4 + 2));
+		    FHE_INTEGER_BIT_WIDTH_MULTIPLY / 2));
         
 
         result = fhe_decrypt_integer(
@@ -619,7 +642,8 @@ int main(int argc, char **argv) {
         );
         retval |= !(ok = (result == factor1 * factor2));
 
-        (void)gmp_printf("0x%08x × 0x%08x = 0x%08x %s\n",
+        (void)gmp_printf("%1$ 8d × %2$ 8d = %3$ 8d"
+		"  0x%1$08x × 0x%2$08x = 0x%3$08x %4$s\n",
         	factor1,
         	factor2,
         	result,
