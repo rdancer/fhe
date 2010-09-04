@@ -37,6 +37,9 @@
 static const char* kEvaluateMethodId = "evaluate";
 static const char* kFormulaToXmlRpcRequestMethodId = "formulaToXmlRpcRequest";
 
+// State kept between calls
+long long int fhe_internal_counter = 42;
+
 /*
  * Adapted from <http://www.kyzer.me.uk/code/evaluate/eval.c>
  * retrieved on 2010-08-21
@@ -92,13 +95,14 @@ char * EvaluateLocally(char *formula) {
 
 /** Evaluate the formula */
 char * DoEvaluate(char *formula) {
-//#define BUFFER_SIZE 2000
-//    char *s = reinterpret_cast<char*>(NPN_MemAlloc(BUFFER_SIZE));
-//
-//    snprintf (s, BUFFER_SIZE, "%lld", atoll(formula) + 2);
-//
-//    return s;
-    return EvaluateLocally(formula);
+#define BUFFER_SIZE 2000
+    char *s = reinterpret_cast<char*>(NPN_MemAlloc(BUFFER_SIZE));
+
+    //snprintf (s, BUFFER_SIZE, "%lld", atoll(formula) + 2);
+    snprintf (s, BUFFER_SIZE, "%lld", fhe_internal_counter++);
+
+    return s;
+//  return EvaluateLocally(formula);
 }
 
 /** Increment number by one */
@@ -111,7 +115,7 @@ char * AddOne(char *number) {
     return s;
 }
 
-char *DoFormulaToXmlRpcRequest(static char *formula) {
+char *DoFormulaToXmlRpcRequest(char *formula) {
     /** The hard-coded XML-RPC request */
 #define XML_RPC_REQUEST ""
 
@@ -143,7 +147,7 @@ static bool FormulaToXmlRpcRequest(const NPVariant *args,
 	formula[nps.UTF8Length] = '\0';
 
 	if (char *xmlRpcRequest = DoFormulaToXmlRpcRequest(formula)) {
-	    STRINGN_TO_NPVARIANT(xmlRpcRequest, strlen(s), *result);
+	    STRINGN_TO_NPVARIANT(xmlRpcRequest, strlen(xmlRpcRequest), *result);
 	} else {
 	    // XXX Signal error
 	}
