@@ -106,6 +106,7 @@
        Copyright: 2007, Weston Ruter <http://weston.ruter.net/>
     -->
   <script type="text/javascript">
+      // <![CDATA[
       xmlrpc = new rpc.ServiceProxy("RPC2", {
                               asynchronous: false,  //default: true
                               sanitize: true,       //default: true
@@ -136,6 +137,8 @@
       //catch(e){
       //   alert("Unable to perform addition because: " + e);
       //}
+
+      // ]]>
   </script>
 
   <script type="text/javascript">
@@ -234,6 +237,7 @@
   -->
 
   <script type="text/javascript">
+    // <![CDATA[
     fhe_calculator = null;  // Global application object.
     status_text = 'Loading...';
 
@@ -317,6 +321,7 @@
         status_field.innerHTML = status_text;
       }
     }
+    // ]]>
   </script>
 </head>
 
@@ -362,6 +367,7 @@
   -->
   <div id="nacl_fhecalculator_content" style="background: blue"></div>
   <script type="text/javascript">
+    // <![CDATA[
     contentDiv = document.getElementById('nacl_fhecalculator_content');
     if (window.location.hash == '#develop') {
       // Load the develop version of the module.
@@ -389,6 +395,7 @@
       // http://code.google.com/p/nativeclient/issues/detail?id=500
       document.getElementById('fhe_calculator').nexes = nexes;
     }
+    // ]]>
   </script>
 <!-- XXX Unmatched </p> --><!-- </p> -->
 </div id="hello_world_html_div">
