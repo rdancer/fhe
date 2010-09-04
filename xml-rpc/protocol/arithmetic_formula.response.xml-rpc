@@ -1,61 +1,86 @@
 <?xml version="1.0"?>
+<!-- arithmetic_formula.response.xml-rpc - FHE calculator sample response -->
+
 <!--
-    This XML-RPC response format encodes the result of an arithmetic formula
-    evaluation.  The result is a single multi-bit number encoded as
-    FHE-encrypted single bits.
+
+    Copyright © 2010 Jan Minář <rdancer@rdancer.org>
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License version 2 (two),
+    as published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+  -->
+
+<!--
+    This XML-RPC response format encodes a single multi-bit number encoded as
+    FHE-encrypted single bits.  This number is the result of an arithmetic
+    formula specified in the corresponding XML-RPC request.
 
     See the sample request file for discussion on field formats.
+  -->
+
+<!--
+    Note: The number values are encrypted, and so the recipient of this file
+    will not know what their plaintext values are (random values not
+    representing any plaintext were chosen in the construction of this file).
+
+    Note: The number in this file is 4 bits wide.  In real life, the number
+    would typically be wider.
   -->
 
 <methodResponse>
     <params>
 
 	<!--
-	     Output pins
+	     Result: array of FHE-encrypted single bits
 	  -->
 
-	<!-- output pin S -->
 	<param>
-	    <struct>
-		<member>
-		    <name>gate</name>
-		    <value><string>pin</string></value>
-		</member>
-		<member>
-		    <name>type</name>
-		    <value><string>out</string></value>
-		</member>
-		<member>
-		    <name>id</name>
-		    <value><string>S</string></value>
-		</member>
-		<member>
-		    <name>value</name>
-		    <value><base64>AC4gcmVhbCBsaWZlLCB0aGlzIHdpbGwgYmUgcmFuZG9tIGRhdGEgZnJvbSAvZGV2L3JhbmRvbQo=</base64></value>
-		</member>
-	    </struct>
-	</param>
-
-	<!-- output pin C_out -->
-	<param>
-	    <struct>
-		<member>
-		    <name>gate</name>
-		    <value><string>pin</string></value>
-		</member>
-		<member>
-		    <name>type</name>
-		    <value><string>out</string></value>
-		</member>
-		<member>
-		    <name>id</name>
-		    <value><string>C_out</string></value>
-		</member>
-		<member>
-		    <name>value</name>
-		    <value><base64>XZ4gcmVhbCBsaWZlLCB0aGlzIHdpbGwgYmUgcmFuZG9tIGRhdGEgZnJvbSAvZGV2L3JhbmRvbQo=</base64></value>
-		</member>
-	    </struct>
+	    <array>
+		<data>
+		    <value>
+			<base64>2k9PD8I9CVxhw16lcMHvI1QldB3JpPaWiEvtUxHidm0sTSiDz8a6Z7bXizxjbKqGdMqPr8Phi/X2
+UQnyAbYmrTsHcf3vhSDtSuzVcWxL9lCgX2+XI2cJZUkCWOY/7DJjNR5cX460afl3rzRU0ROSuMtD
+Hj0yawT99g6louHIxorPnqS910kXAIU83b/SjrGtD+mDaPpWRBv1BnBhBbqLLSF7fN5lGfrDAat3
+EnQdmF4PeCdl8NK0Zrbi4RvqWIROm6MDu2WF+h2gxWU/O7kg6T90cRlC9Z1uMP8vWLJk3nNNXXAh
+5rwFa6ShMGk6IfuVKlixG68nRX5IpDArO42uIwd3GG9SEBw9Rk0/nRW4HQslzAZ8JjCrUwSexi/5
+UD/N5DELnrdzGasKLeFuiBZJB5KjQJbLJ9x4GWxN+Pn8ink=</base64>
+		    </value>
+		    <value>
+			<base64>DGJdPxOmrmMCIsElbqjFIDiZrOOnX5FuQAsmYkGA2sUGyuUNG7wENITBqHNqWPFdgzfYkKSN+QUl
+dofKQMav0ztfG+xWaYn6Am7xt5AJla/CkP7j7q+RpkIGDSlsUciNExruDT5hsnxZoyFBWnnZ7n6Z
+vj9gcrhp418Wg8KRY6+WSiANVYEXV5RBgYmSPESK2bQI2Ssb7dgsZAaOUYt9Wf3hZP63CK6gbHgp
+A3J47PDsr6diF5zAI9evXWu9aWYqxzZVgyoH/AQryMc1juTZmXlcUhWuI+MG2a9TdxJZru6Kkslf
+XeA+ZrY5u5lyIIxvPiJLH7MvLdIN0sTi6BRXmbsm9BTZoRE62k+FIgF3PJAZgj7rM/SCm6rr8fyO
+g4vL6MMQbWnKlwV0zFrlk18z27oCZIEod1pzyZZVxa9RlB0=</base64>
+		    </value>
+		    <value>
+			<base64>tb6Y8VnrtYaDHhOeNmi4XmiY4VpUTyDqo0rIrc/4LMDQz4tQpJ2R1Blz/1RubDLijXvt19kG1sRc
+VMWrazZrB3Yonusm/1Gj0qtK+Z056kO+Eof6WjqnNFwh/PZ2aX9mFqtYl5EvbdtdWdnTdSpqZHj0
+FDHhGCRnOf5FdVoekP6Crkh8w82jsUGYp3YytMWc/1J+Dl8oveDBzVVaLUoQbKWKgNKlGESlLa6X
+JMCLcY83ryyConYK8iAgAwaq9sFodp50jXr/Y2QaqF9Io0K6MKZCabEHIsiEvdnMjX7p74wC4u0j
+RV44znp+W/R+bn7dROyzTySPNfevippX42K6dnJGkaEvuqMuf1JOL2/bzQHTXvEArXfPQzu2E4Es
+s97FQzwxahACNFDqfrXVeDzlyhXoJHdJdRWXLN2p+oVP1UU=</base64>
+		    </value>
+		    <value>
+			<base64>2RGaOTlyxYaGBKUUf2MnH1JDO5KUbRROm1BPbTmftz/JR2TgOPkIWgVa5lwbPIEdpJrxEX+3QBG8
+3K2fhQi8K0eL8X89RMl+u6F8g0gQ/lm3oOooQR7qx4m1b35HRNBSPKs70gcyYPH3yDwmvQl5lPL7
+5SvfSgLVcuJM0T914ed9jsJOA9pfIqsTMrlU/GFMtEi0nLDcsoAk9GpePM7ccJSm6b5DQNA4ipUn
+7Dc0w6W0EmDAmbL4AnQ3dP2TnZQeCRkYCYGvz9Xz7zB5TXsjcIACLn6oJ3hFvB7nHaF7ZeJIzspa
+BttYX+6QBwvW3on1Y6/yuOPuZ4eKi0et/31bLHmxvJ6fjROMDZGvQl8RJ/2pTl9pE9AZ9CZWO+I1
+6tj8tcGsiCySasP2njwthsJNEXnaCfqR5GEEOUlxpj1LlL4=</base64>
+		    </value>
+		</data>
+	    </array>
 	</param>
 
     </params>
