@@ -1,0 +1,196 @@
+<?xml version="1.0"?>
+<!-- arithmetic_formula.request.xml-rpc - FHE calculator sample request -->
+
+<!--
+
+    Copyright © 2010 Jan Minář <rdancer@rdancer.org>
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License version 2 (two),
+    as published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+  -->
+
+<!--
+
+    This XML-RPC request format encodes an arithmetic formula to be evaluated
+    by the server.
+    
+    The file is logically composed of two parts: variable assignment, and the
+    formula proper.
+    
+    All the numbers in the formula are represented by variables.  Why?  All the
+    numbers are FHE-encrypted, and therefore can be extremely large (typically
+    in the order of megabits).  The most efficient encoding XML-RPC supports is
+    base64 encoding of the binary representation.  Morover, the FHE cryptotext
+    is essentially random data, and therefore incompressible, which rules out
+    compression as a space-saving measure.  It seems appropriate not to include
+    extremely large numbers in the text of the formula.  Including the numbers
+    via reference seems appropriate.
+
+    Referencing numbers can also save a lot of processing time and space if
+    some numbers appear more than once in a formula.
+
+    Single encrypted bits are represented as base64-encoded binary
+    represenatation of a FHE-encrypted boolean value 0 or 1.
+
+    Multi-bit numbers are stored as bit arrays of encrypted single bits.
+	
+	- binary representation for integers is 2-complement big-endian (this
+	  is, the most-significant bit comes first in an octet, and the
+	  most-significant octet comes first in a message)
+	- this applies both to the representation of the encrypted single bits,
+	  and to the representation of multi-bit numbers
+	- XXX binary representation for floats needs to be specified
+
+
+    Supported arithmetic operations are implementation specific.
+  -->
+
+<!--
+    This file encodes a simple arithmetic formula "(a + b) * (a - b)".
+
+    Note: The number values are encrypted, and so the recipient of this file
+    will not know what their plaintext values are (random values not
+    representing any plaintext were chosen in the construction of this file).
+
+    Note: The numbers in this file are 4 bits wide.  In real life, the numbers
+    would typically be wider.
+  -->
+
+<methodCall>
+    <methodName>fhe.calculator</methodName>
+
+    <params>
+
+	<!--
+	     Formula
+	  -->
+
+	<param>
+	    <name>formula</name>
+	    <!-- Variable name must mach an existing variable id below -->
+	    <value><string>(var0 + var1) * (var0 - var1)</string>
+	</param>
+
+	<!--
+	     Variable assignments
+	  -->
+
+	<!-- variable a -->
+	<param>
+	    <struct>
+		<!-- variable name -->
+		<member>
+		    <name>id</name>
+		    <value>
+			<string>var0</string>
+		    </value>
+		</member>
+		<!-- assigned value -->
+		<member>
+		    <name>value</name>
+		    <value>
+			<array>
+			    <data>
+				<value>
+				    <base64>rfM+JnUCeahKaaPo0zSWLhiJhakQrGKuTg7ta7I0unU/2K0oTMzJBVGyX13JCndEoq5qeKe9PF/x
+iFK3rP1YyF/4KC/fk1LHE9782JxCa7fboVTuEyClNexivOlgN0rMkv9Zpf64JEPE93ADWq7hwmQV
+xE8GYjpg3aeNp7bgLcFPU61Tvl36W6qh0rQ8919mfoIlCvbWUWBjqMxBeCuZ5wLJ2KWpCErTNZGm
+DTRHjs4O0lsftVmGoJgoCQRYKSxA2Hkn+EyK8NR0xPphQGU9uZEZqGAbLqZ7vv3kld/VAUEzBR5q
+cIVIbNqPH1Zmf5d8mglPmcNBBqiy4Hhb+DZy6lC3/WdRkPEdbkxzZWdiwvm7sznQ+qXe/8aoPYfu
+JlUepZgsz3II+5mN74ObYLD0NXalD53Yi1O8gP5RrO0z0yc=</base64>
+				</value>
+				<value>
+				    <base64>0WJRDB0C+ZnPpB82pzGvNV1v86dMLmRiPZLN3A/6m1eugmsZdmfy7v+/0lSnffHKX8QQr69x9ubh
+8MGW/FMVHkOCjrMY9aCRhTFUeeq4BeRF1wwp0+R3U/AOHZR0eE+paAZ9AGYQTIZ7JMoFUyrHos/1
+CSD+qx9wQWsuSKJ4fssiFBXkLO3Q4AKYtXgEzXj1ehg+Hh+wdfG61EGHwqSi2xLseWDFvlKqQ5Tn
+gwm2kazrawgTZ9aaMfcwOQlrYJ41H+4D/KsWr2CmrxMj6UgeBwXmGVPI0v9dR6JMtRvXvLEWCRy4
+g0uK1htXclS6HQa8BuOdYkMcKA12veUqwOM4Xtb0zzvyohZm2jCUqDEWxC7diK4hcd9XVz4Z1jGD
+u7qkrt5KIWb0k1k6dt7X/bTcHQe4oywlWYHdPSnkSlweYtY=</base64>
+				</value>
+				<value>
+				    <base64>SISVsBLpURlAUoxfLJ6jRilFzhswuQxMDcedvx940tlrZBd1vIHUdEU/ulye6LthwuhtyDoge1uG
+EIfw/9E0TCGcy4Puktz+XyUaOPWUlijI5+/nlRbYwql1aVZhOYQmy/Zyffj0uQmNQtOyTdPCoLZw
+tDSk4dpUZknEgFRxhBKLKOrVUVMVFcvapDxAJ5FYIJmUReaWtX0hviNgqHzOVf5ZMSq+enSNXyq5
+Mo5/lMn9NcutXCcXpfMLQzgbLsQfAAeX5ivAca4MhLiORI9p6k2Wm5ZUciOVuPzdR/iZTmNWpDTe
+devQ8BmGByuqyJcGosniDLt8krZpBN9YuttJRcfvFCPJ1ErxEQiDATNlD5Frsna/DFv8MVX5PqHD
+gKYqtLsydGZUxVctk0Pby5+kstNkft69xVt+hRoxmzQslZo=</base64>
+				</value>
+				<value>
+				    <base64>Nn3JVWdT18vdcOX9PYeRPLGINyGRDLiYxqHq4KAv9C1xz0ZVrMmEz71mJABETUlzmJ1YjAUOyVoo
+jylokgL5BNcPO55nDBG6TTcP0ADopSkIBKVU9qctMLV95VrqIKmX87Xm9GmGsviCKuJ5EoPnoV7m
+mNHHjjJmPWwziIw4aYxE26qHZBOlqtX5k8xe/ujMOM1TB04L+RwPIJslP4zBC8XXALdfwBWX2thA
+uryeLC9Yoffx9SRAmgbPjgyEYk+C8Qe2DFiLDTreqOccuswixHVsy8wKa2khLhpgGPBCakuhWthP
+TiOAjBXYAxsa3Yp04v6SWu0Rcnndc2xx8opXMpRqEV1Ha2U8uT+iiT4eTbYRASExfmVLIfm/femJ
+GLOBTEtX0ixvswWnx6xpcmytTtpoEkTmnfn6bsKqmFucwYQ=</base64>
+				</value>
+			    </data>
+			</array>
+		    </value>
+		</member>
+	    </struct>
+	</param>
+
+	<!-- variable b -->
+	<param>
+	    <struct>
+		<member>
+		    <name>id</name>
+		    <value><string>var1</string></value>
+		</member>
+		<member>
+		    <name>value</name>
+		    <value>
+			<array>
+			    <data>
+				<value>
+				    <base64>LjlHM5eps4BczJF1BtE40EP/k6+JtSRpRfy7vGD4P65PiwjAD1KTvErRHbEyqKBvBM5UXF8uvg3/
+MCnN1o9udlXGFLsMN/n92WP9JdXl11kSsYTI9ZdSDrS12iPM/MTpbr8XLlGIjmyLlIpd3qNgzqIr
+isWKYGDkM5aREnXxBq5VeecAB3NWI/ZCNkM9KQDPlATZcjiW/QjFnzfcvwicYQVXdnlBwrpUjm4F
+MDfOgdqiZzttliDYE0Jc1NHCOZlEMKiWGhHkeHzY9Hk/Ip829jNmGR2QZz+Y17eMlzHco+pRRByB
+eBo/fG55g5IPBWtVDhdn86ftVQdZSEPhpUBE9ZiBrLHZCsVW1eyAYwo8bBvYvR0Q5EJRNEWER783
+X1mFn8LkZ90BkLm0knGBx3JtDlbAiEG6IyTikJ0a6ZBMtJA=</base64>
+				</value>
+				<value>
+				    <base64>x9/BCDKN7qavevSkmQWGkni5Wy6yK76NYgjuepB0F93oN5SCt1VdkMv08X9a7zKY+UedDLFrwWHy
+CbtAsFg1rjXsBOkxX0fyscFSNENetnfWM87fiSpley1U5qt84BZ2Z3Pq+J1sYlb5MEcUI3kD2vXt
++YDLfsTQNIJhcCV7HjW5xg9H4BUlgFyMaCGY5Z5fQBGA48bk18nM9hhZEpG4GcQzkXysi5uV/+Im
+O1gVZA9VG2wEIFBlHhNDQ/jEI6aXJn+4+gBs9v25VYz9+IABEm+IVIFWx9Yvrv45v2CcE1Oi0bzm
+pY8oFCAYkcVTx89A1uQlRm1uK+YzDehbc/yzdnJ86fJu6A+ZHrcwv+zGpqPhG9CvX018mHxUU3qv
+s1mHZWPPBUPfsW7J8VRvJS/2CkLingCfhkKjvbS31mQemso=</base64>
+				</value>
+				<value>
+				    <base64>Kd4BhA7QV+ZAjgZNgJMeeb9uvjSf1haHkdzGgEnMfVqHFA9ROMDQHf8tBuaiO4rIe6/b9nif4U2F
+CSKQItZ3IGzJ0e5G8yfCTCn4guzo+uVrnmd/JB7O8lGJhoHFGEXnTUE2uGMV7yA4SAFzdvK6hnDO
+DSCOHiTQEWC2/DWVMkoTJUuCsX9ypr/LxfXvmYkV3K6HrhXDk3ViXbFzIsGFGAA6IwOS1zazIJ/7
+3U/raU9+lSyIFNp5NnNn6MA/kz4by2KaCTaj0egNKEGLm3XKvyKzet5XyRPFhnk2NVAOaIypDviQ
+xV29cST8EZ/Q0xMJ7wHOLWiFA2w0mwBf33CyF1H6TtDknGOUOXHmbFE936Ulwgy6xbt+KOI2/cUI
+tLavphiTG6EkzI/B5/HQoph28g7FZHF/dnySIoREfjVGXSQ=</base64>
+				</value>
+				<value>
+				    <base64>kXG2+rFseFrksyCSyVsTGHadBc9JE7t4I6zQWOMPbV9/ROO9x/FzzU4a07UD31/lUMB4ofBieghX
+lnO+6PvkmX6v+TcOOLjvhadDPwkXilex/KdVr/R54voz7SWGhG6rbnvgO2vLt7es57NKi/pe9EyL
+93An9QrIApxmjjXCqCEQqUCxOqxXD0cnXFg2+1DhTjNwqZDfi8LWlDdU25/UH5nfAPQ5AJfe9uy7
+vC2OaXR9FNr71xPyf65Gl0RNhJL8bwo5lsmm+db6kcmO9nMU1fLd8IlxyJo3pAYwpdgZS8lgsTnN
+t4cDKmTmgmCIM24zAJ49BOoym7jQ13+KoXk4A1Ck7S9WCbzw0opEXFcJZw+/pCbbuV477ojwW/Dp
+of9fQ+i1qzcUg0xw4akVT93u4hDR5nRr/gxgIoVvFP/ITPo=</base64>
+				</value>
+			    </data>
+			</array>
+		    </value>
+		</member>
+	    </struct>
+	</param>
+
+    </params>
+</methodCall>

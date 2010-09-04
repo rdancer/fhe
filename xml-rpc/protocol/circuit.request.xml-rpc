@@ -1,0 +1,319 @@
+<?xml version="1.0"?>
+<!-- circuit.request.xml-rpc - logical circuit evaluation request sample -->
+
+<!--
+
+    Copyright © 2010 Jan Minář <rdancer@rdancer.org>
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License version 2 (two),
+    as published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+  -->
+
+<!--
+
+    This XML-RPC request format encodes a logical circuit with two types of
+    parts:
+	
+	(1) Pins
+	    - input
+	    - output
+	(2) Gates
+	    - XOR
+	    - AND
+	    - ... all the other logical operations
+    
+    An input pin will have a "value" member, which will describe the state of
+    the pin.  The value of the "value" member is a base64-encoded binary
+    represenatation of a FHE-encrypted boolean value 0 or 1.
+	
+	- binary representation for integers is 2-complement big-endian (this
+	  is, the most-significant bit comes first in an octet, and the
+	  most-significant octet comes first in a message)
+	- XXX binary representation for floats needs to be specified
+
+  -->
+
+<!--
+    Full adder (add two bits + carry together), from
+     &lt;http://en.wikipedia.org/w/index.php?title=Adder_(electronics)&amp;oldid=381607326#Full_adder&gt;
+  -->
+
+<methodCall>
+    <methodName>fhe.evaluate</methodName>
+
+    <params>
+
+	<!--
+	     Input pins
+	  -->
+
+	<!-- input pin A: encrypted bit for value -->
+	<param>
+	    <struct>
+		<member>
+		    <name>gate</name>
+		    <value><string>pin</string></value>
+		</member>
+		<member>
+		    <name>type</name>
+		    <value><string>in</string></value>
+		</member>
+		<member>
+		    <name>id</name>
+		    <value><string>A</string></value>
+		</member>
+		<member>
+		    <name>value</name>
+		    <value><base64>SW4gcmVhbCBsaWZlLCB0aGlzIHdpbGwgYmUgcmFuZG9tIGRhdGEgZnJvbSAvZGV2L3JhbmRvbQo=</base64></value>
+		</member>
+	    </struct>
+	</param>
+
+	<!-- input pin B: encrypted bit for value -->
+	<param>
+	    <struct>
+		<member>
+		    <name>gate</name>
+		    <value><string>pin</string></value>
+		</member>
+		<member>
+		    <name>type</name>
+		    <value><string>in</string></value>
+		</member>
+		<member>
+		    <name>id</name>
+		    <value><string>B</string></value>
+		</member>
+		<member>
+		    <name>value</name>
+		    <value><base64>SW4gamVcbCBsaWZlLCB0aGlzIHdpbGwgYmUgcmFuZG9tIGRhdGEgZnJvbSAvZGX2L3JhbmRvbQo=</base64></value>
+		</member>
+	    </struct>
+	</param>
+
+	<!-- input pin C: unconnected -->
+	<param>
+	    <struct>
+		<member>
+		    <name>gate</name>
+		    <value><string>pin</string></value>
+		</member>
+		<member>
+		    <name>type</name>
+		    <value><string>in</string></value>
+		</member>
+		<member>
+		    <name>id</name>
+		    <value><string>C_in</string></value>
+		</member>
+		<!-- Could not specify the value at all -->
+		<member>
+		    <name>value</name>
+		    <value><nil/></value>
+		</member>
+	    </struct>
+	</param>
+
+
+	<!--
+	     Gates
+	  -->
+
+	<!-- XOR #0: inputs: A, B -->
+	<param>
+	    <struct>
+		<member>
+		    <name>gate</name>
+		    <value><string>xor</string></value>
+		</member>
+		<member>
+		    <name>id</name>
+		    <value>x0</value>
+		</member>
+		<member>
+		    <name>inputs</name>
+		    <value>
+			<array>
+			    <data>
+				<value><string>A</string></value>
+				<value><string>B</string></value>
+			    </data>
+			</array>
+		    </value>
+		</member>
+	    </struct>
+	</param>
+
+	<!-- XOR #1: inputs: x0, C_in -->
+	<param>
+	    <struct>
+		<member>
+		    <name>gate</name>
+		    <value><string>xor</string></value>
+		</member>
+		<member>
+		    <name>id</name>
+		    <value>x1</value>
+		</member>
+		<member>
+		    <name>inputs</name>
+		    <value>
+			<array>
+			    <data>
+				<value><string>x0</string></value>
+				<value><string>C_in</string></value>
+			    </data>
+			</array>
+		    </value>
+		</member>
+	    </struct>
+	</param>
+
+	<!-- AND #0: inputs: x0, C_in -->
+	<param>
+	    <struct>
+		<member>
+		    <name>gate</name>
+		    <value><string>and</string></value>
+		</member>
+		<member>
+		    <name>id</name>
+		    <value>a0</value>
+		</member>
+		<member>
+		    <name>inputs</name>
+		    <value>
+			<array>
+			    <data>
+				<value><string>x0</string></value>
+				<value><string>C_in</string></value>
+			    </data>
+			</array>
+		    </value>
+		</member>
+	    </struct>
+	</param>
+
+	<!-- AND #1: inputs: A, B -->
+	<param>
+	    <struct>
+		<member>
+		    <name>gate</name>
+		    <value><string>and</string></value>
+		</member>
+		<member>
+		    <name>id</name>
+		    <value>a1</value>
+		</member>
+		<member>
+		    <name>inputs</name>
+		    <value>
+			<array>
+			    <data>
+				<value><string>A</string></value>
+				<value><string>B</string></value>
+			    </data>
+			</array>
+		    </value>
+		</member>
+	    </struct>
+	</param>
+
+	<!-- XOR #2: inputs: a0, a1 -->
+	<param>
+	    <struct>
+		<member>
+		    <name>gate</name>
+		    <value><string>xor</string></value>
+		</member>
+		<member>
+		    <name>id</name>
+		    <value>x2</value>
+		</member>
+		<member>
+		    <name>inputs</name>
+		    <value>
+			<array>
+			    <data>
+				<value><string>a0</string></value>
+				<value><string>a1</string></value>
+			    </data>
+			</array>
+		    </value>
+		</member>
+	    </struct>
+	</param>
+
+	<!--
+	     Output pins
+	  -->
+
+	<!-- output pin S: input: x1 -->
+	<param>
+	    <struct>
+		<member>
+		    <name>gate</name>
+		    <value><string>pin</string></value>
+		</member>
+		<member>
+		    <name>type</name>
+		    <value><string>out</string></value>
+		</member>
+		<member>
+		    <name>id</name>
+		    <value><string>S</string></value>
+		</member>
+		<member>
+		    <name>inputs</name>
+		    <value>
+			<array>
+			    <data>
+				<value><string>x1</string></value>
+			    </data>
+			</array>
+		    </value>
+		</member>
+	    </struct>
+	</param>
+
+	<!-- output pin C_out: input: x2 -->
+	<param>
+	    <struct>
+		<member>
+		    <name>gate</name>
+		    <value><string>pin</string></value>
+		</member>
+		<member>
+		    <name>type</name>
+		    <value><string>out</string></value>
+		</member>
+		<member>
+		    <name>id</name>
+		    <value><string>C_out</string></value>
+		</member>
+		<member>
+		    <name>inputs</name>
+		    <value>
+			<array>
+			    <data>
+				<value><string>x2</string></value>
+			    </data>
+			</array>
+		    </value>
+		</member>
+	    </struct>
+	</param>
+
+    </params>
+</methodCall>
