@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!--
+    This XML-RPC response format encodes several output bits of the circuit
+    specified in the corresponding XML-RPC request.  See the sample request
+    file for discussion on field formats.
+  -->
+
+<!--
+    Output (sum, carry) of a full adder, from
+    &lt;http://en.wikipedia.org/w/index.php?title=Adder_(electronics)&amp;oldid=381607326#Full_adder&gt;
+  -->
+
+<methodResponse>
+    <params>
+
+	<!--
+	     Output pins
+	  -->
+
+	<!-- output pin S -->
+	<param>
+	    <struct>
+		<member>
+		    <name>gate</name>
+		    <value><string>pin</string></value>
+		</member>
+		<member>
+		    <name>type</name>
+		    <value><string>out</string></value>
+		</member>
+		<member>
+		    <name>id</name>
+		    <value><string>S</string></value>
+		</member>
+		<member>
+		    <name>value</name>
+		    <value><base64>AC4gcmVhbCBsaWZlLCB0aGlzIHdpbGwgYmUgcmFuZG9tIGRhdGEgZnJvbSAvZGV2L3JhbmRvbQo=</base64></value>
+		</member>
+	    </struct>
+	</param>
+
+	<!-- output pin C_out -->
+	<param>
+	    <struct>
+		<member>
+		    <name>gate</name>
+		    <value><string>pin</string></value>
+		</member>
+		<member>
+		    <name>type</name>
+		    <value><string>out</string></value>
+		</member>
+		<member>
+		    <name>id</name>
+		    <value><string>C_out</string></value>
+		</member>
+		<member>
+		    <name>value</name>
+		    <value><base64>XZ4gcmVhbCBsaWZlLCB0aGlzIHdpbGwgYmUgcmFuZG9tIGRhdGEgZnJvbSAvZGV2L3JhbmRvbQo=</base64></value>
+		</member>
+	    </struct>
+	</param>
+
+    </params>
+</methodCall>

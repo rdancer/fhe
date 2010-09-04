@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!--
+    This XML file encodes a logical circuit with two types of parts:
+	
+	(1) Pins
+	    - input
+	    - output
+	(2) Gates
+	    - XOR
+	    - AND
+	    - ... all the other logical operations
+    
+    The elements have these attributes:
+	
+	(1) Identity ("id")
+	(2) Input element connection ("i<NATURAL_NUMBER>")
+	    - References an existing element id
+    
+    An input pin will have a child element <value>, which will describe the
+    state of the pin.  The content of the <value> element is an encoded boolean value 0 or 1.  The encoding method is specified in the <value> attribute "encoding", possible values being:
+	
+	(1) "ascii"
+	    - The ASCII character for 0 or 1
+	    - legal values: "0", "1"
+	    - this should be used for plaintext data
+	(2) "base64"
+	    - Base64-encoded binary representation of the value
+	    - the binary value is encoded, not the ASCII
+	    - this should be used for FHE-encrypted data
+	    - binary representation for integers is 2-complement big-endian
+	      (this is, the most-significant bit comes first in an octet, and
+	      the most-significant octet comes first in a message)
+	    - XXX binary representation for floats needs to be specified
+  -->
+
+<circuit>
+    <info>
+	Full adder, from &lt;http://en.wikipedia.org/w/index.php?title=Adder_(electronics)&amp;oldid=381607326#Full_adder&gt;
+    </info>
+
+    <pin type="in" id="A">
+	<value encoding="base64">
+	    AA== <!-- zero -->
+	</value>
+    </pin>
+    <pin type="in" id="B" />
+	<value encoding="ascii">
+	    0
+	</value>
+    </pin>
+    <pin type="in" id="C_in" />
+	<value encoding="base64">
+<![CDATA[
+SW4gcmVhbCBsaWZlLCB0aGlzIHdpbGwgYmUgcmFuZG9tIGRhdGEgZnJvbSAvZGV2L3JhbmRvbQo=
+]]>
+	</value>
+    </pin>
+
+    <xor id="x0" i0="A" i1="B" />
+    <xor id="x1" i0="x0" i1="C_in" />
+    <and id="a0" i0="x0" i1="C_in" />
+    <and id="a1" i0="A" i1="B" />
+    <xor id="x2" i0="a0" i1="a1" />
+
+    <pin type="out" id="S" i0="x1" />
+    <pin type="out" id="C_out" i0="x2" />
+</circuit>
+<!-- the identity of the gate (a unique name) and i1 and i2 -->
