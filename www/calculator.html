@@ -333,8 +333,12 @@
 
 	var arraySize = fhe_calculator.preprocess(formula);
 	//return arraySize;
-	fhe_calculator.getNext(formula);
-	return fhe_calculator.getNext(formula);
+
+	var result = "";
+	for (var i = 0; i < arraySize; i++) {
+	    result += i + ": \"" + fhe_calculator.getNext() + "\"\n";
+	}
+	return result;
 
 	var request = buildXmlRpcRequest(formula);
 	return request.formula;
