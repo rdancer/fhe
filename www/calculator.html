@@ -274,7 +274,7 @@
      * response.
      */
     function sendToXmlRpcServer(xmlRpcRequest) {
-	//throw new Error("XML-RPC not implemented yet");
+	//throw ("XML-RPC not implemented yet");
         try {
            var message = xmlrpc.sample.add(parseInt(xmlRpcRequest), 0);
            return(message);
@@ -284,24 +284,75 @@
         }
     }
 
+    /**
+     * Build the structure containing the parsed formula and the base64-encoded
+     * encrypted bits
+     *
+     * @return structure containing the formula and the encoded variables
+     */
+    function buildXmlRpcRequest(formula) {
+	/* Let the NaCl pre-process the formula.  Number of elements is
+	   returned */
+	var arrayLength = fhe_calculator.preprocess(formula);
+	//return (arrayLength);
+
+	if (arrayLength < 1) {
+	    // This is an error, we expect at least the formula back with no
+	    // variables
+	    throw ("Internal error: NaCl returned " + arrayLength
+		    + " when pre-processing the formula");
+	}
+
+	/*
+	 * Build the XML-RPC request
+	 */
+
+	var request;
+
+	/* Get the formula */
+	request.formula = fhe_calculator.getNext();
+	alert(request.formula);
+
+	/* Get the base64-encoded encrypted single integers */
+	for (var i = 0; i < arrayLength - 1; i++) {
+	    request.variables[i]["id"] = "var" + i;
+	    if ((request.variables[i]["value"] = fhe_calculator.getNext())
+			    == "") {
+		throw ("Internal error: cannot get enough bits from NaCl");
+	    };
+	}
+
+	return request;
+    }
+
     function evaluate(formula) {
       try {
 	// Evaluate locally
         //return(fhe_calculator.evaluate(formula));
 
-	/* Let NaCl pre-process the formula into boolean circuit + data,
-	   wrapped in XML-RPC, ready to send to server */ 
-	var xmlRpcRequest = fhe_calculator.formulaToXmlRpcRequest(formula);
-	//return (xmlRpcRequest);
-	
-	/* Send the XML-RPC request to server, receive the XML-RPC-encoded
-	   encrypted response */
-	var xmlRpcResponse = sendToXmlRpcServer(xmlRpcRequest);
-	return (xmlRpcResponse);
 
-	/* Pass XML-RPC-encoded result to NaCl */
-	var result = fhe_calculator.xmlRpcResponseToResult(xmlRpcResponse);
-        return(result);
+	var arraySize = fhe_calculator.preprocess(formula);
+	//return arraySize;
+	fhe_calculator.getNext(formula);
+	return fhe_calculator.getNext(formula);
+
+	var request = buildXmlRpcRequest(formula);
+	return request.formula;
+
+//	/* Let NaCl pre-process the formula into boolean circuit + data,
+//	   wrapped in XML-RPC, ready to send to server */ 
+//	var xmlRpcRequest = fhe_calculator.formulaToXmlRpcRequest(formula);
+//	return (xmlRpcRequest);
+//	
+//	/* Send the XML-RPC request to server, receive the XML-RPC-encoded
+//	   encrypted response */
+//	var xmlRpcResponse = sendToXmlRpcServer(xmlRpcRequest);
+        var bits = xmlrpc.fhe.calculate(request);
+//	return (xmlRpcResponse);
+//
+//	/* Pass XML-RPC-encoded result to NaCl */
+//	var result = fhe_calculator.xmlRpcResponseToResult(xmlRpcResponse);
+//        return(result);
 
       } catch(e) {
         return(e.message);

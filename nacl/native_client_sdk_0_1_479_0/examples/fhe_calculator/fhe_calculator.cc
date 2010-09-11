@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #if defined(__native_client__)
 #include <nacl/nacl_npapi.h>
@@ -33,12 +34,18 @@
 #include "third_party/npapi/bindings/nphostapi.h"
 #endif
 
+#define FHE_ERROR -1	// Integer error return value
+
 // These are the method names as JavaScript sees them.
 static const char* kEvaluateMethodId = "evaluate";
+static const char* kPreprocessMethodId = "preprocess";
 static const char* kFormulaToXmlRpcRequestMethodId = "formulaToXmlRpcRequest";
+static const char* kGetNextMethodId = "getNext";
 
-// State kept between calls
-long long int fhe_internal_counter = 42;
+// how many array members are remaining
+int32_t remaining = 0;
+char *processed_formula = NULL;
+char **encrypted_variables = NULL;
 
 /*
  * Adapted from <http://www.kyzer.me.uk/code/evaluate/eval.c>
@@ -93,13 +100,58 @@ char * EvaluateLocally(char *formula) {
 }
 
 
+/**
+ * Preprocess the formula and store the tokenized formula in an array.
+ *
+ * @return number of members in the array
+ */
+int32_t DoPreprocess(char *formula) {
+    size_t ptr = 0, size = strlen(formula) + 1, length, variables_count = 0;
+    char *s = (char *)malloc(size);
+    encrypted_variables = reinterpret_cast<char**>(NPN_MemAlloc(sizeof (char *)
+		* strlen(formula)));  // maximum is one variable per char
+
+    for (size_t i = 0; i < strlen(formula); i++) {
+	if (isdigit(formula[i])) {
+	    /* Substitute the number with a variable in the formula */
+	    length = snprintf(&(s[ptr]), 0, "var%u", variables_count);
+	    if ((s = (char*)realloc(s, size += length)) == NULL) {
+		return FHE_ERROR;
+	    }
+	    sprintf (&(s[ptr]), "var%u", variables_count);
+	    ptr += length;
+
+	    /* todo Get the encrypted number in the variables array */
+	    encrypted_variables[variables_count] =
+		reinterpret_cast<char*>(NPN_MemAlloc(BUFFER_SIZE));
+	    snprintf(encrypted_variables[variables_count], BUFFER_SIZE, "%d",
+		atoi(&(formula[i])));
+	    variables_count++;
+	    // advance the pointer past this number
+	    while (isdigit(formula[i + 1])) {
+		i++;
+	    }
+	} else {
+	    s[ptr++] = formula[i];
+	}
+    }
+    s[ptr] = '\0';
+
+    /* Copy into the global variable */
+    // XXX memory leak
+    processed_formula = reinterpret_cast<char*>(NPN_MemAlloc(strlen(s) + 1));
+    strcpy(processed_formula, s);
+
+    return remaining = variables_count + 1;
+}
+
 /** Evaluate the formula */
 char * DoEvaluate(char *formula) {
 #define BUFFER_SIZE 2000
     char *s = reinterpret_cast<char*>(NPN_MemAlloc(BUFFER_SIZE));
 
-    //snprintf (s, BUFFER_SIZE, "%lld", atoll(formula) + 2);
-    snprintf (s, BUFFER_SIZE, "%lld", fhe_internal_counter++);
+    snprintf (s, BUFFER_SIZE, "%lld", atoll(formula) + 2);
+    //snprintf (s, BUFFER_SIZE, "%lld", fhe_internal_counter++);
 
     return s;
 //  return EvaluateLocally(formula);
@@ -158,6 +210,38 @@ static bool FormulaToXmlRpcRequest(const NPVariant *args,
   return true;
 }
 
+/**
+ * Preprocess the formula, tokenizing it.  The tokens are thenceforth available
+ * from the getNext() method.
+ *
+ * @return number of tokens in the formula
+ */
+// This function creates a string in the browser's memory pool and then returns
+// a variable containing a pointer to that string.  The variable is later
+// returned back to the browser by the Invoke() function that called this.
+static bool Preprocess(const NPVariant *args,
+                       uint32_t arg_count,
+		       NPVariant *result) {
+  if (result) {
+    if (arg_count > 0) {
+	NPString nps = NPVARIANT_TO_STRING(args[0]);
+
+	// Note: |formula| will be freed later on by the browser, so it needs to
+	// be allocated here with NPN_MemAlloc().
+	char *formula = reinterpret_cast<char*>(NPN_MemAlloc(nps.UTF8Length + 1));
+	memcpy(formula, nps.UTF8Characters, nps.UTF8Length);
+	formula[nps.UTF8Length] = '\0';
+
+	int32_t retval = DoPreprocess(formula);
+
+	INT32_TO_NPVARIANT(retval, *result);
+    } else {
+	INT32_TO_NPVARIANT(FHE_ERROR, *result);
+    }
+  }
+  return true;
+}
+
 // This function creates a string in the browser's memory pool and then returns
 // a variable containing a pointer to that string.  The variable is later
 // returned back to the browser by the Invoke() function that called this.
@@ -175,6 +259,54 @@ static bool Evaluate(const NPVariant *args,
 	formula[nps.UTF8Length] = '\0';
 
 	char *s = DoEvaluate(formula);
+
+	STRINGN_TO_NPVARIANT(s, strlen(s), *result);
+    } else {
+	// XXX Signal error
+	STRINGN_TO_NPVARIANT("", 0, *result);
+    }
+  }
+  return true;
+}
+/**
+ * Return the next string, which is either the preprocessed formula, or, if
+ * that has been returned, the encrypted variables, in order.
+ *
+ * @return next string (preprocessed formula or encrypted variable)
+ */
+char * DoGetNext(void) {
+    char *s = reinterpret_cast<char*>(NPN_MemAlloc(BUFFER_SIZE));
+
+    if (processed_formula != NULL) {
+	--remaining;
+	snprintf (s, BUFFER_SIZE, "%s", processed_formula);
+	processed_formula = NULL;
+    } else if (remaining-- > 0) {
+	snprintf (s, BUFFER_SIZE, "%s", *(encrypted_variables++));
+    } else {
+	snprintf (s, BUFFER_SIZE, "Error: no more variables");
+    }
+
+    return s;
+}
+
+// This function creates a string in the browser's memory pool and then returns
+// a variable containing a pointer to that string.  The variable is later
+// returned back to the browser by the Invoke() function that called this.
+static bool GetNext(const NPVariant *args,
+                       uint32_t arg_count,
+		       NPVariant *result) {
+  if (result) {
+    if (arg_count > 0) {
+	NPString nps = NPVARIANT_TO_STRING(args[0]);
+
+	// Note: |formula| will be freed later on by the browser, so it needs to
+	// be allocated here with NPN_MemAlloc().
+	char *formula = reinterpret_cast<char*>(NPN_MemAlloc(nps.UTF8Length + 1));
+	memcpy(formula, nps.UTF8Characters, nps.UTF8Length);
+	formula[nps.UTF8Length] = '\0';
+
+	char *s = DoGetNext();
 
 	STRINGN_TO_NPVARIANT(s, strlen(s), *result);
     } else {
@@ -206,6 +338,10 @@ static bool HasMethod(NPObject* obj, NPIdentifier method_name) {
   char *name = NPN_UTF8FromIdentifier(method_name);
   bool is_method = false;
   if (!strcmp((const char *)name, kEvaluateMethodId)) {
+    is_method = true;
+  } else if (!strcmp((const char*)name, kPreprocessMethodId)) {
+    is_method = true;
+  } else if (!strcmp((const char*)name, kGetNextMethodId)) {
     is_method = true;
   } else if (!strcmp((const char*)name, kFormulaToXmlRpcRequestMethodId)) {
     is_method = true;
@@ -247,6 +383,10 @@ static bool Invoke(NPObject* obj,
   // called function, then gets returned to the browser when Invoke() returns.
   if (!strcmp((const char *)name, kEvaluateMethodId)) {
     rval = Evaluate(args, arg_count, result);
+  } else if (!strcmp((const char*)name, kPreprocessMethodId)) {
+    rval = Preprocess(args, arg_count, result);
+  } else if (!strcmp((const char*)name, kGetNextMethodId)) {
+    rval = GetNext(args, arg_count, result);
   } else if (!strcmp((const char*)name, kFormulaToXmlRpcRequestMethodId)) {
     rval = FormulaToXmlRpcRequest(args, arg_count, result);
   }
