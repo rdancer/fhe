@@ -37,9 +37,10 @@
  *
  * Then again that breaks our tests, so not so fast.
  */ 
-#define FHE_INTEGER_BIT_WIDTH 16
-#define FHE_INTEGER_BIT_WIDTH_MULTIPLY (FHE_INTEGER_BIT_WIDTH)
 typedef int32_t fhe_integer;
+#define FHE_INTEGER_BIT_WIDTH 16
+#define FHE_INTEGER_BIT_WIDTH_MULTIPLY FHE_INTEGER_BIT_WIDTH
+#define FHE_MASK(x) ((x) & (0xffffffff >> (32 - FHE_INTEGER_BIT_WIDTH)))
 
 
 /*
@@ -58,7 +59,7 @@ typedef int32_t fhe_integer;
 #define INIT_MPZ_T(x) \
     mpz_t *x; \
     do { \
-	x = checkMalloc(sizeof(void *)); \
+	x = (mpz_t *)checkMalloc(sizeof(void *)); \
 	mpz_init(*x); \
     } while (0)
 
