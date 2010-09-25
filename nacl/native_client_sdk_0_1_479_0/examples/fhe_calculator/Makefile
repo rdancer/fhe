@@ -19,19 +19,21 @@
 
 .PHONY: all clean
 
-CCFILES = fhe_calculator_module.cc fhe_calculator.cc npn_bridge.cc npp_gate.cc evaluate.cc
+CCFILES = fhe_calculator_module.cc fhe_calculator.cc npn_bridge.cc npp_gate.cc evaluate.cc libfhe.cc
 
 OBJECTS_X86_32 = $(CCFILES:%.cc=%_x86_32.o)
 OBJECTS_X86_64 = $(CCFILES:%.cc=%_x86_64.o)
 
 NACL_SDK_ROOT = ../..
 
-CFLAGS = -Wall -Wno-long-long -pthread -DXP_UNIX -Werror
+CFLAGS = -Wall -Wno-long-long -pthread -DXP_UNIX -Werror -I "../../../../libfhe/" -I /usr/include
 INCLUDES =
 LDFLAGS = -lgoogle_nacl_imc \
           -lgoogle_nacl_npruntime \
           -lpthread \
           -lsrpc \
+          -lgmp \
+          -I "../../../../libfhe/" \
           $(ARCH_FLAGS)
 OPT_FLAGS = -O2
 

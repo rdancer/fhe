@@ -67,20 +67,20 @@ mpz_t **fhe_multiply_integers(mpz_t **integer1, mpz_t **integer2) {
     mpz_t **result, **intermediate_product, **factor1, **factor2;
     mpz_t **tmp;
 
-    factor1 = checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
-    factor2 = checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
-    result = checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
-    intermediate_product = checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
+    factor1 = (mpz_t **)checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
+    factor2 = (mpz_t **)checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
+    result = (mpz_t **)checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
+    intermediate_product = (mpz_t **)checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
 
     /* Initialize the objects that we need to be zero */
     for (int i = 0; i < FHE_INTEGER_BIT_WIDTH; i++) {
-	factor1[i] = checkMalloc(sizeof(void *));
+	factor1[i] = (mpz_t *)checkMalloc(sizeof(void *));
 	mpz_init(*factor1[i]);
-	factor2[i] = checkMalloc(sizeof(void *));
+	factor2[i] = (mpz_t *)checkMalloc(sizeof(void *));
 	mpz_init(*factor2[i]);
-	result[i] = checkMalloc(sizeof(void *));
+	result[i] = (mpz_t *)checkMalloc(sizeof(void *));
 	mpz_init(*result[i]);
-	intermediate_product[i] = checkMalloc(sizeof(void *));
+	intermediate_product[i] = (mpz_t *)checkMalloc(sizeof(void *));
 	mpz_init(*intermediate_product[i]);
 
 	/* Create a local deep copy of the parameters */
@@ -168,7 +168,7 @@ mpz_t **fhe_add_integers(mpz_t **integer1, mpz_t **integer2) {
     mpz_t **sum, *tmp1, *tmp2, *tmp3;
     INIT_MPZ_T(carry);
 
-    sum = checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
+    sum = (mpz_t **)checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
 
     for (int i = 0; i < FHE_INTEGER_BIT_WIDTH; i++) {
 	assert(integer1[i] != NULL && integer2[i] != NULL);
@@ -209,7 +209,7 @@ mpz_t **fhe_add_integers(mpz_t **integer1, mpz_t **integer2) {
 mpz_t **fhe_encrypt_integer(fhe_integer integer) {
     mpz_t **encryptedInteger;
 
-    encryptedInteger = checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
+    encryptedInteger = (mpz_t **)checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
     for (int i = 0; i < FHE_INTEGER_BIT_WIDTH; i++) {
 	encryptedInteger[i] = fhe_encrypt_one_bit((integer >> i) & 0x1);
     }
@@ -260,11 +260,11 @@ mpz_t *fhe_new_random_integer(unsigned long long int numberOfBits) {
 #if defined(__linux__)
     int c;
     unsigned int bitmask;
-    long int i;
+    unsigned long int i;
     INIT_MPZ_T(randomInteger);
 
     /* The whole bytes */
-    for (bitmask = 0xff, i = numberOfBits; i > 0; i -= 8) {
+    for (bitmask = 0xff, i = numberOfBits; i > 0;) {
         if ((c = fgetc(randomFile)) == EOF) {
 	    perror("Error reading " RANDOM_FILE);
 	    exit(EXIT_FAILURE);
@@ -282,6 +282,13 @@ mpz_t *fhe_new_random_integer(unsigned long long int numberOfBits) {
         }
         mpz_mul_ui(*randomInteger, *randomInteger, bitmask + 1);
         mpz_add_ui(*randomInteger, *randomInteger, c & bitmask);
+
+	/* Decrement; check for underflow */
+	if (i < 8) {
+	    break;
+	} else {
+	    i -= 8;
+	}
     }
 
     return randomInteger;
@@ -447,7 +454,6 @@ int main(int argc, char **argv) {
 	bitValue1
     };
 
-#if 0
     do {
 	bool result;
 
@@ -517,7 +523,7 @@ int main(int argc, char **argv) {
     /* Encrypt and decrypt an integer */
 
     do {
-	fhe_integer integer = 0x12345678;
+	fhe_integer integer = 0x123456789abcdef0 >> (64 - FHE_INTEGER_BIT_WIDTH);
 	fhe_integer result = fhe_decrypt_integer(fhe_encrypt_integer(integer));
 
 	retval |= !(ok = (result == integer));
@@ -538,7 +544,7 @@ int main(int argc, char **argv) {
 
     (void)printf("\n");
     for (int i = 0; i < 16; i++) {
-	fhe_integer result, addend = 0x11111111 * i;
+	fhe_integer result, addend = FHE_MASK(0x1111111111111111 * i);
 	
 
 	result = fhe_decrypt_integer(
@@ -548,13 +554,14 @@ int main(int argc, char **argv) {
 		)
 	);
 	DESTROY_ENCRYPTED_INTEGER(tmp1);
-	retval |= !(ok = (result ==  (addend + addend)));
+	retval |= !(ok = (result ==  FHE_MASK(addend + addend)));
 
-	(void)gmp_printf("0x%08x + 0x%08x = 0x%08x %s\n",
+	(void)gmp_printf("0x%0*5$x + 0x%0*5$x = 0x%0*5$x %s\n",
 		addend,
 		addend,
 		result,
-		ok ? "OK" : "FAIL");
+		ok ? "OK" : "FAIL",
+		FHE_INTEGER_BIT_WIDTH / 4);
 	assert(ok);
     }
 
@@ -574,15 +581,17 @@ int main(int argc, char **argv) {
 		)
 	);
 	DESTROY_ENCRYPTED_INTEGER(tmp1);
-	retval |= !(ok = (result == addend1 + addend2));
+	retval |= !(ok = (result == FHE_MASK(addend1 + addend2)));
 
-	(void)gmp_printf("0x%08x + 0x%08x = 0x%08x %s\n",
+	(void)gmp_printf("0x%0*5$x + 0x%0*5$x = 0x%0*5$x %s\n",
 		addend1,
 		addend2,
 		result,
-		ok ? "OK" : "FAIL");
+		ok ? "OK" : "FAIL",
+		FHE_INTEGER_BIT_WIDTH / 4);
 	assert(ok);
     }
+#if 0
 #endif /* 0 */
 
 
