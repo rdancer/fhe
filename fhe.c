@@ -290,7 +290,7 @@ mp_int *fhe_new_random_integer(unsigned long long int numberOfBits) {
             // The last few bits will have a bitmask
             bitmask = 0xff >> (8 - i);
         }
-	for (int j = 0; j < i; j++) {
+	for (unsigned long int j = 0; j < i; j++) {
 	    mp_mul_2(randomInteger, randomInteger);
 	}
 	mp_set_int(tmp1, c & bitmask);
@@ -479,7 +479,7 @@ int main(int argc, char **argv) {
 	
 	/* Allocate space and generate ASCII representation of private key */
 	(void)mp_radix_size(privateKey, 0x10, &size);
-	buf = checkMalloc(size);
+	buf = (char *)checkMalloc(size);
 	(void)mp_toradix(privateKey, buf, 0x10);
 
 	(void)printf("Private key: 0x%s\n", buf);
@@ -549,7 +549,7 @@ int main(int argc, char **argv) {
     /* Encrypt and decrypt an integer */
 
     do {
-	fhe_integer integer = 0x123456789abcdef0 >> (64 - FHE_INTEGER_BIT_WIDTH);
+	fhe_integer integer = 0x123456789abcdef0LL >> (64 - FHE_INTEGER_BIT_WIDTH);
 	fhe_integer result = fhe_decrypt_integer(fhe_encrypt_integer(integer));
 
 	retval |= !(ok = (result == integer));
@@ -570,7 +570,7 @@ int main(int argc, char **argv) {
 
     (void)printf("\n");
     for (int i = 0; i < 16; i++) {
-	fhe_integer result, addend = FHE_MASK(0x1111111111111111 * i);
+	fhe_integer result, addend = FHE_MASK(0x1111111111111111LL * i);
 	
 
 	result = fhe_decrypt_integer(
@@ -580,7 +580,7 @@ int main(int argc, char **argv) {
 		)
 	);
 	DESTROY_ENCRYPTED_INTEGER(tmp1);
-	retval |= !(ok = (result ==  FHE_MASK(addend + addend)));
+	retval |= !(ok = (result ==  (fhe_integer)FHE_MASK(addend + addend)));
 
 	(void)printf("0x%1$0*5$x + 0x%2$0*5$x = 0x%3$0*5$x %4$s\n",
 		addend,
@@ -608,7 +608,7 @@ int main(int argc, char **argv) {
 		)
 	);
 	DESTROY_ENCRYPTED_INTEGER(tmp1);
-	retval |= !(ok = (result == FHE_MASK(addend1 + addend2)));
+	retval |= !(ok = (result == (fhe_integer)FHE_MASK(addend1 + addend2)));
 
 	(void)printf("0x%1$0*5$x + 0x%2$0*5$x = 0x%3$0*5$x %4$s\n",
 		addend1,
@@ -639,7 +639,7 @@ int main(int argc, char **argv) {
 		)
 	);
 	DESTROY_ENCRYPTED_INTEGER(tmp1);
-	retval |= !(ok = (result == ((factor * factor) & mask)));
+	retval |= !(ok = (result == (fhe_integer)((factor * factor) & mask)));
 
 	(void)printf("0x%1$0*5$x × 0x%2$0*5$x = 0x%3$0*5$x %4$s\n",
 		factor,
@@ -667,7 +667,8 @@ int main(int argc, char **argv) {
         	)
         );
 	DESTROY_ENCRYPTED_INTEGER(tmp1);
-	retval |= !(ok = (result == ((factor1 * factor2) & mask)));
+	retval |= !(ok = (result == (fhe_integer)((factor1 * factor2) &
+			mask)));
 
         (void)printf("%1$ *6$d × %2$ *6$d = %3$ *6$d"
 		"    0x%1$0*5$x × 0x%2$0*5$x = 0x%3$0*5$x %4$s\n",
