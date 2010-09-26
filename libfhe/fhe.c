@@ -347,7 +347,7 @@ bool fhe_decrypt_one_bit(mp_int *encryptedBit) {
     // XXX re-enable
     //assert(mpz_cmp_ui(*privateKey, 0) != 0);
     mp_mod(encryptedBit, privateKey, modulus);
-    result = (bool)mp_get_int(modulus);
+    result = (bool)(mp_get_int(modulus) & 0x1);
     DESTROY_MP_INT(modulus);
     return result;
 }
