@@ -49,6 +49,27 @@ static inline void *checkMalloc(size_t size) {
     return ptr;
 }
 
+/**
+ * Create a string representation of a given multi-precision integer
+ *
+ * @param s destination pointer
+ * @param mp the number to represent
+ * @param base Output the string representation in this base
+ */
+void static fhe_mp_to_string(char **s, mp_int *mp, int base) {
+    int size;	// is int, not size_t; this is how libtommath wants it
+
+    // libtommath documentation says that the maximum base is 64; base < 2 does
+    // not make sense.  (Actually, base 1 makes sense, but nobody seems to
+    // agree with me on that one.)
+    assert (base > 1 && base <= 64);
+
+    /* Allocate space and generate ASCII representation of private key */
+    (void)mp_radix_size(mp, 0x10, &size);
+    *s = (char *)checkMalloc(size);
+    (void)mp_toradix(mp, *s, 0x10);
+}
+
 mp_int *privateKey;
 unsigned long int securityParameter;
 static FILE *randomFile;
@@ -475,18 +496,16 @@ int main(int argc, char **argv) {
     do {
 	bool result;
 	char *buf;
-	int size;
 	
 	/* Allocate space and generate ASCII representation of private key */
-	(void)mp_radix_size(privateKey, 0x10, &size);
-	buf = (char *)checkMalloc(size);
-	(void)mp_toradix(privateKey, buf, 0x10);
-
+	fhe_mp_to_string(&buf, privateKey, 0x10);
 	(void)printf("Private key: 0x%s\n", buf);
+	free(buf), buf = NULL;
 
 	for (int i = 0; i < 2; i++) {
-	    (void)mp_toradix(bitValues[i], buf, 0x10);
+	    fhe_mp_to_string(&buf, bitValues[i], 64);
 	    (void)printf("Encrypted bit (%d): 0x%s\n", i, buf);
+	    free(buf), buf = NULL;
 
 	    result = fhe_decrypt_one_bit(bitValues[i]);
 	    ok = (result == i);
