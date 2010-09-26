@@ -31,13 +31,16 @@
 
 /* TODO Do not hard-code bit width */
 /*
- * Multiplication consumes too much memory in 32 bits.  Therefore it may be
- * advantageous to set it separately.  However, if we set all precision to 16
- * bits, everything runs very quickly, and we are able to perform arithmetic
- * operations on 2-digit denary numbers.
+ * Multiplication consumes too much memory and processing power in 32 bits.
+ * Therefore it may be advantageous to set it separately.
+ *
+ * Note: Multiplication in 16 bits performs quickly with libgmp.  However, with
+ * libtommath, it is very slow.  15 bits are the minimum for production,
+ * otherwise we couldn't even compute single arbitrary 2-digit number
+ * multiplication: log_2(99 × 99) = 14; plus 1 bit for sign.
  */ 
 typedef int32_t fhe_integer;
-#define FHE_INTEGER_BIT_WIDTH 16
+#define FHE_INTEGER_BIT_WIDTH 11
 #define FHE_INTEGER_BIT_WIDTH_MULTIPLY FHE_INTEGER_BIT_WIDTH
 #define FHE_MASK(x) ((x) & (0xffffffff >> (32 - FHE_INTEGER_BIT_WIDTH)))
 
