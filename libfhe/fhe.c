@@ -587,7 +587,8 @@ int main(int argc, char **argv) {
 		addend,
 		result,
 		ok ? "OK" : "FAIL",
-		FHE_INTEGER_BIT_WIDTH / 4);
+		FHE_INTEGER_BIT_WIDTH / 4
+			+ (FHE_INTEGER_BIT_WIDTH % 4 ? 1 : 0));
 	assert(ok);
     }
 
@@ -614,11 +615,10 @@ int main(int argc, char **argv) {
 		addend2,
 		result,
 		ok ? "OK" : "FAIL",
-		FHE_INTEGER_BIT_WIDTH / 4);
+		FHE_INTEGER_BIT_WIDTH / 4
+			+ (FHE_INTEGER_BIT_WIDTH % 4 ? 1 : 0));
 	assert(ok);
     }
-#if 0
-#endif /* 0 */
 
 
     /* Multiplication: hard-coded numbers */
@@ -646,7 +646,8 @@ int main(int argc, char **argv) {
 		factor,
 		result,
 		ok ? "OK" : "FAIL",
-		FHE_INTEGER_BIT_WIDTH_MULTIPLY / 4);
+		FHE_INTEGER_BIT_WIDTH_MULTIPLY / 4
+			+ (FHE_INTEGER_BIT_WIDTH_MULTIPLY % 4 ? 1 : 0));
 	assert(ok);
     }
 
@@ -674,8 +675,10 @@ int main(int argc, char **argv) {
         	factor2,
         	result,
 		ok ? "OK" : "FAIL",
-		FHE_INTEGER_BIT_WIDTH_MULTIPLY / 4,
-		FHE_INTEGER_BIT_WIDTH_MULTIPLY / 2);
+		FHE_INTEGER_BIT_WIDTH_MULTIPLY / 4
+			+ (FHE_INTEGER_BIT_WIDTH_MULTIPLY % 4 ? 1 : 0),
+		FHE_INTEGER_BIT_WIDTH_MULTIPLY / 2
+			+ (FHE_INTEGER_BIT_WIDTH_MULTIPLY % 2 ? 1 : 0));
         assert(ok);
     }
 
