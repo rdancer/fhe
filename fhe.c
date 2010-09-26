@@ -49,7 +49,7 @@ static inline void *checkMalloc(size_t size) {
     return ptr;
 }
 
-mpz_t *privateKey;
+mp_int *privateKey;
 unsigned long int securityParameter;
 static FILE *randomFile;
 
@@ -63,29 +63,27 @@ static FILE *randomFile;
  * @param integer2 Multiplicand
  * @return The product of the two integers
  */
-mpz_t **fhe_multiply_integers(mpz_t **integer1, mpz_t **integer2) {
-    mpz_t **result, **intermediate_product, **factor1, **factor2;
-    mpz_t **tmp;
+mp_int **fhe_multiply_integers(mp_int **integer1, mp_int **integer2) {
+    mp_int **result, **intermediate_product, **factor1, **factor2;
+    mp_int **tmp;
 
-    factor1 = (mpz_t **)checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
-    factor2 = (mpz_t **)checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
-    result = (mpz_t **)checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
-    intermediate_product = (mpz_t **)checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
+    factor1 = (mp_int **)checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
+    factor2 = (mp_int **)checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
+    result = (mp_int **)checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
+    intermediate_product = (mp_int **)checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
 
     /* Initialize the objects that we need to be zero */
     for (int i = 0; i < FHE_INTEGER_BIT_WIDTH; i++) {
-	factor1[i] = (mpz_t *)checkMalloc(sizeof(void *));
-	mpz_init(*factor1[i]);
-	factor2[i] = (mpz_t *)checkMalloc(sizeof(void *));
-	mpz_init(*factor2[i]);
-	result[i] = (mpz_t *)checkMalloc(sizeof(void *));
-	mpz_init(*result[i]);
-	intermediate_product[i] = (mpz_t *)checkMalloc(sizeof(void *));
-	mpz_init(*intermediate_product[i]);
+	factor1[i] = (mp_int *)checkMalloc(sizeof(void *));
+	factor2[i] = (mp_int *)checkMalloc(sizeof(void *));
+	result[i] = (mp_int *)checkMalloc(sizeof(void *));
+	mp_init(result[i]);
+	intermediate_product[i] = (mp_int *)checkMalloc(sizeof(void *));
+	mp_init(intermediate_product[i]);
 
 	/* Create a local deep copy of the parameters */
-	mpz_set (*factor1[i], *integer1[i]);
-	mpz_set (*factor2[i], *integer2[i]);
+	mp_init_copy (factor1[i], integer1[i]);
+	mp_init_copy (factor2[i], integer2[i]);
     }
 
     /*
@@ -164,11 +162,11 @@ P[15]  P[14]  P[13]  P[12]  P[11]  P[10]   P[9]   P[8]   P[7]   P[6]   P[5]   P[
  * @param integer1 Second addend
  * @return The sum of the two addends
  */
-mpz_t **fhe_add_integers(mpz_t **integer1, mpz_t **integer2) {
-    mpz_t **sum, *tmp1, *tmp2, *tmp3;
-    INIT_MPZ_T(carry);
+mp_int **fhe_add_integers(mp_int **integer1, mp_int **integer2) {
+    mp_int **sum, *tmp1, *tmp2, *tmp3;
+    INIT_MP_INT(carry);
 
-    sum = (mpz_t **)checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
+    sum = (mp_int **)checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
 
     for (int i = 0; i < FHE_INTEGER_BIT_WIDTH; i++) {
 	assert(integer1[i] != NULL && integer2[i] != NULL);
@@ -186,15 +184,15 @@ mpz_t **fhe_add_integers(mpz_t **integer1, mpz_t **integer2) {
 	tmp2 = fhe_and_bits(integer1[i], integer2[i]);
 	tmp3 = fhe_and_bits(carry, tmp1);
 
-	DESTROY_MPZ_T(carry);
+	DESTROY_MP_INT(carry);
 	carry = fhe_xor_bits(tmp2, tmp3);
 
-	DESTROY_MPZ_T(tmp1);
-	DESTROY_MPZ_T(tmp2);
-	DESTROY_MPZ_T(tmp3);
+	DESTROY_MP_INT(tmp1);
+	DESTROY_MP_INT(tmp2);
+	DESTROY_MP_INT(tmp3);
     }
 
-    DESTROY_MPZ_T(carry);
+    DESTROY_MP_INT(carry);
 
 
     return sum;
@@ -206,10 +204,10 @@ mpz_t **fhe_add_integers(mpz_t **integer1, mpz_t **integer2) {
  * @param integer An integer
  * @return Array of encrypted bits
  */
-mpz_t **fhe_encrypt_integer(fhe_integer integer) {
-    mpz_t **encryptedInteger;
+mp_int **fhe_encrypt_integer(fhe_integer integer) {
+    mp_int **encryptedInteger;
 
-    encryptedInteger = (mpz_t **)checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
+    encryptedInteger = (mp_int **)checkMalloc(sizeof(void *[FHE_INTEGER_BIT_WIDTH]));
     for (int i = 0; i < FHE_INTEGER_BIT_WIDTH; i++) {
 	encryptedInteger[i] = fhe_encrypt_one_bit((integer >> i) & 0x1);
     }
@@ -224,7 +222,7 @@ mpz_t **fhe_encrypt_integer(fhe_integer integer) {
  * @param encryptedInteger Array of encrypted bits
  * @return An integer
  */
-fhe_integer fhe_decrypt_integer(mpz_t **encryptedInteger) {
+fhe_integer fhe_decrypt_integer(mp_int **encryptedInteger) {
     fhe_integer integer = 0;	// must initialize to 0
 
     for (int i = 0; i < FHE_INTEGER_BIT_WIDTH; i++) {
@@ -241,12 +239,22 @@ fhe_integer fhe_decrypt_integer(mpz_t **encryptedInteger) {
  * @return Random integer
  */
 long int fhe_random(unsigned long long int numberOfBits) {
-    mpz_t *randomInteger;
+    mp_int *randomInteger;
+    INIT_MP_INT(mask);
+
+    mp_set(mask, 1);
+    for (unsigned long long int i = 0; i < numberOfBits; i++) {
+	mp_mul_2(mask, mask);
+    }
+
 
     randomInteger = fhe_new_random_integer(numberOfBits + 1);
-    mpz_clrbit(*randomInteger, numberOfBits);
+    mp_xor(randomInteger, mask, randomInteger);
 
-    return mpz_get_si(*randomInteger);
+    DESTROY_MP_INT(mask);
+
+    // Note: need to cast from unsigned to signed
+    return (long int)mp_get_int(randomInteger);
 }
 
 /**
@@ -256,12 +264,14 @@ long int fhe_random(unsigned long long int numberOfBits) {
  *
  * @return random number
  */
-mpz_t *fhe_new_random_integer(unsigned long long int numberOfBits) {
+mp_int *fhe_new_random_integer(unsigned long long int numberOfBits) {
 #if defined(__linux__)
     int c;
     unsigned int bitmask;
     unsigned long int i;
-    INIT_MPZ_T(randomInteger);
+    INIT_MP_INT(randomInteger);
+    INIT_MP_INT(tmp1);
+
 
     /* The whole bytes */
     for (bitmask = 0xff, i = numberOfBits; i > 0;) {
@@ -280,8 +290,11 @@ mpz_t *fhe_new_random_integer(unsigned long long int numberOfBits) {
             // The last few bits will have a bitmask
             bitmask = 0xff >> (8 - i);
         }
-        mpz_mul_ui(*randomInteger, *randomInteger, bitmask + 1);
-        mpz_add_ui(*randomInteger, *randomInteger, c & bitmask);
+	for (int j = 0; j < i; j++) {
+	    mp_mul_2(randomInteger, randomInteger);
+	}
+	mp_set_int(tmp1, c & bitmask);
+        mp_add(randomInteger, tmp1, randomInteger);
 
 	/* Decrement; check for underflow */
 	if (i < 8) {
@@ -291,6 +304,7 @@ mpz_t *fhe_new_random_integer(unsigned long long int numberOfBits) {
 	}
     }
 
+    DESTROY_MP_INT(tmp1);
     return randomInteger;
 #else // __linux__
 # error This function is only implemented for Linux
@@ -301,19 +315,22 @@ mpz_t *fhe_new_random_integer(unsigned long long int numberOfBits) {
  * This function implements the special modulo operation found in §3.2:
  * “(c mod p) is the integer c' in (-p/2, p/2> such that p divides c − c')”
  */
-mpz_t *modulo(mpz_t *divident, mpz_t *divisor) {
-    INIT_MPZ_T(remainder);
+mp_int *modulo(mp_int *divident, mp_int *divisor) {
+    INIT_MP_INT(remainder);
 
-    assert(mpz_cmp_ui(*divisor, 0) != 0);
-    mpz_mod(*remainder, *divident, *divisor);
+    // XXX re-enable
+    //assert(mpz_cmp_ui(*divisor, 0) != 0);
+    mp_mod(divident, divisor, remainder);
+    mp_abs(remainder, remainder);
 
     /* Adjust (divident/2, divident) -> (-divident/2, 0) */
-    INIT_MPZ_T(divident_half);
-    mpz_fdiv_q_ui(*divident_half, *divident, 2);
-    if (mpz_cmp(*remainder, *divident_half) > 0) {
-	mpz_sub(*remainder, *remainder, *divident);
+    INIT_MP_INT(divident_half);
+    mp_div_2(divident, divident_half);
+    mp_abs(divident_half, divident_half);
+    if (mp_cmp(remainder, divident_half) == MP_GT) {
+	mp_sub(divisor, remainder, remainder);
     }
-    DESTROY_MPZ_T(divident_half);
+    DESTROY_MP_INT(divident_half);
 
     return remainder;
 }
@@ -323,14 +340,15 @@ mpz_t *modulo(mpz_t *divident, mpz_t *divisor) {
  * @param encryptedBit Single bit, encrypted
  * @return Decrypted bit
  */
-bool fhe_decrypt_one_bit(mpz_t *encryptedBit) {
+bool fhe_decrypt_one_bit(mp_int *encryptedBit) {
     bool result;
-    INIT_MPZ_T(modulus);
+    INIT_MP_INT(modulus);
 
-    assert(mpz_cmp_ui(*privateKey, 0) != 0);
-    mpz_mod(*modulus, *encryptedBit, *privateKey);
-    result = mpz_tstbit(*modulus, 0);
-    DESTROY_MPZ_T(modulus);
+    // XXX re-enable
+    //assert(mpz_cmp_ui(*privateKey, 0) != 0);
+    mp_mod(encryptedBit, privateKey, modulus);
+    result = (bool)mp_get_int(modulus);
+    DESTROY_MP_INT(modulus);
     return result;
 }
 
@@ -340,26 +358,26 @@ bool fhe_decrypt_one_bit(mpz_t *encryptedBit) {
  * @param plainTextBit One-bit number to be encrypted
  * @return Cryptotext under this scheme
  */
-mpz_t *fhe_encrypt_one_bit(bool plainTextBit) {
-    INIT_MPZ_T(encryptedBit);
-    mpz_t *tmp1;
+mp_int *fhe_encrypt_one_bit(bool plainTextBit) {
+    INIT_MP_INT(encryptedBit);
+    INIT_MP_INT(tmp1);
 
     /* noise: 2r */
     assert(bitsN > 0);
-    tmp1 = fhe_new_random_integer(bitsN - 1);
-    mpz_mul_ui(*encryptedBit, *tmp1, 2);
-    DESTROY_MPZ_T(tmp1);
+    encryptedBit = fhe_new_random_integer(bitsN - 1);
+    mp_mul_2(encryptedBit, encryptedBit);
 
     /* add parity */
-    mpz_add_ui(*encryptedBit, *encryptedBit, plainTextBit);
+    mp_set(tmp1, plainTextBit);
+    mp_add(encryptedBit, tmp1, encryptedBit);
 
     /* add pq */
-    INIT_MPZ_T(pq);
+    INIT_MP_INT(pq);
     tmp1 = fhe_new_random_integer(bitsQ);
-    mpz_mul(*pq, *privateKey, *tmp1);
-    mpz_add(*encryptedBit, *encryptedBit, *pq);
-    DESTROY_MPZ_T(tmp1);
-    DESTROY_MPZ_T(pq);
+    mp_mul(privateKey, tmp1, pq);
+    mp_add(encryptedBit, pq, encryptedBit);
+    DESTROY_MP_INT(tmp1);
+    DESTROY_MP_INT(pq);
 
     return encryptedBit;
 }
@@ -388,7 +406,7 @@ void fhe_initialize(unsigned long int mySecurityParameter) {
 
     /* Private key is a bitsP-bit wide even integer */
     privateKey = fhe_new_random_integer(bitsP - 1);
-    mpz_mul_ui(*privateKey, *privateKey, 2);
+    mp_mul_2(privateKey, privateKey);
 }
 
 
@@ -405,10 +423,10 @@ void fhe_initialize(unsigned long int mySecurityParameter) {
  * @param bit2 Single encrypted bit
  * @return _Exclusive_or_ of the parameters
  */
-mpz_t *fhe_xor_bits(mpz_t *bit1, mpz_t *bit2) {
-    INIT_MPZ_T(result);
+mp_int *fhe_xor_bits(mp_int *bit1, mp_int *bit2) {
+    INIT_MP_INT(result);
     
-    mpz_add(*result, *bit1, *bit2);
+    mp_add(bit1, bit2, result);
 
     return result;
 }
@@ -421,10 +439,10 @@ mpz_t *fhe_xor_bits(mpz_t *bit1, mpz_t *bit2) {
  * @param bit2 Single encrypted bit
  * @return Logical _and_ of the parameters
  */
-mpz_t *fhe_and_bits(mpz_t *bit1, mpz_t *bit2) {
-    INIT_MPZ_T(result);
+mp_int *fhe_and_bits(mp_int *bit1, mp_int *bit2) {
+    INIT_MP_INT(result);
 
-    mpz_mul(*result, *bit1, *bit2);
+    mp_mul(bit1, bit2, result);
 
     return result;
 }
@@ -436,7 +454,7 @@ mpz_t *fhe_and_bits(mpz_t *bit1, mpz_t *bit2) {
 int main(int argc, char **argv) {
 
     int retval = 0, ok;
-    mpz_t **tmp1;
+    mp_int **tmp1;
 
     // Get rid of compiler warning about unused parameters
     argc = argc;
@@ -444,23 +462,31 @@ int main(int argc, char **argv) {
 
     fhe_initialize(argc > 1 ? atoi(argv[1]): 2);
 
-    INIT_MPZ_T(bitValue0);
-    INIT_MPZ_T(bitValue1);
+    INIT_MP_INT(bitValue0);
+    INIT_MP_INT(bitValue1);
 
     bitValue1 = fhe_encrypt_one_bit(1);
     bitValue0 = fhe_encrypt_one_bit(0);
-    mpz_t *bitValues[2] = {
+    mp_int *bitValues[2] = {
 	bitValue0,
 	bitValue1
     };
 
     do {
 	bool result;
+	char *buf;
+	int size;
+	
+	/* Allocate space and generate ASCII representation of private key */
+	(void)mp_radix_size(privateKey, 0x10, &size);
+	buf = checkMalloc(size);
+	(void)mp_toradix(privateKey, buf, 0x10);
 
-	(void)gmp_printf("Private key: 0x%Zx\n", privateKey);
+	(void)printf("Private key: 0x%s\n", buf);
 
 	for (int i = 0; i < 2; i++) {
-	    (void)gmp_printf("Encrypted bit (%d): 0x%Zx\n", i, *bitValues[i]);
+	    (void)mp_toradix(bitValues[i], buf, 0x10);
+	    (void)printf("Encrypted bit (%d): 0x%s\n", i, buf);
 
 	    result = fhe_decrypt_one_bit(bitValues[i]);
 	    ok = (result == i);
@@ -488,7 +514,7 @@ int main(int argc, char **argv) {
 		result = fhe_decrypt_one_bit(/* leak */fhe_xor_bits(bitValues[i],
 			    bitValues[j]));
 		retval |= !(ok = (result == (i ^ j)));
-		(void)gmp_printf("%d ⊕ %d = %d %s\n",
+		(void)printf("%d ⊕ %d = %d %s\n",
 			i,
 			j,
 			result,
@@ -505,7 +531,7 @@ int main(int argc, char **argv) {
 		result = fhe_decrypt_one_bit(/* leak */fhe_and_bits(bitValues[i],
 			    bitValues[j]));
 		retval |= !(ok = (result == (i & j)));
-		(void)gmp_printf("%d × %d = %d %s\n",
+		(void)printf("%d × %d = %d %s\n",
 			i,
 			j,
 			result,
@@ -517,8 +543,8 @@ int main(int argc, char **argv) {
 
     } while (0);
 
-    DESTROY_MPZ_T(bitValue0);
-    DESTROY_MPZ_T(bitValue1);
+    DESTROY_MP_INT(bitValue0);
+    DESTROY_MP_INT(bitValue1);
 
     /* Encrypt and decrypt an integer */
 
@@ -528,7 +554,7 @@ int main(int argc, char **argv) {
 
 	retval |= !(ok = (result == integer));
 
-	(void)gmp_printf("\nEncrypt-decrypt integer: 0x%x = 0x%x\n",
+	(void)printf("\nEncrypt-decrypt integer: 0x%x = 0x%x %s\n",
 		integer,
 		result,
 		ok ? "OK" : "FAIL");
@@ -556,7 +582,7 @@ int main(int argc, char **argv) {
 	DESTROY_ENCRYPTED_INTEGER(tmp1);
 	retval |= !(ok = (result ==  FHE_MASK(addend + addend)));
 
-	(void)gmp_printf("0x%0*5$x + 0x%0*5$x = 0x%0*5$x %s\n",
+	(void)printf("0x%1$0*5$x + 0x%2$0*5$x = 0x%3$0*5$x %4$s\n",
 		addend,
 		addend,
 		result,
@@ -583,7 +609,7 @@ int main(int argc, char **argv) {
 	DESTROY_ENCRYPTED_INTEGER(tmp1);
 	retval |= !(ok = (result == FHE_MASK(addend1 + addend2)));
 
-	(void)gmp_printf("0x%0*5$x + 0x%0*5$x = 0x%0*5$x %s\n",
+	(void)printf("0x%1$0*5$x + 0x%2$0*5$x = 0x%3$0*5$x %4$s\n",
 		addend1,
 		addend2,
 		result,
@@ -615,7 +641,7 @@ int main(int argc, char **argv) {
 	DESTROY_ENCRYPTED_INTEGER(tmp1);
 	retval |= !(ok = (result == ((factor * factor) & mask)));
 
-	(void)gmp_printf("0x%0*5$x × 0x%0*5$x = 0x%0*5$x %s\n",
+	(void)printf("0x%1$0*5$x × 0x%2$0*5$x = 0x%3$0*5$x %4$s\n",
 		factor,
 		factor,
 		result,
@@ -642,7 +668,7 @@ int main(int argc, char **argv) {
 	DESTROY_ENCRYPTED_INTEGER(tmp1);
 	retval |= !(ok = (result == ((factor1 * factor2) & mask)));
 
-        (void)gmp_printf("%1$ *6$d × %2$ *6$d = %3$ *6$d"
+        (void)printf("%1$ *6$d × %2$ *6$d = %3$ *6$d"
 		"    0x%1$0*5$x × 0x%2$0*5$x = 0x%3$0*5$x %4$s\n",
         	factor1,
         	factor2,
