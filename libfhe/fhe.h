@@ -21,7 +21,8 @@
 #ifndef FHE_H
 #define FHE_H
 
-#include <gmp.h>
+#include <tommath.h>
+#include <tomcrypt.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -34,8 +35,6 @@
  * advantageous to set it separately.  However, if we set all precision to 16
  * bits, everything runs very quickly, and we are able to perform arithmetic
  * operations on 2-digit denary numbers.
- *
- * Then again that breaks our tests, so not so fast.
  */ 
 typedef int32_t fhe_integer;
 #define FHE_INTEGER_BIT_WIDTH 16
@@ -47,6 +46,8 @@ typedef int32_t fhe_integer;
  * Function macros and constants
  */
 
+//#define assert(x) do {} while(0)
+
 #define bitsN /* λ  */ securityParameter
 #define bitsP /* λ² */ securityParameter * securityParameter
 #define bitsQ /* λ⁵ */ securityParameter \
@@ -56,18 +57,17 @@ typedef int32_t fhe_integer;
 	* securityParameter
 
 
-#define INIT_MPZ_T(x) \
-    mpz_t *x; \
+#define INIT_MP_INT(x) \
+    mp_int *x; \
     do { \
-	x = (mpz_t *)checkMalloc(sizeof(void *)); \
-	mpz_init(*x); \
+	x = (mp_int *)checkMalloc(sizeof(void *)); \
+	mp_init(x); \
     } while (0)
 
-#define DESTROY_MPZ_T(x) \
+#define DESTROY_MP_INT(x) \
     do { \
 	if (x != NULL) { \
-	   mpz_clear(*x); \
-	   free(x); \
+	   mp_clear(x); \
 	} \
     } while (0)
 
@@ -76,22 +76,22 @@ typedef int32_t fhe_integer;
 	assert(x != NULL); \
 	for (int i = 0; i < FHE_INTEGER_BIT_WIDTH; i++) { \
 	    assert (x[i] != NULL); \
-	    DESTROY_MPZ_T(x[i]); \
+	    DESTROY_MP_INT(x[i]); \
 	} \
 	free(x); \
     } while (0)
 
 
-mpz_t *fhe_new_random_integer(unsigned long long int numberOfBits);
-mpz_t *fhe_encrypt_one_bit(bool plainTextBit);
-bool fhe_decrypt_one_bit(mpz_t *encryptedBit);
+mp_int *fhe_new_random_integer(unsigned long long int numberOfBits);
+mp_int *fhe_encrypt_one_bit(bool plainTextBit);
+bool fhe_decrypt_one_bit(mp_int *encryptedBit);
 void fhe_initialize(unsigned long int mySecurityParameter);
-mpz_t *fhe_xor_bits(mpz_t *bit1, mpz_t *bit2);
-mpz_t *fhe_and_bits(mpz_t *bit1, mpz_t *bit2);
-mpz_t **fhe_encrypt_integer(fhe_integer integer);
-fhe_integer fhe_decrypt_integer(mpz_t **encryptedInteger);
-mpz_t **fhe_add_integers(mpz_t **integer1, mpz_t **integer2);
-mpz_t **fhe_multiply_integers(mpz_t **integer1, mpz_t **integer2);
+mp_int *fhe_xor_bits(mp_int *bit1, mp_int *bit2);
+mp_int *fhe_and_bits(mp_int *bit1, mp_int *bit2);
+mp_int **fhe_encrypt_integer(fhe_integer integer);
+fhe_integer fhe_decrypt_integer(mp_int **encryptedInteger);
+mp_int **fhe_add_integers(mp_int **integer1, mp_int **integer2);
+mp_int **fhe_multiply_integers(mp_int **integer1, mp_int **integer2);
 long int fhe_random(unsigned long long int numberOfBits);
 
 #endif // FHE_H
