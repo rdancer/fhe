@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/114/trunk/src/examples/scriptable/matrix
+END
+npp_gate.cc
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/98/trunk/src/examples/scriptable/matrix/npp_gate.cc
+END
+scripting_bridge.cc
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/98/trunk/src/examples/scriptable/matrix/scripting_bridge.cc
+END
+scripting_bridge.h
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/98/trunk/src/examples/scriptable/matrix/scripting_bridge.h
+END
+matrix_comp.cc
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/98/trunk/src/examples/scriptable/matrix/matrix_comp.cc
+END
+matrix.html
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/98/trunk/src/examples/scriptable/matrix/matrix.html
+END
+matrix_comp.h
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/98/trunk/src/examples/scriptable/matrix/matrix_comp.h
+END
+loader.cc
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/98/trunk/src/examples/scriptable/matrix/loader.cc
+END
+scriptable.cc
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/98/trunk/src/examples/scriptable/matrix/scriptable.cc
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/114/trunk/src/examples/scriptable/matrix/Makefile
+END
+scriptable.h
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/!svn/ver/98/trunk/src/examples/scriptable/matrix/scriptable.h
+END

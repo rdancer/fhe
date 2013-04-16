@@ -1,0 +1,125 @@
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/common/c_salt
+END
+bool_type.cc
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/common/c_salt/bool_type.cc
+END
+npp_gate.cc
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/common/c_salt/npp_gate.cc
+END
+bool_type.h
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/common/c_salt/bool_type.h
+END
+callback.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/common/c_salt/callback.h
+END
+int32_type.cc
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/common/c_salt/int32_type.cc
+END
+int32_type.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/common/c_salt/int32_type.h
+END
+object_type.cc
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/common/c_salt/object_type.cc
+END
+npn_bridge.cc
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/common/c_salt/npn_bridge.cc
+END
+string_type.cc
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/common/c_salt/string_type.cc
+END
+string_type.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/common/c_salt/string_type.h
+END
+object_type.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/common/c_salt/object_type.h
+END
+double_type.cc
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/common/c_salt/double_type.cc
+END
+double_type.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/common/c_salt/double_type.h
+END
+scripting_bridge.cc
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/common/c_salt/scripting_bridge.cc
+END
+scripting_bridge.h
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/common/c_salt/scripting_bridge.h
+END
+type.cc
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/common/c_salt/type.cc
+END
+type.h
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/common/c_salt/type.h
+END
+module.cc
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/common/c_salt/module.cc
+END
+module.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/common/c_salt/module.h
+END
+basic_macros.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/common/c_salt/basic_macros.h
+END

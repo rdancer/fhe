@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+  <!--
+  Copyright (c) 2010 The Native SDK Client Authors. All rights reserved.
+  Use of this source code is governed by a BSD-style license that can be
+  found in the LICENSE file.
+  -->
+<head>
+  <title>Notification Center</title>
+
+  <script type="text/javascript">
+    server = null;  // Global application object.
+    client_one = null;  // Global application object.
+    client_two = null;  // Global application object.
+    status_text = 'NO-STATUS';
+    server_socket = null;
+
+    function modulesDidLoad() {
+      server = document.getElementById('server');
+      client_one = document.getElementById('client_one');
+      client_two = document.getElementById('client_two');
+      if(server != null && client_one != null && client_two != null) {
+        updateStatus('SUCCESS');
+      } else {
+        updateStatus('LOADING...');
+      }
+    }
+
+    // If the page loads before the Native Client module loads, then set the
+    // status message indicating that the module is still loading.  Otherwise,
+    // do not change the status message.
+    function pageDidLoad() {
+      if (server == null) {
+        updateStatus('LOADING...');
+      } else {
+        // It's possible that the Native Client module onload event fired
+        // before the page's onload event.  In this case, the status message
+        // will reflect 'SUCCESS', but won't be displayed.  This call will
+        // display the current message.
+        updateStatus();
+      }
+    }
+
+    function fortytwo() {
+      try {
+        alert(server.fortytwo());
+      } catch(e) {
+        alert(e.message);
+      }
+    }
+
+    function helloworld() {
+      try {
+        alert(server.helloworld());
+      } catch(e) {
+        alert(e.message);
+      }
+    }
+
+    function client_one_connect() {
+      try {
+        var socket = server.opensocket();
+        client_one.connect(socket);
+        alert("Client one connected on socket: " + socket);
+      } catch(e) {
+        alert(e.message);
+      }
+    }
+
+    function client_one_fortytwo() {
+      try {
+        var result = client_one.fortytwo();
+        alert("Client got: " + result);
+      } catch(e) {
+        alert(e.message);
+      }
+    }
+
+    function client_one_helloworld() {
+      try {
+        var result = client_one.helloworld();
+        alert("Client got: " + result);
+      } catch(e) {
+        alert(e.message);
+      }
+    }
+
+    function client_one_disconnect() {
+      try {
+        client_one.disconnect();
+        alert("Client one has disconnected from the server.");
+      } catch(e) {
+        alert(e.message);
+      }
+    }
+
+    function client_two_connect() {
+      try {
+        var socket = server.opensocket();
+        client_two.connect(socket);
+        alert("Client two connected on socket: " + socket);
+      } catch(e) {
+        alert(e.message);
+      }
+    }
+
+    function client_two_fortytwo() {
+      try {
+        var result = client_two.fortytwo();
+        alert("Client got: " + result);
+      } catch(e) {
+        alert(e.message);
+      }
+    }
+
+    function client_two_helloworld() {
+      try {
+        var result = client_two.helloworld();
+        alert("Client got: " + result);
+      } catch(e) {
+        alert(e.message);
+      }
+    }
+
+    function client_two_disconnect() {
+      try {
+        client_two.disconnect();
+        alert("Client two has disconnected from server.");
+      } catch(e) {
+        alert(e.message);
+      }
+    }
+
+    // Set the global status message.  If the element with id 'status_field'
+    // exists, then set its HTML to the status message as well.
+    // opt_message The message test.  If this is null or undefined, then
+    //     attempt to set the element with id 'status_field' to the value of
+    //     |status_text|.
+    function updateStatus(opt_message) {
+      if (opt_message)
+        status_text = opt_message;
+      var status_field = document.getElementById('status_field');
+      if (status_field) {
+        status_field.innerHTML = status_text;
+      }
+    }
+  </script>
+</head>
+<body onload="pageDidLoad()">
+
+<h1>SRPC Client-Server Test Page</h1>
+<p>
+  Call functions Directly on Server:
+  <br>
+  <button onclick="fortytwo()">Call fortytwo()</button>
+  <button onclick="helloworld()">Call helloworld()</button>
+  <br>
+  Client 1 Controls:
+  <br>
+  <button onclick="client_one_connect()">Connect client 1 to server</button>
+  <button onclick="client_one_fortytwo()">Call client 1 fortytwo()</button>
+  <button onclick="client_one_helloworld()">Call client 2 helloworld()</button>
+  <button onclick="client_one_disconnect()">Disconnect client 1</button>
+  <br>
+  Client 2 Controls:
+  <br>
+  <button onclick="client_two_connect()">Connect client 2 to server</button>
+  <button onclick="client_two_fortytwo()">Call client 2 fortytwo()</button>
+  <button onclick="client_two_helloworld()">Call client 2 helloworld()</button>
+  <button onclick="client_two_disconnect()">Disconnect client 2</button>
+  
+  <embed name="server_module"
+         id="server"
+         width="0" height="0"
+         type="application/x-nacl-srpc" />
+  <script type="text/javascript">
+    var nexes = 'x86-32: server_x86_32.nexe\n'
+              + 'x86-64: server_x86_64.nexe\n'
+              + 'ARM: server_arm.nexe ';
+
+    document.getElementById('server').nexes = nexes;
+  </script>
+
+  <embed name="client_module"
+         id="client_one"
+         width="0" height="0"
+         type="application/x-nacl-srpc" />
+  <script type="text/javascript">
+    var nexes = 'x86-32: client_x86_32.nexe\n'
+              + 'x86-64: client_x86_64.nexe\n'
+              + 'ARM: client_arm.nexe ';
+
+    document.getElementById('client_one').nexes = nexes;
+  </script>
+
+  <embed name="client_module"
+         id="client_two"
+         width="0" height="0"
+         type="application/x-nacl-srpc" />
+  <script type="text/javascript">
+    var nexes = 'x86-32: client_x86_32.nexe\n'
+              + 'x86-64: client_x86_64.nexe\n'
+              + 'ARM: client_arm.nexe ';
+
+    document.getElementById('client_two').nexes = nexes;
+
+    modulesDidLoad();
+  </script>
+</p>
+
+<p>If the module is working correctly, a server and two clients should exist.
+  Clicking on the server controls calls its functions directly, clients can 
+  connect and call the functions via srpc on the server. </p>
+<h2>Status</h2>
+<div id="status_field">NO-STATUS</div>
+</body>
+</html>

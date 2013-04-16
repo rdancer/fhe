@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/!svn/ver/86/trunk/src/gallery/hello_world
+END
+hello_world_x86_32.nexe
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/86/trunk/src/gallery/hello_world/hello_world_x86_32.nexe
+END
+hello.png
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/!svn/ver/63/trunk/src/gallery/hello_world/hello.png
+END
+hello_world_x86_64.nexe
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/86/trunk/src/gallery/hello_world/hello_world_x86_64.nexe
+END
+hello_world.html
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/65/trunk/src/gallery/hello_world/hello_world.html
+END

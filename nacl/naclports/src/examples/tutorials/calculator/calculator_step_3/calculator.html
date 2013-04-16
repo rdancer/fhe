@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>NativeClient Calculator</title>
+
+<!--
+TODO(everyone): In a final implementation, it would be cool for Google to host
+a simple nexe api, just like our other js apis. For example, anyone who wants
+our nexe loading interface would include...
+
+  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+
+For this example, I'm loading a mock of the interface in nexeapi.js.
+-->
+<script src="nexeapi.js" type="text/javascript"></script>
+<script src="expressionParser.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+
+/**
+ * This is the standard google way of loading a Google JS API by version.
+ */
+google.load("nexe", "1");
+
+/**
+ * For this example, we're using a simple global variable to contain our nexe.
+ * Here's where we load it up.
+ */
+calculator = {};
+
+function init() {
+  var url = 'http://localhost:5103/calculator/calculator.nexe';
+  calculator.application =
+      new google.nexe.Nexe(url, { onloadprogress: onLoadProgress });
+  calc_settings = { nexeModuleId: 'calculator_module',
+                    contentDivName: 'calculator_content',
+                    nexeModules: 'x86-32: calculator_x86_32.nexe\n'
+                               + 'x86-64: calculator_x86_64.nexe\n'
+                               + 'ARM: calculator_arm.nexe',
+                    onload: 'moduleDidLoad()',
+                    width: 0,
+                    height: 0 };
+  calculator.application.run(calc_settings);
+}
+
+/**
+ * This function is called when the calculator module is loaded.
+ */
+function moduleDidLoad() {
+  var module = document.getElementById('calculator_module');
+  calculator.application.moduleDidLoad(module);
+  var calculator_module = calculator.application.module();
+  calculator_module.buttonSound = true;
+}
+
+/**
+ * As the nexe loads, it sends periodic events so you can update progress bars.
+ * You'll always get one when it is completely done.
+ */
+function onLoadProgress(percent) {
+  if (percent == 100) {
+    alert('done loading ' + calculator.application.module().id);
+  }
+}
+
+/**
+ * Here we start a calculation, calling a custom method on the nexe that
+ * has an asynchronous callback. (The API also supports synchronous method
+ * calls for things that are really fast. This example could, of course,
+ * be handled synchronously.)
+ */
+function startCalculate() {
+  click();
+  // Convert the formula to postfix notation, and put the postfix expression
+  // into an array that gets passed to the calculator module.
+  postfixExpr = google.expr.parseExpression(
+      document.getElementById('formula').value);
+  var calculator_module = calculator.application.module();
+  try {
+    calculator_module.calculate(postfixExpr, onCalculate);
+  } catch(err) {
+    onCalculate('42, I think');
+  }
+}
+
+/**
+ * Handler for the event when the calculation is complete.
+ */
+function onCalculate(result, opt_error) {
+  if (opt_error) {
+    alert(opt_error);
+  } else {
+    document.getElementById('formula').value = result;
+  }
+}
+
+/**
+ * Play the click sound if sounds are turned on.
+ */
+function click() {
+  var calculator_module = calculator.application.module();
+  if (calculator_module && calculator_module.buttonSound) {
+    calculator_module.click();
+  }
+}
+
+/**
+ * Adds a button press to the formula, and appends the number to the current
+ * operand.
+ */
+function pressNumber(buttonSpan) {
+  click();
+  document.getElementById('formula').value += buttonSpan.innerHTML;
+}
+
+/**
+ * Adds an operator.  Pushes any pending operands and operators on the postfix
+ * stack, then sets the current operator.
+ */
+function pressOperator(buttonSpan) {
+  click();
+  document.getElementById('formula').value += buttonSpan.innerHTML;
+}
+
+/**
+ * Clears the formula.
+ */
+function clean() {
+  click();
+  document.getElementById('formula').value = '';
+}
+
+/**
+ * Does a "backspace" on the formula.
+ */
+function back() {
+  click();
+  var formula = document.getElementById('formula').value;
+  formula = formula.slice(0, formula.length - 1);
+  document.getElementById('formula').value = formula;
+}
+
+</script>
+
+</head>
+<body onload="init()">
+
+  <div class="shadow-out"><div class="shadow-mid"><div class="shadow-in">
+    <!-- For development, use a #develop location, which loads the develop
+    version of the module.
+    -->
+    <div id="calculator_content"></div>
+    <script type="text/javascript">
+    </script>
+    <div id="calculator">
+      <input type="text" id="formula" />
+
+      <div>
+        <div class="button"><span onclick="clean()">C</span></div>
+        <div class="button"><span onclick="pressOperator(this)">(</span></div>
+        <div class="button"><span onclick="pressOperator(this)">)</span></div>
+        <div class="button"><span onclick="back()"><b style="font-size: 11px">Back</b></span></div>
+      </div>
+
+      <div>
+        <div class="button"><span onclick="pressNumber(this)">7</span></div>
+        <div class="button"><span onclick="pressNumber(this)">8</span></div>
+        <div class="button"><span onclick="pressNumber(this)">9</span></div>
+        <div class="button"><span onclick="pressOperator(this)">/</span></div>
+      </div>
+
+      <div>
+        <div class="button"><span onclick="pressNumber(this)">4</span></div>
+        <div class="button"><span onclick="pressNumber(this)">5</span></div>
+        <div class="button"><span onclick="pressNumber(this)">6</span></div>
+        <div class="button"><span onclick="pressOperator(this)">*</span></div>
+      </div>
+
+      <div>
+        <div class="button"><span onclick="pressNumber(this)">1</span></div>
+        <div class="button"><span onclick="pressNumber(this)">2</span></div>
+        <div class="button"><span onclick="pressNumber(this)">3</span></div>
+        <div class="button"><span onclick="pressOperator(this)">-</span></div>
+      </div>
+
+      <div>
+        <div class="button"><span onclick="pressNumber(this)">0</span></div>
+        <div class="button"><span onclick="pressNumber(this)">.</span></div>
+        <div class="button"><span onclick="startCalculate()">=</span></div>
+        <div class="button"><span onclick="pressOperator(this)">+</span></div>
+      </div>
+    </div>
+  </div></div></div>
+
+<style>
+
+body {
+  text-align: center;
+  margin-top: 20%;
+}
+
+.shadow-in {
+  display: inline-block;
+  border-radius: 13px;
+  -moz-border-radius: 13px;
+  -webkit-border-radius: 13px;
+  border: 2px solid #ccc;
+  background: #bbb;
+}
+.shadow-mid {
+  display: inline-block;
+  border-radius: 15px;
+  -moz-border-radius: 15px;
+  -webkit-border-radius: 15px;
+  border: 2px solid #ddd;
+  border-right: 1px solid #ddd;
+  border-left: 1px solid #ddd;
+}
+.shadow-out {
+  display: inline-block;
+  border-radius: 17px;
+  -moz-border-radius: 17px;
+  -webkit-border-radius: 17px;
+  border: 2px solid #eee;
+  border-right: 1px solid #eee;
+  border-left: 1px solid #eee;
+}
+
+#calculator {
+  position: relative;
+  top: -3px;
+  display: inline-block;
+  border-radius: 12px;
+  -moz-border-radius: 12px;
+  -webkit-border-radius: 12px;
+  border-left: 3px solid #eee;
+  border-right: 3px solid #eee;
+  border-top: 3px solid #fff;
+  border-bottom: 3px solid #ddd;
+  padding: 6px;
+  background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#eee));
+  background: -moz-linear-gradient(top, #fff, #eee);
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  text-align: left;
+}
+
+.button {
+  display: inline-block;
+  border-radius: 13px;
+  -moz-border-radius: 13px;
+  -webkit-border-radius: 13px;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  border-top: 1px solid #ccc;
+  margin-right: 3px;
+  cursor: pointer;
+}
+
+.button span {
+  text-align: center;
+  color: black;
+  font-family: sans-serif;
+  font-weight: bold;
+  display: block;
+  border-right: 1px solid #ddd;
+  border-left: 1px solid #fff;
+  border-top: 1px solid #fff;
+  border-bottom: 1px solid #ddd;
+  width: 30px;
+  border-radius: 12px;
+  -moz-border-radius: 12px;
+  -webkit-border-radius: 12px;
+  background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#eee));
+  background: -moz-linear-gradient(top, #fff, #eee);
+  padding: 6px 12px 6px 12px;
+  font-size: 20px;
+  text-decoration: none;
+  float: left;
+}
+
+.zbutton span:hover {
+  border: 3px solid #f00;
+  padding: 4px 10px 4px 10px;
+}
+
+.button span:active {
+  padding: 7px 12px 5px 12px;
+  background: -webkit-gradient(linear, left top, left bottom, from(#ddd), to(#fff));
+  background: -moz-linear-gradient(top, #ddd, #fff);
+}
+
+#formula {
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 20px;
+  margin-bottom: 6px;
+  background: #666;
+  background: -webkit-gradient(linear, left top, left bottom, from(#555), to(#777));
+  background: -moz-linear-gradient(top, #555, #777);
+  padding: 6px;
+  color: #0f0;
+  border-radius: 6px;
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+  text-align: right;
+}
+
+</style>
+</body>
+</html>

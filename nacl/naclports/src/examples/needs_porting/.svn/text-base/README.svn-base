@@ -1,0 +1,6 @@
+Note: None of the code in here works.  It either uses outdated/deprecated API
+or is an example that works on platforms other than NativeClient.
+
+It should all be considered work-in-progress.  As these examples get ported to
+current APIs and NativeClient, they will be moved to other directories in this
+project.

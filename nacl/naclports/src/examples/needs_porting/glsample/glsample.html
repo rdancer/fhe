@@ -1,0 +1,50 @@
+<HTML>
+<HEAD>
+<TITLE>OpenGL Demo</TITLE>
+
+<SCRIPT type="text/javascript"><![CDATA[
+
+var nacl_elt;
+
+// Before scripting the module ensure the Native Client module loaded.
+var startupTimeout;
+
+var PostLoadInit = function() {
+  if (nacl_elt.__moduleReady == 1) {
+    clearTimeout(startupTimeout);
+    nacl_elt.focus();
+  } else {
+    if (nacl_elt.__moduleReady == undefined) {
+      alert('The Native Client plugin was unable to load');
+      return;
+    }
+    startupTimeout = setTimeout(PostLoadInit, 100);
+  }
+}
+
+// Init is called when the document has completed loading.  It downloads the
+// NativeClient modules.
+var Init = function() {
+  // service_url contains the location of the NativeClient module to be
+  // loaded as a service.
+  nacl_elt = document.getElementById('embed1');
+  PostLoadInit();
+}
+
+var embed1 = document.getElementById('embed1');
+
+]]</SCRIPT>
+
+</HEAD>
+<BODY id="bodyId" onload="Init();">
+
+<h1>OpenGL Demo</h1>
+ <p>
+  You should see below a spinning multi-colored triangle.
+ </p>
+<embed id="embed1" src="glsample.nexe"
+  type="application/x-nacl-srpc" width=512 height=512/>
+<br>
+
+</BODY>
+</HTML>

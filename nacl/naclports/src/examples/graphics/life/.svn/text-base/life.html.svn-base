@@ -1,0 +1,81 @@
+<html>
+<head>
+<TITLE>Life Demo</TITLE>
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+<META HTTP-EQUIV="Expires" CONTENT="-1">
+
+<script type="text/javascript">
+  // Set the global status message.  If the element with id 'status_field'
+  // exists, then set its HTML to the status message as well.
+  // opt_message The message test.  If this is null or undefined, then
+  //     attempt to set the element with id 'status_field' to the value of
+  //     |status_text|.
+  var life = null;
+  var updateInterval = null;
+  function updateStatus(opt_message) {
+    if (opt_message)
+      status_text = opt_message;
+    var status_field = document.getElementById('status_field');
+    if (status_field) {
+      status_field.innerHTML = status_text;
+    }
+  }
+
+  // use a 10ms update interval to drive frame rate
+  function moduleDidLoad() {
+    life = document.getElementById('life');
+    if (life != null) {
+      updateStatus('SUCCESS');
+      updateInterval = setInterval("life.update()", 10);
+    }
+  }
+
+  function pageDidUnload() {
+    clearInterval(updateInterval);
+  }
+
+</script>
+
+</head>
+<body id="bodyId" onunload="pageDidUnload();" >
+
+<h1>Conway's Life</h1>
+ <p>
+  Use the mouse to paint extra life into the simulation.
+ </p>
+
+  <div id="life_content"></div>
+  <script type="text/javascript">
+    contentDiv = document.getElementById('life_content');
+    if (window.location.hash == '#develop') {
+       // Load the develop version of the module.
+       contentDiv.innerHTML = '<embed name="nacl_module" '
+                              + 'id="life" '
+                              + 'width=200 height=200 '
+                              + 'type="pepper-application/life" '
+                              + 'dimension="2" />'
+      moduleDidLoad();
+    } else {
+      // Load the published .nexe.  This includes the 'nexes' attribute which
+      // shows how to load multi-architecture modules.  Each entry in the
+      // table is a key-value pair: the key is the runtime ('x86-32',
+      // 'x86-64', etc.); the value is a URL for the desired NaCl module.
+      var nexes = 'x86-32: life_x86_32.nexe\n'
+                  + 'x86-64: life_x86_64.nexe\n'
+                  + 'arm: life_arm.nexe ';
+      contentDiv.innerHTML = '<embed name="nacl_module" '
+                             + 'id="life" '
+                             + 'width=200 height=200 '
+                          // + 'nexes="' + nexes + '" '
+                             + 'type="application/x-nacl-srpc" '
+                             + 'dimensions="2" '
+                             + 'onload=moduleDidLoad() />';
+      // Note: this code is here to work around a bug in Chromium build
+      // #47357.  See also
+      // http://code.google.com/p/nativeclient/issues/detail?id=500
+      document.getElementById('life').nexes = nexes;
+    }
+  </script>
+<br>
+</body>
+</html>

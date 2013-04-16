@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/69/trunk/src/examples/srpc/client_server
+END
+install.sh
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/60/trunk/src/examples/srpc/client_server/install.sh
+END
+client.cc
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/60/trunk/src/examples/srpc/client_server/client.cc
+END
+client_server.html
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/60/trunk/src/examples/srpc/client_server/client_server.html
+END
+server.cc
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/60/trunk/src/examples/srpc/client_server/server.cc
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/69/trunk/src/examples/srpc/client_server/Makefile
+END

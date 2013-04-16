@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/svn/!svn/ver/84/trunk/src/build_tools
+END
+download_sdk.py
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/28/trunk/src/build_tools/download_sdk.py
+END
+buildbot_cleanup_packages.sh
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/83/trunk/src/build_tools/buildbot_cleanup_packages.sh
+END
+buildbot_build_packages.cmd
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/!svn/ver/83/trunk/src/build_tools/buildbot_build_packages.cmd
+END
+buildbot_build_packages.sh
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/83/trunk/src/build_tools/buildbot_build_packages.sh
+END
+buildbot_cleanup_packages.cmd
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/83/trunk/src/build_tools/buildbot_cleanup_packages.cmd
+END
+buildbot_sdk_setup.py
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/!svn/ver/84/trunk/src/build_tools/buildbot_sdk_setup.py
+END

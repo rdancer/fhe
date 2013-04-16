@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/!svn/ver/35/trunk/src/examples/needs_porting/quake
+END
+nacl_quake.patch
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/35/trunk/src/examples/needs_porting/quake/nacl_quake.patch
+END
+quake_x3.html
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/!svn/ver/35/trunk/src/examples/needs_porting/quake/quake_x3.html
+END
+quake.html
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/!svn/ver/35/trunk/src/examples/needs_porting/quake/quake.html
+END
+README.nacl
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/35/trunk/src/examples/needs_porting/quake/README.nacl
+END
+quake_x9.html
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/!svn/ver/35/trunk/src/examples/needs_porting/quake/quake_x9.html
+END
+nacl_file.c
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/35/trunk/src/examples/needs_porting/quake/nacl_file.c
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/35/trunk/src/examples/needs_porting/quake/Makefile
+END

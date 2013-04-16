@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <!--
+  Copyright (c) 2010 The Native Client SDK Authors. All rights reserved.
+  Use of this source code is governed by a BSD-style license that can be
+  found in the LICENSE file.
+  -->
+<head>
+  <title>Duality!</title>
+  
+  <script type="text/javascript">
+    // Global application objects.
+    proc_one = null;
+
+    // Indicates the shared state of the two application objects.
+    shared_object = 'UNINITIALIZED';
+    
+    // Updates the status field for |process| to indicate that it has loaded
+    // successfully.
+    function moduleDidLoad() {
+      proc_one = document.getElementById('process_one');
+      updateStatus('LOADED');
+    }
+
+    // If the page loads before the Native Client module loads, then set the
+    // status message indicating that the module is still loading.  Otherwise,
+    // do not change the status message.
+    // TODO(mlinck) populate
+    function pageDidLoad() {
+      if (proc_one == null) {
+        updateStatus('LOADING...', 1);
+      } else {
+        updateStatus('LOADED', 1);
+      }
+    }
+
+    // Tells |process| to read from the global status.
+    function sayHello() {
+      alert("SayHello says " + proc_one.HelloWorld());
+    }
+    
+    // Tells |process| to write to the global status.
+    function print42() {
+      var printer = proc_one.GetPrint42();
+      alert("Print42 says " + printer.Print42());
+    }
+    
+    // figures out which status field is to be updated and then updates it.
+    function updateStatus(message) {
+      var status_field = document.getElementById('status_one_field');
+      if (status_field) {
+        status_field.innerHTML = message;
+      } else {
+      //  alert("updatestatus could not find status field");
+      }
+    }
+  </script>
+</head>
+<body onload="pageDidLoad()">
+<!-- First draw the content... -->
+<h1>Example of Multiple Scriptable Objects</h1>
+<p>
+  Clicking on "Say Hello" simply calls Say Hello on the root scriptable 
+  instance.  Clicking on "Print 42" first gets a second scriptable instance
+  from SayHello, and then tries to call Print42 on it.
+</p>
+
+
+
+<button onclick="sayHello()">Say Hello</button>
+<button onclick="print42()">Print 42</button>
+
+
+<!-- ... then load modules -->
+<embed name="nacl_module_one"
+       id="process_one"
+       width=0 
+       height=0
+       type="application/x-nacl-srpc"/>
+
+<script type="text/javascript">
+  var nexes = 'x86-32: duality_x86_32.nexe\n'
+            + 'x86-64: duality_x86_64.nexe\n'
+            + 'ARM: duality_arm.nexe ';
+
+  document.getElementById('process_one').nexes = nexes;
+
+  moduleDidLoad();
+</script>
+
+<h2>Status</h2>
+Has our NaCl Module loaded?
+<br><br>
+Module 1:
+<div id="status_one_field">UNINITIALIZED</div>
+</body>
+</html>

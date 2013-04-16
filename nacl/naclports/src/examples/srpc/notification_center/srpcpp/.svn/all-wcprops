@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/67/trunk/src/examples/srpc/notification_center/srpcpp
+END
+listener_config_test.mk
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/!svn/ver/67/trunk/src/examples/srpc/notification_center/srpcpp/listener_config_test.mk
+END
+runtests.sh
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/!svn/ver/67/trunk/src/examples/srpc/notification_center/srpcpp/runtests.sh
+END
+listener_config.h
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/61/trunk/src/examples/srpc/notification_center/srpcpp/listener_config.h
+END
+method_functor-inl.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/!svn/ver/61/trunk/src/examples/srpc/notification_center/srpcpp/method_functor-inl.h
+END
+srpcpp.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/!svn/ver/61/trunk/src/examples/srpc/notification_center/srpcpp/srpcpp.h
+END
+listener_config_test.cc
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/!svn/ver/67/trunk/src/examples/srpc/notification_center/srpcpp/listener_config_test.cc
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/!svn/ver/67/trunk/src/examples/srpc/notification_center/srpcpp/Makefile
+END
+listener_config.cc
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/!svn/ver/61/trunk/src/examples/srpc/notification_center/srpcpp/listener_config.cc
+END

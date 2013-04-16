@@ -1,0 +1,107 @@
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/!svn/ver/101/trunk/src/examples/graphics/photo
+END
+photo.h
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/80/trunk/src/examples/graphics/photo/photo.h
+END
+npp_gate.cc
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/!svn/ver/85/trunk/src/examples/graphics/photo/npp_gate.cc
+END
+callback.h
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/80/trunk/src/examples/graphics/photo/callback.h
+END
+carpe.patch
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/!svn/ver/80/trunk/src/examples/graphics/photo/carpe.patch
+END
+loader.cc
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/!svn/ver/80/trunk/src/examples/graphics/photo/loader.cc
+END
+npn_bridge.cc
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/80/trunk/src/examples/graphics/photo/npn_bridge.cc
+END
+photo.html
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/80/trunk/src/examples/graphics/photo/photo.html
+END
+fastmath.h
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/80/trunk/src/examples/graphics/photo/fastmath.h
+END
+nacl_file.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/!svn/ver/80/trunk/src/examples/graphics/photo/nacl_file.c
+END
+photo_tool.sh
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/80/trunk/src/examples/graphics/photo/photo_tool.sh
+END
+scripting_bridge.cc
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/80/trunk/src/examples/graphics/photo/scripting_bridge.cc
+END
+scripting_bridge.h
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/!svn/ver/80/trunk/src/examples/graphics/photo/scripting_bridge.h
+END
+surface.cc
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/80/trunk/src/examples/graphics/photo/surface.cc
+END
+photo.cc
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/!svn/ver/80/trunk/src/examples/graphics/photo/photo.cc
+END
+sunspots.jpg
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/80/trunk/src/examples/graphics/photo/sunspots.jpg
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/!svn/ver/101/trunk/src/examples/graphics/photo/Makefile
+END
+surface.h
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/!svn/ver/80/trunk/src/examples/graphics/photo/surface.h
+END

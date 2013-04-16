@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/!svn/ver/86/trunk/src/gallery/pi_generator
+END
+montecarlopi.png
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/63/trunk/src/gallery/pi_generator/montecarlopi.png
+END
+pi_generator.html
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/65/trunk/src/gallery/pi_generator/pi_generator.html
+END
+pi_generator_x86_32.nexe
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/86/trunk/src/gallery/pi_generator/pi_generator_x86_32.nexe
+END
+pi_generator_x86_64.nexe
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/86/trunk/src/gallery/pi_generator/pi_generator_x86_64.nexe
+END

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+  <!--
+  Copyright (c) 2010 The Native Client SDK Authors. All rights reserved.
+  Use of this source code is governed by a BSD-style license that can be
+  found in the LICENSE file.
+  -->
+<head>
+  <title>Matrix Example</title>
+  
+  <script type="text/javascript">
+    // Global application objects.
+    proc_one = null;
+
+    // global object to hold app-specific values
+    var matrixApp = {
+      maxRows: 8,
+      maxColumns: 8
+    };
+
+    // Indicates the shared state of the two application objects.
+    shared_object = 'UNINITIALIZED';
+   
+    /**
+     * Updates the status field for |proc_one| to indicate that it has loaded
+     * successfully.
+     */
+    function moduleDidLoad() {
+      proc_one = document.getElementById('button1');
+      var status_field = document.getElementById('status_field');
+      updateStatus(status_field, 'LOADED');
+    }
+
+    /**
+     * If the page loads before the Native Client module loads, then set the
+     * status message indicating that the module is still loading.  Otherwise,
+     * do not change the status message.
+     */
+    function pageDidLoad() {
+      var multiply_field = document.getElementById('matrix_result');
+      var status_field = document.getElementById('status_field');
+      multiply_field.disable = true;
+      if (proc_one == null) {
+        updateStatus(status_field, 'LOADING...', 1);
+      } else {
+        updateStatus(status_field, 'LOADED', 1);
+      }
+    }
+
+    /**
+     * Calls |proc_one.ComputeAnswer| with table data (from the matrixform)
+     * as multiple args (scalar values).
+     * @param {object} matrixForm The form containing the html table
+     */
+    function invertMatrix(matrixForm) {
+      var width = 0;
+      var height = 0;
+      if (matrixForm == undefined || matrixForm == null) {
+         alert("Error, form is undefined or null");
+      }
+      var arrayData = []; 
+      var matrixWidth = 0;
+      var matrixHeight = 0;
+      var matrixIsValid = true;
+      for (var i = 0; i < matrixApp.maxColumns; ++i) {
+         var thisRowWidth = 0;
+         for (var j = 0; j < matrixApp.maxRows; j++) {
+            var index = i * matrixApp.maxRows + j;
+            // matrixForm.elements is a 1-d array
+            var cell = matrixForm.elements[index];
+            if (cell.value) {
+               ++thisRowWidth;  // width of this row is bigger
+               arrayData.push(cell.value);
+            }
+         }
+         // Handle the error case when we have an existing matrixWidth and a
+         // non-zero thisRowWidth that does not match it
+         if (matrixWidth !=0 && thisRowWidth != 0 
+            && thisRowWidth != matrixWidth) {
+              alert("Mismatch matrixWidth: " + matrixWidth + " thisRowWidth: "
+                    + thisRowWidth);
+            matrixIsValid = false;
+         }
+         // If matrixWidth is 0 and thisRowWidth is non-zero, set matrixWidth to
+         // this row's value
+         if (matrixWidth == 0 && thisRowWidth > 0) { matrixWidth = thisRowWidth;
+         }
+         // If this row has a non-zero width, increment matrixHeight 
+         // NOTE:  If it has the wrong number of columns, we'll catch that above
+         //        and set matrixIsValid to false
+         if (thisRowWidth>0) {
+            matrixHeight++;
+         }
+      }
+     
+      arrayData.unshift(matrixWidth, matrixHeight); 
+
+      // Convert the arrayData to a comma-separated list of values which can be
+      // part of a call to the C++ static method ComputeAnswer.  We will create
+      // a string with the array data as a series of individual scalar values,
+      // then eval it and get an answer back...
+      var javascriptCommand = "proc_one.ComputeAnswer(" + arrayData.join(",") 
+          + ")";
+      if(matrixIsValid) {
+         try {
+           var result = eval(javascriptCommand);
+           var multiply_field = document.getElementById('matrix_result');
+           multiply_field.innerHTML = result;
+         }
+         catch(exc) {
+           // Note that javascriptCommand is constructed and eval'd on the fly.
+           // If the user entered just numbers, we get a valid command and it
+           // works fine.  However, if the user entered 'hi' in one of the cell
+           // entries, then the eval will fail because it will treat 'hi' as a
+           // Javascript variable and, assuming it's not defined, will throw
+           // an exception.
+           alert('An error occurred executing "' + javascriptCommand
+                 + '" Error message:"' + exc.message + '"');
+         }
+      } else {
+         alert("Matrix is not valid!");
+      }
+    }
+    
+    /**
+     * Calls |proc_one.ComputeUsingArray| with the JS arrayObject
+     * as multiple args (scalar values).
+     * @param {object} matrixForm The form containing the html table
+     */
+    function transpose(matrixForm) {
+      // var matrixForm = document.forms[0]; // grab the only form on the doc
+      var arrayData = []; 
+      var matrixWidth = 0;
+      var matrixHeight = 0;
+      var matrixIsValid = true;
+
+      for (var i = 0; i < matrixApp.maxColumns; i++) {
+         var thisRowWidth = 0;
+         for (var j = 0; j < matrixApp.maxRows; j++) {
+            var index = i * matrixApp.maxRows + j;
+            // matrixForm.elements is a 1-d array
+            var cell = matrixForm.elements[index];
+            if(cell.value) {
+               thisRowWidth++; //width of this row is bigger
+               arrayData.push(cell.value);
+               // adds data as strings, we could use parseFloat in JS,
+               // but then non-numeric values are passed to C++ as 'NaN'
+            }
+         }
+         // If matrixWidth is 0 and thisRowWidth is non-zero, set matrixWidth to
+         // this row's value
+         if(matrixWidth == 0 && thisRowWidth > 0) {
+            matrixWidth = thisRowWidth;
+         }
+         // If this row has a non-zero width, increment matrixHeight 
+         // NOTE:  If it has the wrong number of columns, we'll catch that above
+         //   and set matrixIsValid to false
+         if (thisRowWidth>0) {
+            matrixHeight++;
+         }
+      }
+      if (matrixWidth > 0 && matrixHeight > 0) {
+        arrayData.unshift(matrixWidth, matrixHeight); 
+
+        var proc_one_info;
+        // Call C++ static method (ComputeUsingArray)
+        var result = proc_one.ComputeUsingArray(arrayData);
+        var result_field = document.getElementById('matrix_result2');
+        result_field.innerHTML = result;
+      }
+    }
+   
+    /**
+     * Updates the |status_field| with |message|
+     * @param {object} status_field Field that will be updated
+     * @param {string} Message written on the field
+     */
+    function updateStatus(status_field, message) {
+      if (status_field) {
+        status_field.innerHTML = message;
+      }
+    }
+  </script>
+</head>
+<body onload="pageDidLoad()">
+<!-- First draw the content... -->
+<h1>Example of passing tabular data as scalar parameters and as a Javascript
+    array</h1>
+<p>
+  Enter data in the table for a matrix.  The matrix does not have to be
+  square (same number of rows and columns) but each row must have the same
+  number of columns in it.
+  <BR>
+  Clicking on "Invert Matrix" calls a function with a comma-separated list
+  of arguments to the C++ code including
+  <a href="http://www.boost.org/">Boost</a> to invert the matrix if
+  it is square.  If the matrix is singular (cannot be inverted) then a text
+  message will be shown rather than the matrix.
+  The <a href="http://www.boost.org/doc/libs/1_44_0/libs/numeric/ublas/doc/index.htm">
+  Boost Linear Algebra Library</a> is used to perform the matrix operations.  
+  <BR>
+  Clicking on "Transpose Matrix" passed a Javascript array down to C++,
+  where <a href="http://www.boost.org/">Boost</a> is used to transpose the
+  matrix.
+</p>
+
+<form name="matrix_data">
+ <table border cellpadding=3>
+  <script type="text/javascript">
+     var row_num, column_num; 
+     for(row_num=0;row_num < matrixApp.maxRows; row_num++) {
+        document.write('<tr>\n');
+        for(column_num=0;column_num < matrixApp.maxColumns; column_num++) {
+           document.write('<td><input size="5"></td>\n');
+        }
+        document.write('</tr>\n');
+     }
+  </script>
+ </table>
+</form>
+
+
+<button onclick="invertMatrix(document.forms[0])">Invert Matrix</button>
+<button onclick="transpose(document.forms[0])">Transpose Matrix</button>
+
+<!-- ... then load modules -->
+<embed name="nacl_module_one"
+       id="button1"
+       width=0 
+       height=0
+       type="application/x-nacl-srpc"/>
+
+<script type="text/javascript">
+  var nexes = 'x86-32: matrix_x86_32.nexe\n'
+            + 'x86-64: matrix_x86_64.nexe\n'
+            + 'ARM: matrix_arm.nexe ';
+
+  document.getElementById('button1').nexes = nexes;
+
+  moduleDidLoad();
+</script>
+
+<h2>Status</h2>
+Has our NaCl Module loaded?
+<div id="status_field">UNINITIALIZED</div>
+<h2>Matrix invert output:</h2>
+<p id=matrix_result> NOT COMPUTED</p>
+<h2> Matrix transpose results </h2>
+<p id=matrix_result2> NOT COMPUTED</p>
+</body>
+</html>

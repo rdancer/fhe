@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/35/trunk/src/examples/needs_porting/glsample
+END
+glsample.html
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/35/trunk/src/examples/needs_porting/glsample/glsample.html
+END
+glsample.cc
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/35/trunk/src/examples/needs_porting/glsample/glsample.cc
+END
+README.nacl
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/35/trunk/src/examples/needs_porting/glsample/README.nacl
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/35/trunk/src/examples/needs_porting/glsample/Makefile
+END

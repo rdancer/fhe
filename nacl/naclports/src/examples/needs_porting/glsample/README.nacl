@@ -1,0 +1,15 @@
+An OpenGL demo for Native Client.
+
+If you haven't already installed these packages, please see
+
+  native_client_sdk/packages/README.txt
+
+Once you've installed these packages, you'll be able to build and run
+this demo.  From this directory run:
+
+  make release nacl run
+
+Once the demo is built, point your browser (with the Native
+Client plugin installed) to the glsample.html file in this directory.
+This html file will run the demo embedded in a web page.
+

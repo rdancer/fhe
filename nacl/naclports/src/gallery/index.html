@@ -1,0 +1,282 @@
+<!--
+  Copyright (c) 2010 The Native Client Authors. All rights reserved.
+  Use of this source code is governed by a BSD-style license that can be
+  found in the LICENSE file.
+-->
+
+<!DOCTYPE html PUBLIC
+    "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+.INFO {
+  font-weight: bold;
+  font-size: 100%;
+  margin: 0 0.25in 0 0.25in; 
+  background-color: white;
+  border: solid blue 5px;
+  padding: 5px; 
+}
+.WARNING {
+  font-weight: bold;
+  font-size: 125%;
+  margin: 0 0.25in 0 0.25in; 
+  background-color: yellow;
+  border: solid red 5px;
+  padding: 5px; 
+}
+.inactive_link {
+  font-weight: bold;
+  font-size: 100%;
+  color: grey;
+  text-decoration: line-through;
+}
+</style>
+
+<script type="text/javascript">
+  /**
+   * Determines if the plugin with name |name| exists in the browser.
+   * @param {string} name The name of the plugin.
+   * @return {bool} |true| if the plugin is found.
+   */
+  function pluginExists(name) {
+    var plugins = navigator["plugins"];
+    for (var index=0; index < plugins.length; index++) {
+      var plugin = plugins[index];
+      var plugin_name = plugin["name"];
+      if (plugin_name.indexOf(name) != -1) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  var naclGallery = {
+    chromeVersion: null,
+    validBrowser: false,
+    browserSupportMessage: '???'
+  };
+
+  /**
+   * Called return startup - before the DOM is set up so that naclGallery
+   * fields are set and can be used by the rest of the Javascript code.
+   * @param {Object} naclGalObj An object used to store version about
+   *     the browser and its support for NaCl.
+   */
+  function checkBrowser(naclGalObj) {
+    var appVersion = navigator['appVersion'];
+    var versionPatt = /Chrome\/(\d+)\.(\d+)\.(\d+)\.(\d+)/;
+    var result = appVersion.match(versionPatt);
+
+    //result stores the Chrome version number
+    if (!result) {
+      naclGalObj.browserSupportMessage = "This non-Chrome browser does NOT "
+        + " support native-client apps.";
+      naclGalObj.validBrowser = false; 
+    } else {
+      naclGalObj.chromeVersion = result[1];
+      //then we have a Chrome browswer, check version and/or plugin
+      if (naclGalObj.chromeVersion >= 6) {
+        var found_nacl = pluginExists("Native Client");
+        if (found_nacl) {
+          naclGalObj.browserSupportMessage = "Native Client plugin located"
+            + " in Google Chrome version " + naclGalObj.chromeVersion + ".";
+          naclGalObj.validBrowser = true;
+        } else {
+          naclGalObj.browserSupportMessage = "Native Client plugin missing!<BR>"
+          + "To run NativeClient modules you need to quit Google Chrome and"
+          + " restart it from the command line with the --enable-nacl flag.<BR>"
+          + "For more information see "
+          + '<a href="http://code.google.com/p/nativeclient-sdk/wiki/HowTo_RunModules#Step_2:_Launch_the_browser_with_--enable-nacl">'
+          + "Launch the browser with --enable-nacl</a>."
+          naclGalObj.validBrowser = false;
+        }
+      } else { 
+        naclGalObj.browserSupportMessage = "Google Chrome nacl cannot run"
+          + " in version " + naclGalObj.chromeVersion
+          + ". You need version 7 or version 6 with --enable-nacl!";
+        naclGalObj.validBrowser = false;
+      }
+    }
+  }
+
+  // Check for Native Client support in the browser before the DOM loads.
+  checkBrowser(naclGallery); 
+
+  /**
+   * The page onload event handler. Update the markup to reflect whether this is
+   * a valid version of the Google Chrome browser, and that it supports Native
+   * client modules.
+   */
+  function pageDidLoad() {
+    var nacl_status_field = document.getElementById('nacl_status');
+    if (!naclGallery.validBrowser) {
+      nacl_status_field.className = "WARNING";
+      nacl_status_field.innerHTML = "WARNING: " 
+        + naclGallery.browserSupportMessage
+        + "<BR>You can view the screenshots and source code for NaCl plugins"
+        + "<BR>but you will not be able to run the plugins in this browser";
+    } else {
+      nacl_status_field.className = "INFO";
+      nacl_status_field.innerHTML = "INFO: " 
+        + naclGallery.browserSupportMessage 
+        + "  To run the NaCl plugins within this browser, "
+        + "click 'Run' or click the plugin screenshot.";
+    }
+  }
+
+  /**
+   * Adds a link to the plugin page if naclGallery.validBrowser is true
+   * (i.e. if NaCl is enabled); otherwise it uses the inactive_link
+   * sytlesheet to show a greyed out link.
+   * @param {string} href The link (url) to the plugin page.
+   * @return {bool} |true| if the plugin is found.
+   */
+  function addNaclPluginLink(href) {
+    if (naclGallery.validBrowser) {
+      document.write('<BR><a href="' + href + '">Run</a>');
+    } else {
+      document.write("<BR><p class=inactive_link>Run</p>");
+    }
+  }
+
+  /**
+   * Adds an image for this plugin and, if NaCl is enabled, also makes
+   * the image a link to the plugin page.
+   * @param {string} imagelink The link (url) to the image.
+   * @param {string} href The link (url) to the plugin page.
+   * @return {bool} |true| if the plugin is found.
+   */
+  function addNaclImageLink(imagelink, href) {
+    if (naclGallery.validBrowser) {
+      document.write('<a href="' + href + '"><IMG src="'
+        + imagelink + '" width=100% alt="screenshot of NaCl-enabled app"></a>');
+    } else {
+      document.write('<IMG src="' + imagelink 
+         + '" width=100% alt=screenshot of NaCl-enabled app>');
+    }
+  }
+
+</script>
+
+<link href="http://code.google.com/css/codesite.css" rel="stylesheet" 
+ type="text/css" />
+<title>Gallery: Native Client Examples</title>
+</head>
+
+<body onload="pageDidLoad()">
+<h2>Gallery: Native Client Examples</h2>
+<BR>
+<div id="nacl_status"> </div>
+
+<p>This page lists the current Native Client (NaCl) examples, some of which 
+  are included with the
+<a href="http://code.google.com/p/nativeclient-sdk">download file</a>.</p>
+<p>To run these examples, you must use Chromium or Dev-channel version of 
+Google Chrome with the <code>--enable-nacl</code> flag. You can also use the 
+<a href="http://blog.chromium.org/2010/08/google-chrome-in-coal-mine.html">
+  Canary Build</a> to run them. Refer to
+<a href="http://code.google.com/p/nativeclient-sdk/wiki/HowTo_RunModules">
+  HowTo_RunModules</a> for further information.</p>
+<table>
+<tbody>
+<tr>
+  <td style="width: 75%;"><b>Hello World</b>
+    <p><b>Overview: </b>The Hello World example combines HTML, JavaScript, and 
+    C++ (the C++ is compiled to create a .nexe file). The .nexe code responds 
+    to button click events and calls the browser to show alert panels.</p>
+    <p></p>
+    <a href="http://code.google.com/p/nativeclient-sdk/source/browse/#svn/trunk/src/examples/hello_world">View source</a>
+    <script type="text/javascript">
+      addNaclPluginLink("hello_world/hello_world.html");
+    </script>
+  </td>
+  <td style="width: 25%;">
+    <script type="text/javascript">
+      addNaclImageLink("hello_world/hello.png", "hello_world/hello_world.html");
+    </script>
+  </td>
+</tr>
+<tr>
+  <td style="width: 75%;"><b>Pi Generator</b>
+    <p><b>Overview: </b>The Pi Generator example combines HTML, JavaScript, 
+    and C++ (the C++ is compiled to create a .nexe file). The .nexe code 
+    creates a thread that estimate pi using the Monte Carlo method while 
+    randomly putting 1,000,000,000 points inside a 2D square that shares two 
+    sides with a quarter circle. The 2D square is generated using the Pepper 2D
+    API. Pepper is an extension of the NPAPI or Netscape Plugin Application 
+    Programming API.</p>
+    <p></p>
+    <a href="http://code.google.com/p/nativeclient-sdk/source/browse/#svn/trunk/src/examples/pi_generator">View source</a>
+    <script type="text/javascript">
+      addNaclPluginLink("pi_generator/pi_generator.html");
+    </script>
+  </td>
+  <td style="width: 25%;">
+    <script type="text/javascript">
+      addNaclImageLink("pi_generator/montecarlopi.png", 
+        "pi_generator/pi_generator.html");
+    </script>
+  </td>
+</tr>
+<tr>
+  <td style="width: 75%;"><b>Sine Wave Synthesizer</b>
+    <p><b>Overview: </b>The Sine Wave Synthesizer example combines HTML, 
+    JavaScript, and C++ (the C++ is compiled to create a .nexe file). It 
+    synthesizes and plays a sine wave.  You can enter the frequency of the 
+    sine wave.  It uses Pepper Audio API to play the tone.</p>
+    <p></p>
+    <a href="http://code.google.com/p/nativeclient-sdk/source/browse/#svn/trunk/src/examples/sine_synth">View source</a>
+    <script type="text/javascript">
+      addNaclPluginLink("sine_synth/sine_synth.html");
+    </script>
+  </td>
+  <td style="width: 25%;">
+    <script type="text/javascript">
+      addNaclImageLink("sine_synth/sinewave.png", "sine_synth/sine_synth.html");
+    </script>
+  </td>
+</tr>
+<tr>
+  <td style="width: 75%;"><b>Tumbler</b>
+    <p><b>Overview: </b> The Tumbler example combines HTML, JavaScript, and C++
+    (the C++ is compiled to create a .nexe file). The .nexe code uses the 
+    Pepper 3D API to create a 3 dimensional cube that can be rotated using the 
+    left mouse button.</p>
+    <p></p>
+    <a href="http://code.google.com/p/nativeclient-sdk/source/browse/#svn/trunk/src/examples/tumbler">View source</a>
+    <script type="text/javascript">
+      addNaclPluginLink("tumbler/tumbler.html");
+    </script>
+  </td>
+  <td style="width: 25%;">
+    <script type="text/javascript">
+      addNaclImageLink("tumbler/tumbler.png", "tumbler/tumbler.html");
+    </script>
+  </td>
+</tr>
+<tr>
+  <td style="width: 75%;"><b>Life</b>
+    <p><b>Overview: </b> The Life example combines HTML and C++
+    (the C++ is compiled to create a .nexe file). The .nexe code implements 
+    the Life cellular automaton invented by British mathematiciaion John 
+    Horton Conway.  Use the mouse to paint extra life into the simulation.</p>
+    <p></p>
+    <a href="http://code.google.com/p/naclports/source/browse/#svn/trunk/src/examples/graphics/life">View source</a>
+    <script type="text/javascript">
+      addNaclPluginLink("life/life.html");
+    </script>
+  </td>
+  <td style="width: 25%;">
+    <script type="text/javascript">
+      addNaclImageLink("life/life.png", "life/life.html");
+    </script>
+  </td>
+</tr>
+
+</tbody> 
+</table> 
+</body> 
+</html>

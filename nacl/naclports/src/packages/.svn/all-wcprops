@@ -1,0 +1,113 @@
+K 25
+svn:wc:ra_dav:version-url
+V 36
+/svn/!svn/ver/118/trunk/src/packages
+END
+NOTICE
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/svn/!svn/ver/51/trunk/src/packages/NOTICE
+END
+URLS_TO_MIRROR
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/!svn/ver/18/trunk/src/packages/URLS_TO_MIRROR
+END
+nacl-check-package.cmd
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/26/trunk/src/packages/nacl-check-package.cmd
+END
+nacl-clean-repository.sh
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/!svn/ver/30/trunk/src/packages/nacl-clean-repository.sh
+END
+nacl-clean-all-bitsize.sh
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/!svn/ver/106/trunk/src/packages/nacl-clean-all-bitsize.sh
+END
+nacl-clean-repository-bitsize.cmd
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/!svn/ver/30/trunk/src/packages/nacl-clean-repository-bitsize.cmd
+END
+nacl-install-all.cmd
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/!svn/ver/26/trunk/src/packages/nacl-install-all.cmd
+END
+nacl-check-package.sh
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/!svn/ver/2/trunk/src/packages/nacl-check-package.sh
+END
+nacl-clean-repository-bitsize.sh
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/30/trunk/src/packages/nacl-clean-repository-bitsize.sh
+END
+nacl-install-all-bitsize.cmd
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/30/trunk/src/packages/nacl-install-all-bitsize.cmd
+END
+nacl-install-all.sh
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/!svn/ver/30/trunk/src/packages/nacl-install-all.sh
+END
+nacl-clean-all.cmd
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/26/trunk/src/packages/nacl-clean-all.cmd
+END
+nacl-install-all-bitsize.sh
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/113/trunk/src/packages/nacl-install-all-bitsize.sh
+END
+httpd.py
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/svn/!svn/ver/18/trunk/src/packages/httpd.py
+END
+README.txt
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/!svn/ver/69/trunk/src/packages/README.txt
+END
+nacl-clean-repository.cmd
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/26/trunk/src/packages/nacl-clean-repository.cmd
+END
+nacl-clean-all-bitsize.cmd
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/!svn/ver/30/trunk/src/packages/nacl-clean-all-bitsize.cmd
+END
+nacl-clean-all.sh
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/30/trunk/src/packages/nacl-clean-all.sh
+END

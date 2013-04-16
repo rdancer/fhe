@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <!--
+  Copyright (c) 2010 The Native Client Authors. All rights reserved.
+  Use of this source code is governed by a BSD-style license that can be
+  found in the LICENSE file.
+  -->
+  <head>
+    <title>Monte Carlo Estimate for Pi</title>
+    <script type="text/javascript">
+      var pi_generator = null;
+      var paintInterval = null;
+
+      function moduleDidLoad() {
+        pi_generator = document.getElementById('pi_generator');
+        paintInterval = setInterval(
+            "document.form.pi.value = pi_generator.paint()", 5);
+      }
+
+      function pageDidUnload() {
+        clearInterval(paintInterval);
+      }
+    </script>
+  </head>
+    <body id="bodyId" onunload="pageDidUnload()">
+    <h1>Monte Carlo Estimate for Pi</h1>
+    <p>
+      The Native Client module executed in this page creates a thread
+      that estimates pi (&pi;) using the Monte Carlo method.
+      The thread randomly puts 1,000,000,000 points
+      inside a square that shares two sides with a quarter circle (a quadrant).
+      Because the area of
+      the quadrant is r&#178;&pi;/4
+      and the area of
+      the square is r&#178;,
+      dividing the number of points inside the quadrant
+      by the number of points inside the square gives us
+      an estimate of &pi;/4.
+      The textbox under the square
+      shows the current estimate of &pi;.
+    </p>
+    <!-- For development, use a #develop location, which loads the develop
+    version of the module.
+    -->
+    <div id="nacl_pi_generator_content"></div>
+    <script type="text/javascript">
+      contentDiv = document.getElementById('nacl_pi_generator_content');
+      if (window.location.hash == '#develop') {
+        // Load the develop version of the module.
+        contentDiv.innerHTML = '<embed name="nacl_module" '
+                               + 'id="pi_generator" '
+                               + 'width=200 height=200 '
+                               + 'type="pepper-application/pi-generator" '
+                               + 'dimensions="2" />';
+        moduleDidLoad();
+      } else {
+        // Load the published .nexe.  This includes the 'nexes' attribute which
+        // shows how to load multi-architecture modules.  Each entry in the
+        // table is a key-value pair: the key is the runtime ('x86-32',
+        // 'x86-64', etc.); the value is a URL for the desired NaCl module.
+        var nexes = 'x86-32: pi_generator_x86_32.nexe\n'
+                    + 'x86-64: pi_generator_x86_64.nexe\n'
+                    + 'ARM: pi_generator_arm.nexe ';
+        contentDiv.innerHTML = '<embed name="nacl_module" '
+                               + 'id="pi_generator" '
+                               + 'width=200 height=200 '
+                            // + 'nexes="' + nexes + '" '
+                               + 'type="application/x-nacl-srpc" '
+                               + 'dimensions="2" '
+                               + 'onload=moduleDidLoad(); />';
+        // Note: this code is here to work around a bug in Chromium build
+        // #47357.  See also
+        // http://code.google.com/p/nativeclient/issues/detail?id=500
+        document.getElementById('pi_generator').nexes = nexes;
+      }
+    </script>
+    <br />
+    <form name="form">
+      <input type="text" size="15" name="pi" />
+    </form>
+  </body>
+</HTML>

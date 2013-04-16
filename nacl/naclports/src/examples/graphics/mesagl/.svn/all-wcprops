@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/!svn/ver/69/trunk/src/examples/graphics/mesagl
+END
+README.nacl
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/37/trunk/src/examples/graphics/mesagl/README.nacl
+END
+mesagl.html
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/37/trunk/src/examples/graphics/mesagl/mesagl.html
+END
+mesagl.cc
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/37/trunk/src/examples/graphics/mesagl/mesagl.cc
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/!svn/ver/69/trunk/src/examples/graphics/mesagl/Makefile
+END

@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 27
+/svn/!svn/ver/118/trunk/src
+END
+PRESUBMIT.py
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/svn/!svn/ver/59/trunk/src/PRESUBMIT.py
+END
+codereview.settings
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/!svn/ver/59/trunk/src/codereview.settings
+END
+DEPS
+K 25
+svn:wc:ra_dav:version-url
+V 31
+/svn/!svn/ver/69/trunk/src/DEPS
+END

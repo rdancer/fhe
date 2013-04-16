@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/!svn/ver/69/trunk/src/examples/srpc/notification_center
+END
+nc_client.cc
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/61/trunk/src/examples/srpc/notification_center/nc_client.cc
+END
+notification_center.html
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/61/trunk/src/examples/srpc/notification_center/notification_center.html
+END
+notification_center.cc
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/!svn/ver/61/trunk/src/examples/srpc/notification_center/notification_center.cc
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/!svn/ver/69/trunk/src/examples/srpc/notification_center/Makefile
+END

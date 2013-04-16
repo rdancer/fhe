@@ -1,0 +1,77 @@
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/69/trunk/src/examples/scriptable/duality
+END
+npp_gate.cc
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/!svn/ver/56/trunk/src/examples/scriptable/duality/npp_gate.cc
+END
+scripting_bridge.cc
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/56/trunk/src/examples/scriptable/duality/scripting_bridge.cc
+END
+say_hello.cc
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/56/trunk/src/examples/scriptable/duality/say_hello.cc
+END
+scripting_bridge.h
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/56/trunk/src/examples/scriptable/duality/scripting_bridge.h
+END
+say_hello.h
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/!svn/ver/56/trunk/src/examples/scriptable/duality/say_hello.h
+END
+print_number.cc
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/56/trunk/src/examples/scriptable/duality/print_number.cc
+END
+loader.cc
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/55/trunk/src/examples/scriptable/duality/loader.cc
+END
+print_number.h
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/!svn/ver/56/trunk/src/examples/scriptable/duality/print_number.h
+END
+scriptable.cc
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/56/trunk/src/examples/scriptable/duality/scriptable.cc
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/69/trunk/src/examples/scriptable/duality/Makefile
+END
+duality.html
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/56/trunk/src/examples/scriptable/duality/duality.html
+END
+scriptable.h
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/56/trunk/src/examples/scriptable/duality/scriptable.h
+END

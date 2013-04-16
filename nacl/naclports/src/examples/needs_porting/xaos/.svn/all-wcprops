@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/35/trunk/src/examples/needs_porting/xaos
+END
+xaos_tool.sh
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/35/trunk/src/examples/needs_porting/xaos/xaos_tool.sh
+END
+README.nacl
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/!svn/ver/35/trunk/src/examples/needs_porting/xaos/README.nacl
+END
+XaoS-3.4.patch
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/!svn/ver/35/trunk/src/examples/needs_porting/xaos/XaoS-3.4.patch
+END
+xaos.hlp
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/35/trunk/src/examples/needs_porting/xaos/xaos.hlp
+END
+xaos.html
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/35/trunk/src/examples/needs_porting/xaos/xaos.html
+END

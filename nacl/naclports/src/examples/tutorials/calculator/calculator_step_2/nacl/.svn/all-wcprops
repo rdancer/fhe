@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/calculator_step_2/nacl
+END
+calculator.h
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/calculator_step_2/nacl/calculator.h
+END
+calculator_module.cc
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/calculator_step_2/nacl/calculator_module.cc
+END
+calculator.cc
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/!svn/ver/100/trunk/src/examples/tutorials/calculator/calculator_step_2/nacl/calculator.cc
+END

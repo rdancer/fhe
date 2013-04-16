@@ -1,0 +1,15 @@
+# DO NOT DELETE
+
+edanticbase64.o: ../include/b64/encode.h ../include/b64/cencode.h
+edanticbase64.o: ../include/b64/decode.h ../include/b64/cdecode.h
+edanticbase64.o: /usr/include/stdlib.h /usr/include/features.h
+edanticbase64.o: /usr/include/bits/predefs.h /usr/include/sys/cdefs.h
+edanticbase64.o: /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h
+edanticbase64.o: /usr/include/gnu/stubs-64.h /usr/include/sys/types.h
+edanticbase64.o: /usr/include/bits/types.h /usr/include/bits/typesizes.h
+edanticbase64.o: /usr/include/time.h /usr/include/endian.h
+edanticbase64.o: /usr/include/bits/endian.h /usr/include/bits/byteswap.h
+edanticbase64.o: /usr/include/sys/select.h /usr/include/bits/select.h
+edanticbase64.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+edanticbase64.o: /usr/include/sys/sysmacros.h
+edanticbase64.o: /usr/include/bits/pthreadtypes.h /usr/include/alloca.h
