@@ -21,6 +21,11 @@
 #ifndef FHE_H
 #define FHE_H
 
+#ifdef __native_client__
+/* tommath.h results in some errors that go away when LTC_NO_PROTOTYPES is
+ * defined */
+# define LTC_NO_PROTOTYPES
+#endif /* __native_client__ */
 #include <tommath.h>
 #include <tomcrypt.h>
 #include <stdbool.h>
@@ -40,7 +45,9 @@
  * multiplication: log_2(99 × 99) = 14; plus 1 bit for sign.
  */ 
 typedef int32_t fhe_integer;
-#define FHE_INTEGER_BIT_WIDTH 11
+#ifndef FHE_INTEGER_BIT_WIDTH
+# define FHE_INTEGER_BIT_WIDTH 11
+#endif /* FHE_INTEGER_BIT_WIDTH */
 #define FHE_INTEGER_BIT_WIDTH_MULTIPLY FHE_INTEGER_BIT_WIDTH
 #define FHE_MASK(x) ((x) & (0xffffffff >> (32 - FHE_INTEGER_BIT_WIDTH)))
 
@@ -52,12 +59,12 @@ typedef int32_t fhe_integer;
 //#define assert(x) do {} while(0)
 
 #define bitsN /* λ  */ securityParameter
-#define bitsP /* λ² */ securityParameter * securityParameter
-#define bitsQ /* λ⁵ */ securityParameter \
+#define bitsP /* λ² */ (securityParameter * securityParameter)
+#define bitsQ /* λ⁵ */ (securityParameter \
 	* securityParameter \
 	* securityParameter \
 	* securityParameter \
-	* securityParameter
+	* securityParameter)
 
 
 #define INIT_MP_INT(x) \
