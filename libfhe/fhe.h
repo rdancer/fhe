@@ -28,6 +28,7 @@
 #endif /* __native_client__ */
 #include <tommath.h>
 #include <tomcrypt.h>
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -55,8 +56,6 @@ typedef int32_t fhe_integer;
 /*
  * Function macros and constants
  */
-
-//#define assert(x) do {} while(0)
 
 #define bitsN /* λ  */ securityParameter
 #define bitsP /* λ² */ (securityParameter * securityParameter)
@@ -92,10 +91,10 @@ typedef int32_t fhe_integer;
     } while (0)
 
 
+void fhe_initialize(unsigned long int mySecurityParameter);
 mp_int *fhe_new_random_integer(unsigned long long int numberOfBits);
 mp_int *fhe_encrypt_one_bit(bool plainTextBit);
 bool fhe_decrypt_one_bit(mp_int *encryptedBit);
-void fhe_initialize(unsigned long int mySecurityParameter);
 mp_int *fhe_xor_bits(mp_int *bit1, mp_int *bit2);
 mp_int *fhe_and_bits(mp_int *bit1, mp_int *bit2);
 mp_int **fhe_encrypt_integer(fhe_integer integer);

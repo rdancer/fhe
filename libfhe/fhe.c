@@ -20,7 +20,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <assert.h>
+#define assert(x) do {} while(0)
 
 #include "fhe.h"
 
