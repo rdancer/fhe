@@ -17,7 +17,8 @@
 
 CC = gcc
 CFLAGS += -std=c99 -ggdb -Wall -pg
-LDFLAGS = -pg -ltommath
+LDFLAGS = -pg
+LDLIBS = -ltommath
 
 .PHONY: all
 all: fhe
