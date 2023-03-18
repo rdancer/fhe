@@ -1,6 +1,6 @@
 # Fully Homomorphic Encryption
 
-*[To my knowledge, this was the first public implementation of a Fully Homomorphic Encryption scheme.]*
+*To my knowledge, this was the first public implementation of a Fully Homomorphic Encryption scheme.*
 
 ## Overview
 
